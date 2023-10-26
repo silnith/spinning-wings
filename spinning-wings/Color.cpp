@@ -3,7 +3,8 @@
 Color const Color::BLACK{ 0, 0, 0 };
 Color const Color::WHITE{ 1, 1, 1 };
 
-Color::Color(float r, float g, float b) noexcept : red{ r }, green{ g }, blue{ b }
+Color::Color(float red, float green, float blue) noexcept
+	: red{ red }, green{ green }, blue{ blue }
 {}
 
 float Color::getRed(void) const noexcept
