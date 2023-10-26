@@ -30,24 +30,24 @@ GLuint glMinorVersion;
 GLuint wingDisplayList;
 wing_list wings;
 
-CurveGenerator radiusChange{ 10.0f, -15.0f, 15.0f, false, 0.1f, 0.01f, 150 };
-CurveGenerator angleChange{ CurveGenerator::createGeneratorForAngles(0, 2, 0.05f, 120) };
-CurveGenerator deltaAngleChange{ CurveGenerator::createGeneratorForAngles(15, 0.2f, 0.02f, 80) };
-CurveGenerator zDeltaChange{ 0.5f, 0.4f, 0.7f, false, 0.01f, 0.001f, 200 };
-CurveGenerator rollChange{ CurveGenerator::createGeneratorForAngles(0, 1.0f, 0.25f, 80) };
-CurveGenerator pitchChange{ CurveGenerator::createGeneratorForAngles(0, 2.0f, 0.25f, 40) };
-CurveGenerator yawChange{ CurveGenerator::createGeneratorForAngles(0, 1.5f, 0.25f, 50) };
-CurveGenerator redMovement{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 95) };
-CurveGenerator greenMovement{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 40) };
-CurveGenerator blueMovement{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
+CurveGenerator radiusCurve{ 10.0f, -15.0f, 15.0f, false, 0.1f, 0.01f, 150 };
+CurveGenerator angleCurve{ CurveGenerator::createGeneratorForAngles(0.0f, 2.0f, 0.05f, 120) };
+CurveGenerator deltaAngleCurve{ CurveGenerator::createGeneratorForAngles(15.0f, 0.2f, 0.02f, 80) };
+CurveGenerator deltaZCurve{ 0.5f, 0.4f, 0.7f, false, 0.01f, 0.001f, 200 };
+CurveGenerator rollCurve{ CurveGenerator::createGeneratorForAngles(0.0f, 1.0f, 0.25f, 80) };
+CurveGenerator pitchCurve{ CurveGenerator::createGeneratorForAngles(0.0f, 2.0f, 0.25f, 40) };
+CurveGenerator yawCurve{ CurveGenerator::createGeneratorForAngles(0.0f, 1.5f, 0.25f, 50) };
+CurveGenerator redCurve{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 95) };
+CurveGenerator greenCurve{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 40) };
+CurveGenerator blueCurve{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
 
 void advanceAnimation(void)
 {
 	wings.pop_back();
-	wings.emplace_front(radiusChange.getNextValue(), angleChange.getNextValue(),
-		deltaAngleChange.getNextValue(), zDeltaChange.getNextValue(),
-		rollChange.getNextValue(), pitchChange.getNextValue(), yawChange.getNextValue(),
-		Color{ redMovement.getNextValue(), greenMovement.getNextValue(), blueMovement.getNextValue() },
+	wings.emplace_front(radiusCurve.getNextValue(), angleCurve.getNextValue(),
+		deltaAngleCurve.getNextValue(), deltaZCurve.getNextValue(),
+		rollCurve.getNextValue(), pitchCurve.getNextValue(), yawCurve.getNextValue(),
+		Color{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
 		Color::WHITE);
 }
 
@@ -137,7 +137,7 @@ HGLRC InitializeRenderingContext(HDC const& hdc)
 	return hglrc;
 }
 
-void ParseOpenGLVersion(GLubyte const * glVersion)
+void ParseOpenGLVersion(GLubyte const* glVersion)
 {
 	std::istringstream versionStringInput{ std::string{ reinterpret_cast<char const*>(glVersion) } };
 	//std::basic_istringstream<GLubyte> versionStringInput{ std::basic_string<GLubyte>{glVersion} };
@@ -178,6 +178,9 @@ void InitializeOpenGLState()
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
 	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+
+	glLoadIdentity();
+	gluLookAt(0, 50, 50, 0, 0, 13, 0, 0, 1);
 }
 
 void InitializeDisplayList()
@@ -196,19 +199,18 @@ void InitializeDisplayList()
 void DrawFrame()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
-	gluLookAt(0, 50, 50, 0, 0, 13, 0, 0, 1);
 
 	if (hasOpenGL(1, 1))
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glEnable(GL_POLYGON_OFFSET_LINE);
 		glPushMatrix();
-		wing_list::size_type count = 0;
-		for (Wing const & wing : wings) {
-			glTranslatef(0, 0, wing.getZDelta());
+		for (Wing const& wing : wings) {
+			glTranslatef(0, 0, wing.getDeltaZ());
+			glRotatef(wing.getDeltaAngle(), 0, 0, 1);
+
 			glPushMatrix();
-			glRotatef((wing.getAngle()) + count * (wing.getDeltaAngle()), 0, 0, 1);
+			glRotatef(wing.getAngle(), 0, 0, 1);
 			glTranslatef(wing.getRadius(), 0, 0);
 			glRotatef(-(wing.getYaw()), 0, 0, 1);
 			glRotatef(-(wing.getPitch()), 0, 1, 0);
@@ -216,18 +218,18 @@ void DrawFrame()
 			glColor3f(wing.getEdgeColor().getRed(), wing.getEdgeColor().getGreen(), wing.getEdgeColor().getBlue());
 			glCallList(wingDisplayList);
 			glPopMatrix();
-
-			count++;
 		}
 		glPopMatrix();
 		glDisable(GL_POLYGON_OFFSET_LINE);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
-	wing_list::size_type count = 0;
-	for (Wing const & wing : wings) {
-		glTranslatef(0, 0, wing.getZDelta());
+	glPushMatrix();
+	for (Wing const& wing : wings) {
+		glTranslatef(0, 0, wing.getDeltaZ());
+		glRotatef(wing.getDeltaAngle(), 0, 0, 1);
+
 		glPushMatrix();
-		glRotatef((wing.getAngle()) + count * (wing.getDeltaAngle()), 0, 0, 1);
+		glRotatef(wing.getAngle(), 0, 0, 1);
 		glTranslatef(wing.getRadius(), 0, 0);
 		glRotatef(-(wing.getYaw()), 0, 0, 1);
 		glRotatef(-(wing.getPitch()), 0, 1, 0);
@@ -235,9 +237,8 @@ void DrawFrame()
 		glColor3f(wing.getColor().getRed(), wing.getColor().getGreen(), wing.getColor().getBlue());
 		glCallList(wingDisplayList);
 		glPopMatrix();
-
-		count++;
 	}
+	glPopMatrix();
 
 	glFlush();
 }

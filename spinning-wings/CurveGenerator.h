@@ -8,8 +8,15 @@
 class CurveGenerator
 {
 public:
+	CurveGenerator(void) = delete;
+	~CurveGenerator(void) = default;
+	CurveGenerator(CurveGenerator const& curveGenerator) = delete;
+	CurveGenerator& operator=(CurveGenerator const& curveGenerator) = delete;
+	CurveGenerator(CurveGenerator&& curveGenerator) = delete;
+	CurveGenerator& operator=(CurveGenerator&& curveGenerator) = delete;
+public:
 	/// <summary>
-	/// Constructor
+	/// Creates a new curve generator.
 	/// </summary>
 	/// <param name="_initialValue">the initial value of the curve</param>
 	/// <param name="_minimumValue">the minimum value of the curve</param>
@@ -18,7 +25,7 @@ public:
 	/// <param name="_maximumVelocity">the maximum velocity, or slope of the curve</param>
 	/// <param name="_maximumAcceleration">the maximum acceleration for curve changes</param>
 	/// <param name="_ticksPerAccelerationChange">the number of values to generate before the acceleration changes</param>
-	CurveGenerator(float _initialValue, float _minimumValue, float _maximumValue, bool _valueWraps,
+	explicit CurveGenerator(float _initialValue, float _minimumValue, float _maximumValue, bool _valueWraps,
 		float _maximumVelocity, float _maximumAcceleration, unsigned int _ticksPerAccelerationChange);
 
 	/// <summary>
@@ -42,17 +49,65 @@ public:
 	static CurveGenerator createGeneratorForColorComponents(float initialValue, float maximumVelocity, float maximumAcceleration, unsigned int ticksPerAccelerationChange);
 
 public:
-	float getMinimumValue(void) const;
-	float getMaximumValue(void) const;
-	bool isValueWraps(void) const;
-	float getMaximumVelocity(void) const;
-	float getMaximumAcceleration(void) const;
-	unsigned int getTicksPerAccelerationChange(void) const;
+	/// <summary>
+	/// Returns the minimum allowed value for the curve.
+	/// </summary>
+	/// <returns>the minimum curve value</returns>
+	float getMinimumValue(void) const noexcept;
+	
+	/// <summary>
+	/// Returns the maximum allowed value for the curve.
+	/// </summary>
+	/// <returns>the maximum curve value</returns>
+	float getMaximumValue(void) const noexcept;
+	
+	/// <summary>
+	/// Returns whether curve values wrap between maximum and minimum when they overflow.
+	/// </summary>
+	/// <returns><c>true</c> if exceeding the maximum value should wrap to the minimum value</returns>
+	bool isValueWraps(void) const noexcept;
+	
+	/// <summary>
+	/// Returns the maximum rate at which the curve value is allowed to change.
+	/// </summary>
+	/// <returns>the maximum difference between successive curve values</returns>
+	float getMaximumVelocity(void) const noexcept;
 
-	float getValue(void) const;
-	float getVelocity(void) const;
-	float getAcceleration(void) const;
-	unsigned int getTicks(void) const;
+	/// <summary>
+	/// Returns the maximum acceleration for curve changes.
+	/// </summary>
+	/// <returns>the maximum amount the velocity is allowed to change between successive curve values</returns>
+	float getMaximumAcceleration(void) const noexcept;
+
+	/// <summary>
+	/// Returns the number of curve values to return before changing the curve acceleration.
+	/// </summary>
+	/// <returns>the number of curve values that may be returned before the acceleration changes</returns>
+	unsigned int getTicksPerAccelerationChange(void) const noexcept;
+
+	/// <summary>
+	/// Returns the current value of the curve.
+	/// </summary>
+	/// <returns></returns>
+	float getValue(void) const noexcept;
+
+	/// <summary>
+	/// Returns the current velocity of the curve.  This is the amount the curve value has changed since the last value.
+	/// </summary>
+	/// <returns>the current curve velocity</returns>
+	float getVelocity(void) const noexcept;
+
+	/// <summary>
+	/// Returns the current acceleration of the curve.  This is the amount that the curve velocity has changed since the last curve value.
+	/// </summary>
+	/// <returns>the current curve acceleration</returns>
+	float getAcceleration(void) const noexcept;
+
+	/// <summary>
+	/// Returns the number of curve values retrieved since the last time the curve acceleration changed.
+	/// </summary>
+	/// <returns>the number of curve values since the last change in acceleration</returns>
+	unsigned int getTicks(void) const noexcept;
 
 	/// <summary>
 	/// Advances the tick count, applies velocity and acceleration, and returns the next value for the random curve.
@@ -68,14 +123,19 @@ private:
 	float const maximumVelocity;
 	float const maximumAcceleration;
 	unsigned int const ticksPerAccelerationChange;
-	std::uniform_real_distribution<float> const distributor;
+	std::uniform_real_distribution<float> const distributor{ -maximumAcceleration, maximumAcceleration };
 
 private:
-	float value;
-	float velocity;
-	float acceleration;
-	unsigned int ticks;
+	float value{ 0 };
+	float velocity{ 0 };
+	float acceleration{ 0 };
+	unsigned int ticks{ ticksPerAccelerationChange };
 
+	/// <summary>
+	/// Advances the tick count, which may or may not trigger a change in acceleration.
+	/// Then applies the current acceleration to the velocity,
+	/// and aplies the current velocity to the current curve value.
+	/// </summary>
 	void advanceTick(void);
 
 private:

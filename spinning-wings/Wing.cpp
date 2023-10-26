@@ -1,12 +1,12 @@
 #include "Wing.h"
 
 
-Wing::Wing(float _radius, float _angle, float _angleDelta, float _deltaZ,
-	float _roll, float _pitch, float _yaw,
-	Color const& _color, Color const& _edgeColor) noexcept
-	: radius{ _radius }, angle{ _angle }, angleDelta{ _angleDelta }, deltaZ{ _deltaZ },
-	roll{ _roll }, pitch{ _pitch }, yaw{ _yaw },
-	color{ _color }, edgeColor{ _edgeColor }
+Wing::Wing(float radius, float angle, float deltaAngle, float deltaZ,
+	float roll, float pitch, float yaw,
+	Color const& color, Color const& edgeColor) noexcept
+	: radius{ radius }, angle{ angle }, deltaAngle{ deltaAngle }, deltaZ{ deltaZ },
+	roll{ roll }, pitch{ pitch }, yaw{ yaw },
+	color{ color }, edgeColor{ edgeColor }
 {}
 
 float Wing::getRadius(void) const noexcept
@@ -21,10 +21,10 @@ float Wing::getAngle(void) const noexcept
 
 float Wing::getDeltaAngle(void) const noexcept
 {
-	return angleDelta;
+	return deltaAngle;
 }
 
-float Wing::getZDelta(void) const noexcept
+float Wing::getDeltaZ(void) const noexcept
 {
 	return deltaZ;
 }

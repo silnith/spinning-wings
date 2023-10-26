@@ -10,11 +10,8 @@ CurveGenerator::CurveGenerator(float _initialValue, float _minimumValue, float _
 	float _maximumVelocity, float _maximumAcceleration, unsigned int _ticksPerAccelerationChange)
 	: minimumValue{ _minimumValue }, maximumValue{ _maximumValue }, valueWraps{ _valueWraps },
 	maximumVelocity{ _maximumVelocity }, maximumAcceleration{ _maximumAcceleration }, ticksPerAccelerationChange{ _ticksPerAccelerationChange },
-	distributor{ -_maximumAcceleration, _maximumAcceleration },
-	value{ _initialValue }, velocity{ 0 }, acceleration{ 0 }, ticks{ _ticksPerAccelerationChange }
-{
-	//ticks = std::uniform_int_distribution<unsigned int>{ 0, ticksPerAccelerationChange }(randomDevice);
-}
+	value{ _initialValue }
+{}
 
 CurveGenerator CurveGenerator::createGeneratorForAngles(float initialValue, float maximumVelocity, float maximumAcceleration, unsigned int ticksPerAccelerationChange)
 {
@@ -26,52 +23,52 @@ CurveGenerator CurveGenerator::createGeneratorForColorComponents(float initialVa
 	return CurveGenerator{ initialValue, 0.0f, 1.0f, false, maximumVelocity, maximumAcceleration, ticksPerAccelerationChange };
 }
 
-float CurveGenerator::getMinimumValue(void) const
+float CurveGenerator::getMinimumValue(void) const noexcept
 {
 	return minimumValue;
 }
 
-float CurveGenerator::getMaximumValue(void) const
+float CurveGenerator::getMaximumValue(void) const noexcept
 {
 	return maximumValue;
 }
 
-bool CurveGenerator::isValueWraps(void) const
+bool CurveGenerator::isValueWraps(void) const noexcept
 {
 	return valueWraps;
 }
 
-float CurveGenerator::getMaximumVelocity(void) const
+float CurveGenerator::getMaximumVelocity(void) const noexcept
 {
 	return maximumVelocity;
 }
 
-float CurveGenerator::getMaximumAcceleration(void) const
+float CurveGenerator::getMaximumAcceleration(void) const noexcept
 {
 	return maximumAcceleration;
 }
 
-unsigned int CurveGenerator::getTicksPerAccelerationChange(void) const
+unsigned int CurveGenerator::getTicksPerAccelerationChange(void) const noexcept
 {
 	return ticksPerAccelerationChange;
 }
 
-float CurveGenerator::getValue(void) const
+float CurveGenerator::getValue(void) const noexcept
 {
 	return value;
 }
 
-float CurveGenerator::getVelocity(void) const
+float CurveGenerator::getVelocity(void) const noexcept
 {
 	return velocity;
 }
 
-float CurveGenerator::getAcceleration(void) const
+float CurveGenerator::getAcceleration(void) const noexcept
 {
 	return acceleration;
 }
 
-unsigned int CurveGenerator::getTicks(void) const
+unsigned int CurveGenerator::getTicks(void) const noexcept
 {
 	return ticks;
 }
@@ -98,5 +95,5 @@ void CurveGenerator::advanceTick(void)
 float CurveGenerator::getNextValue(void)
 {
 	advanceTick();
-	return value;
+	return getValue();
 }
