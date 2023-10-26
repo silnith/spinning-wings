@@ -3,16 +3,8 @@
 class Color
 {
 public:
-	/*
-	 * These are the implicitly-generated C++ members.
-	 *  - default constructor
-	 *  - destructor
-	 *  - copy constructor
-	 *  - copy assignment operator
-	 *  - move constructor
-	 *  - move assignment operator
-	 */
 	Color(void) noexcept = default;
+	~Color(void) noexcept = default;
 	Color(Color const&) noexcept = default;
 	Color& operator=(Color const&) noexcept = default;
 	Color(Color&&) noexcept = default;
@@ -59,7 +51,7 @@ public:
 	static Color const WHITE;
 
 private:
-	float const red{ 1 };
-	float const green{ 1 };
-	float const blue{ 1 };
+	float const red{ 0 };
+	float const green{ 0 };
+	float const blue{ 0 };
 };
