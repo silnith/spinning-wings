@@ -6,11 +6,11 @@
 
 std::random_device CurveGenerator::randomDevice{ "default" };
 
-CurveGenerator::CurveGenerator(float _initialValue, float _minimumValue, float _maximumValue, bool _valueWraps,
-	float _maximumVelocity, float _maximumAcceleration, unsigned int _ticksPerAccelerationChange)
-	: minimumValue{ _minimumValue }, maximumValue{ _maximumValue }, valueWraps{ _valueWraps },
-	maximumVelocity{ _maximumVelocity }, maximumAcceleration{ _maximumAcceleration }, ticksPerAccelerationChange{ _ticksPerAccelerationChange },
-	value{ _initialValue }
+CurveGenerator::CurveGenerator(float initialValue, float minimumValue, float maximumValue, bool valueWraps,
+	float maximumVelocity, float maximumAcceleration, unsigned int ticksPerAccelerationChange)
+	: minimumValue{ minimumValue }, maximumValue{ maximumValue }, valueWraps{ valueWraps },
+	maximumVelocity{ maximumVelocity }, maximumAcceleration{ maximumAcceleration }, ticksPerAccelerationChange{ ticksPerAccelerationChange },
+	value{ initialValue }
 {}
 
 CurveGenerator CurveGenerator::createGeneratorForAngles(float initialValue, float maximumVelocity, float maximumAcceleration, unsigned int ticksPerAccelerationChange)

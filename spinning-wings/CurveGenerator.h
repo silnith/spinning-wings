@@ -18,15 +18,15 @@ public:
 	/// <summary>
 	/// Creates a new curve generator.
 	/// </summary>
-	/// <param name="_initialValue">the initial value of the curve</param>
-	/// <param name="_minimumValue">the minimum value of the curve</param>
-	/// <param name="_maximumValue">the maximum value of the curve</param>
-	/// <param name="_valueWraps">whether curve values map from the maximum value to the minimum value</param>
-	/// <param name="_maximumVelocity">the maximum velocity, or slope of the curve</param>
-	/// <param name="_maximumAcceleration">the maximum acceleration for curve changes</param>
-	/// <param name="_ticksPerAccelerationChange">the number of values to generate before the acceleration changes</param>
-	explicit CurveGenerator(float _initialValue, float _minimumValue, float _maximumValue, bool _valueWraps,
-		float _maximumVelocity, float _maximumAcceleration, unsigned int _ticksPerAccelerationChange);
+	/// <param name="initialValue">the initial value of the curve</param>
+	/// <param name="minimumValue">the minimum value of the curve</param>
+	/// <param name="maximumValue">the maximum value of the curve</param>
+	/// <param name="valueWraps">whether curve values map from the maximum value to the minimum value</param>
+	/// <param name="maximumVelocity">the maximum velocity, or slope of the curve</param>
+	/// <param name="maximumAcceleration">the maximum acceleration for curve changes</param>
+	/// <param name="ticksPerAccelerationChange">the number of values to generate before the acceleration changes</param>
+	explicit CurveGenerator(float initialValue, float minimumValue, float maximumValue, bool valueWraps,
+		float maximumVelocity, float maximumAcceleration, unsigned int ticksPerAccelerationChange);
 
 	/// <summary>
 	/// Returns a CurveGenerator for angles.
@@ -88,7 +88,7 @@ public:
 	/// <summary>
 	/// Returns the current value of the curve.
 	/// </summary>
-	/// <returns></returns>
+	/// <returns>the current curve value</returns>
 	float getValue(void) const noexcept;
 
 	/// <summary>
