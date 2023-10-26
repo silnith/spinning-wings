@@ -20,29 +20,32 @@
 #include "Wing.h"
 #include "CurveGenerator.h"
 
-const UINT updateDelayMilliseconds = 35;
+typedef std::deque<Wing> wing_list;
+
+UINT const updateDelayMilliseconds = 35;
 
 GLuint glMajorVersion;
 GLuint glMinorVersion;
 
 GLuint wingDisplayList;
-std::deque<Wing> wings;
+wing_list wings;
 
-CurveGenerator redMovement{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 95) };
-CurveGenerator greenMovement{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 40) };
-CurveGenerator blueMovement{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
-CurveGenerator rollChange{ CurveGenerator::createGeneratorForAngles(0, 1.0f, 0.25f, 80) };
-CurveGenerator pitchChange{ CurveGenerator::createGeneratorForAngles(0, 2.0f, 0.25f, 40) };
-CurveGenerator yawChange{ CurveGenerator::createGeneratorForAngles(0, 1.5f, 0.25f, 50) };
 CurveGenerator radiusChange{ 10.0f, -15.0f, 15.0f, false, 0.1f, 0.01f, 150 };
 CurveGenerator angleChange{ CurveGenerator::createGeneratorForAngles(0, 2, 0.05f, 120) };
 CurveGenerator deltaAngleChange{ CurveGenerator::createGeneratorForAngles(15, 0.2f, 0.02f, 80) };
 CurveGenerator zDeltaChange{ 0.5f, 0.4f, 0.7f, false, 0.01f, 0.001f, 200 };
+CurveGenerator rollChange{ CurveGenerator::createGeneratorForAngles(0, 1.0f, 0.25f, 80) };
+CurveGenerator pitchChange{ CurveGenerator::createGeneratorForAngles(0, 2.0f, 0.25f, 40) };
+CurveGenerator yawChange{ CurveGenerator::createGeneratorForAngles(0, 1.5f, 0.25f, 50) };
+CurveGenerator redMovement{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 95) };
+CurveGenerator greenMovement{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 40) };
+CurveGenerator blueMovement{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
 
 void advanceAnimation(void)
 {
 	wings.pop_back();
-	wings.emplace_front(radiusChange.getNextValue(), angleChange.getNextValue(), deltaAngleChange.getNextValue(), zDeltaChange.getNextValue(),
+	wings.emplace_front(radiusChange.getNextValue(), angleChange.getNextValue(),
+		deltaAngleChange.getNextValue(), zDeltaChange.getNextValue(),
 		rollChange.getNextValue(), pitchChange.getNextValue(), yawChange.getNextValue(),
 		Color{ redMovement.getNextValue(), greenMovement.getNextValue(), blueMovement.getNextValue() },
 		Color::WHITE);
@@ -69,7 +72,7 @@ BOOL MonitorEnumProc(HMONITOR hMonitor, HDC hdc, LPRECT lpRect, LPARAM d)
 /// </summary>
 /// <param name="hdc">a handle to the device context</param>
 /// <returns>the identifier for the pixel format</returns>
-int InitializeDeviceContext(const HDC & hdc)
+int InitializeDeviceContext(HDC const & hdc)
 {
 	PIXELFORMATDESCRIPTOR pfd{};
 	pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
@@ -127,16 +130,16 @@ int InitializeDeviceContext(const HDC & hdc)
 /// </summary>
 /// <param name="hdc">a handle to the device context</param>
 /// <returns>a handle to the rendering context</returns>
-HGLRC InitializeRenderingContext(const HDC& hdc)
+HGLRC InitializeRenderingContext(HDC const& hdc)
 {
 	HGLRC hglrc = wglCreateContext(hdc);
 	BOOL success = wglMakeCurrent(hdc, hglrc);
 	return hglrc;
 }
 
-void ParseOpenGLVersion(const GLubyte* glVersion)
+void ParseOpenGLVersion(GLubyte const * glVersion)
 {
-	std::istringstream versionStringInput{ std::string{ reinterpret_cast<const char*>(glVersion) } };
+	std::istringstream versionStringInput{ std::string{ reinterpret_cast<char const*>(glVersion) } };
 	//std::basic_istringstream<GLubyte> versionStringInput{ std::basic_string<GLubyte>{glVersion} };
 
 	versionStringInput >> glMajorVersion;
@@ -148,10 +151,10 @@ void ParseOpenGLVersion(const GLubyte* glVersion)
 
 void InitializeOpenGLState()
 {
-	const GLubyte* glVendor = glGetString(GL_VENDOR);
-	const GLubyte* glRenderer = glGetString(GL_RENDERER);
-	const GLubyte* glVersion = glGetString(GL_VERSION);
-	const GLubyte* glExtensions = glGetString(GL_EXTENSIONS);
+	GLubyte const* glVendor = glGetString(GL_VENDOR);
+	GLubyte const* glRenderer = glGetString(GL_RENDERER);
+	GLubyte const* glVersion = glGetString(GL_VERSION);
+	GLubyte const* glExtensions = glGetString(GL_EXTENSIONS);
 
 	assert(glVendor != NULL);
 	assert(glRenderer != NULL);
@@ -201,16 +204,16 @@ void DrawFrame()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glEnable(GL_POLYGON_OFFSET_LINE);
 		glPushMatrix();
-		std::deque<Wing>::size_type count = 0;
-		for (std::deque<Wing>::const_iterator i = wings.cbegin(); i != wings.cend(); i++) {
-			glTranslatef(0, 0, i->getZDelta());
+		wing_list::size_type count = 0;
+		for (Wing const & wing : wings) {
+			glTranslatef(0, 0, wing.getZDelta());
 			glPushMatrix();
-			glRotatef((i->getAngle()) + count * (i->getDeltaAngle()), 0, 0, 1);
-			glTranslatef(i->getRadius(), 0, 0);
-			glRotatef(-(i->getYaw()), 0, 0, 1);
-			glRotatef(-(i->getPitch()), 0, 1, 0);
-			glRotatef(i->getRoll(), 1, 0, 0);
-			glColor3f(i->getEdgeColor().getRed(), i->getEdgeColor().getGreen(), i->getEdgeColor().getBlue());
+			glRotatef((wing.getAngle()) + count * (wing.getDeltaAngle()), 0, 0, 1);
+			glTranslatef(wing.getRadius(), 0, 0);
+			glRotatef(-(wing.getYaw()), 0, 0, 1);
+			glRotatef(-(wing.getPitch()), 0, 1, 0);
+			glRotatef(wing.getRoll(), 1, 0, 0);
+			glColor3f(wing.getEdgeColor().getRed(), wing.getEdgeColor().getGreen(), wing.getEdgeColor().getBlue());
 			glCallList(wingDisplayList);
 			glPopMatrix();
 
@@ -220,16 +223,16 @@ void DrawFrame()
 		glDisable(GL_POLYGON_OFFSET_LINE);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
-	std::deque<Wing>::size_type count = 0;
-	for (std::deque<Wing>::const_iterator i = wings.cbegin(); i != wings.cend(); i++) {
-		glTranslatef(0, 0, i->getZDelta());
+	wing_list::size_type count = 0;
+	for (Wing const & wing : wings) {
+		glTranslatef(0, 0, wing.getZDelta());
 		glPushMatrix();
-		glRotatef((i->getAngle()) + count * (i->getDeltaAngle()), 0, 0, 1);
-		glTranslatef(i->getRadius(), 0, 0);
-		glRotatef(-(i->getYaw()), 0, 0, 1);
-		glRotatef(-(i->getPitch()), 0, 1, 0);
-		glRotatef(i->getRoll(), 1, 0, 0);
-		glColor3f(i->getColor().getRed(), i->getColor().getGreen(), i->getColor().getBlue());
+		glRotatef((wing.getAngle()) + count * (wing.getDeltaAngle()), 0, 0, 1);
+		glTranslatef(wing.getRadius(), 0, 0);
+		glRotatef(-(wing.getYaw()), 0, 0, 1);
+		glRotatef(-(wing.getPitch()), 0, 1, 0);
+		glRotatef(wing.getRoll(), 1, 0, 0);
+		glColor3f(wing.getColor().getRed(), wing.getColor().getGreen(), wing.getColor().getBlue());
 		glCallList(wingDisplayList);
 		glPopMatrix();
 
