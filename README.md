@@ -48,3 +48,11 @@ This version has been cleaned up and refactored from the original source code I 
 in school.  Most prominently it now uses the Win32 API rather than GLUT.  I also
 improved and refined its use of STL and the encapsulation of the utility code that
 generates the randomized curves.
+
+The use of the Windows API is minimal.  Every function called should be available as
+far back as Windows 2000.  (Possibly older, but Windows 2000 is the oldest version
+documented in Microsoft's online documentation.)  Building using Visual Studio should
+generate a manifest file that identifies the executable as per-monitor DPI-aware,
+though the program has no text elements that need to be scaled.  The purpose of marking
+the executable thusly is to prevent Windows from attempting to perform any sort of
+bitmap-based window scaling.
