@@ -1,5 +1,7 @@
 #pragma once
 
+//#include <gl/GL.h>
+
 #include "Color.h"
 
 /// <summary>
@@ -32,6 +34,8 @@ public:
 	Wing(Wing&& wing) noexcept = default;
 	Wing& operator=(Wing&& wing) noexcept = default;
 public:
+	Wing(unsigned int displayList) noexcept;
+
 	/// <summary>
 	/// Creates a new wing with the provided parameters.
 	/// </summary>
@@ -44,11 +48,14 @@ public:
 	/// <param name="yaw">the yaw of the wing</param>
 	/// <param name="color">the color of the wing</param>
 	/// <param name="edgeColor">the color of the edge of the wing</param>
-	Wing(float radius, float angle,
+	Wing(unsigned int displayList,
+		float radius, float angle,
 		float deltaAngle, float deltaZ,
 		float roll, float pitch, float yaw,
 		Color const& color,
 		Color const& edgeColor) noexcept;
+
+	unsigned int getGLDisplayList(void) const noexcept;
 
 	/// <summary>
 	/// Returns the distance of the wing from the central axis around which they all rotate.
@@ -110,6 +117,7 @@ public:
 	Color const& getEdgeColor(void) const noexcept;
 
 private:
+	unsigned int const displayList{ 0 };
 	float const radius{ 10 };
 	float const angle{ 0 };
 	float const deltaAngle{ 15 };

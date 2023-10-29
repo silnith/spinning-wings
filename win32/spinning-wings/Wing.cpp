@@ -1,13 +1,22 @@
 #include "Wing.h"
 
+Wing::Wing(unsigned int displayList) noexcept : displayList{ displayList }
+{}
 
-Wing::Wing(float radius, float angle, float deltaAngle, float deltaZ,
+Wing::Wing(unsigned int displayList,
+	float radius, float angle, float deltaAngle, float deltaZ,
 	float roll, float pitch, float yaw,
 	Color const& color, Color const& edgeColor) noexcept
-	: radius{ radius }, angle{ angle }, deltaAngle{ deltaAngle }, deltaZ{ deltaZ },
+	: displayList{ displayList },
+	radius{ radius }, angle{ angle }, deltaAngle{ deltaAngle }, deltaZ{ deltaZ },
 	roll{ roll }, pitch{ pitch }, yaw{ yaw },
 	color{ color }, edgeColor{ edgeColor }
 {}
+
+unsigned int Wing::getGLDisplayList(void) const noexcept
+{
+	return displayList;
+}
 
 float Wing::getRadius(void) const noexcept
 {

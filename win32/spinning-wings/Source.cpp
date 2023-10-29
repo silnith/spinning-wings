@@ -22,7 +22,9 @@
 
 typedef std::deque<Wing> wing_list;
 
-UINT const updateDelayMilliseconds = 35;
+size_t const numWings{ 40 };
+
+UINT const updateDelayMilliseconds{ 35 };
 
 GLuint glMajorVersion;
 GLuint glMinorVersion;
@@ -40,16 +42,6 @@ CurveGenerator yawCurve{ CurveGenerator::createGeneratorForAngles(0.0f, 1.5f, 0.
 CurveGenerator redCurve{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 95) };
 CurveGenerator greenCurve{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 40) };
 CurveGenerator blueCurve{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
-
-void advanceAnimation(void)
-{
-	wings.pop_back();
-	wings.emplace_front(radiusCurve.getNextValue(), angleCurve.getNextValue(),
-		deltaAngleCurve.getNextValue(), deltaZCurve.getNextValue(),
-		rollCurve.getNextValue(), pitchCurve.getNextValue(), yawCurve.getNextValue(),
-		Color{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
-		Color::WHITE);
-}
 
 bool hasOpenGL(GLuint major, GLuint minor)
 {
@@ -102,22 +94,22 @@ int InitializeDeviceContext(HDC const & hdc)
 	pfd.dwVisibleMask = 0;
 	pfd.dwDamageMask = 0;
 
-	int pixelformat = ChoosePixelFormat(hdc, &pfd);
+	int pixelformat{ ChoosePixelFormat(hdc, &pfd) };
 	if (pixelformat == 0) {
-		DWORD error = GetLastError();
+		DWORD error{ GetLastError() };
 		PostQuitMessage(-1);
 		return -1;
 	}
 
 	//int foo = DescribePixelFormat(hdc, pixelformat, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
 
-	BOOL pixelFormatSuccess = SetPixelFormat(hdc, pixelformat, &pfd);
+	BOOL pixelFormatSuccess{ SetPixelFormat(hdc, pixelformat, &pfd) };
 	if (pixelFormatSuccess)
 	{
 	}
 	else
 	{
-		DWORD error = GetLastError();
+		DWORD error{ GetLastError() };
 		PostQuitMessage(-1);
 		return -1;
 	}
@@ -132,8 +124,8 @@ int InitializeDeviceContext(HDC const & hdc)
 /// <returns>a handle to the rendering context</returns>
 HGLRC InitializeRenderingContext(HDC const& hdc)
 {
-	HGLRC hglrc = wglCreateContext(hdc);
-	BOOL success = wglMakeCurrent(hdc, hglrc);
+	HGLRC hglrc{ wglCreateContext(hdc) };
+	BOOL success{ wglMakeCurrent(hdc, hglrc) };
 	return hglrc;
 }
 
@@ -151,10 +143,10 @@ void ParseOpenGLVersion(GLubyte const* glVersion)
 
 void InitializeOpenGLState()
 {
-	GLubyte const* glVendor = glGetString(GL_VENDOR);
-	GLubyte const* glRenderer = glGetString(GL_RENDERER);
-	GLubyte const* glVersion = glGetString(GL_VERSION);
-	GLubyte const* glExtensions = glGetString(GL_EXTENSIONS);
+	GLubyte const* const glVendor{ glGetString(GL_VENDOR) };
+	GLubyte const* const glRenderer{ glGetString(GL_RENDERER) };
+	GLubyte const* const glVersion{ glGetString(GL_VERSION) };
+	GLubyte const* const glExtensions{ glGetString(GL_EXTENSIONS) };
 
 	assert(glVendor != NULL);
 	assert(glRenderer != NULL);
@@ -183,7 +175,7 @@ void InitializeOpenGLState()
 	gluLookAt(0, 50, 50, 0, 0, 13, 0, 0, 1);
 }
 
-void InitializeDisplayList()
+void InitializeWingDisplayList()
 {
 	wingDisplayList = glGenLists(1);
 	glNewList(wingDisplayList, GL_COMPILE);
@@ -193,6 +185,41 @@ void InitializeDisplayList()
 	glVertex2f(-1, -1);
 	glVertex2f(1, -1);
 	glEnd();
+	glEndList();
+}
+
+void InitializeWingList(void)
+{
+	GLuint const wingLists{ glGenLists(numWings) };
+	for (GLuint displayList{ wingLists }; displayList < wingLists + numWings; displayList++) {
+		// This initializes the list of wings to hold the allocated GL display lists.
+		// These display list identifiers are reused throughout the lifetime of the program.
+		wings.emplace_back(displayList);
+		glNewList(displayList, GL_COMPILE);
+		glEndList();
+	}
+}
+
+void advanceAnimation(void)
+{
+	GLuint const displayList{ wings.back().getGLDisplayList() };
+	wings.pop_back();
+	Wing const& wing{ wings.emplace_front(displayList, radiusCurve.getNextValue(), angleCurve.getNextValue(),
+		deltaAngleCurve.getNextValue(), deltaZCurve.getNextValue(),
+		rollCurve.getNextValue(), pitchCurve.getNextValue(), yawCurve.getNextValue(),
+		Color{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
+		Color::WHITE) };
+
+	// TODO: DO I need an HDC in order to execute these OpenGL commands?
+	glNewList(displayList, GL_COMPILE);
+	glPushMatrix();
+	glRotatef(wing.getAngle(), 0, 0, 1);
+	glTranslatef(wing.getRadius(), 0, 0);
+	glRotatef(-(wing.getYaw()), 0, 0, 1);
+	glRotatef(-(wing.getPitch()), 0, 1, 0);
+	glRotatef(wing.getRoll(), 1, 0, 0);
+	glCallList(wingDisplayList);
+	glPopMatrix();
 	glEndList();
 }
 
@@ -209,34 +236,23 @@ void DrawFrame()
 			glTranslatef(0, 0, wing.getDeltaZ());
 			glRotatef(wing.getDeltaAngle(), 0, 0, 1);
 
-			glPushMatrix();
-			glRotatef(wing.getAngle(), 0, 0, 1);
-			glTranslatef(wing.getRadius(), 0, 0);
-			glRotatef(-(wing.getYaw()), 0, 0, 1);
-			glRotatef(-(wing.getPitch()), 0, 1, 0);
-			glRotatef(wing.getRoll(), 1, 0, 0);
-			glColor3f(wing.getEdgeColor().getRed(), wing.getEdgeColor().getGreen(), wing.getEdgeColor().getBlue());
-			glCallList(wingDisplayList);
-			glPopMatrix();
+			Color const& edgeColor{ wing.getEdgeColor() };
+			glColor3f(edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
+			glCallList(wing.getGLDisplayList());
 		}
 		glPopMatrix();
 		glDisable(GL_POLYGON_OFFSET_LINE);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
+
 	glPushMatrix();
 	for (Wing const& wing : wings) {
 		glTranslatef(0, 0, wing.getDeltaZ());
 		glRotatef(wing.getDeltaAngle(), 0, 0, 1);
 
-		glPushMatrix();
-		glRotatef(wing.getAngle(), 0, 0, 1);
-		glTranslatef(wing.getRadius(), 0, 0);
-		glRotatef(-(wing.getYaw()), 0, 0, 1);
-		glRotatef(-(wing.getPitch()), 0, 1, 0);
-		glRotatef(wing.getRoll(), 1, 0, 0);
-		glColor3f(wing.getColor().getRed(), wing.getColor().getGreen(), wing.getColor().getBlue());
-		glCallList(wingDisplayList);
-		glPopMatrix();
+		Color const& color{ wing.getColor() };
+		glColor3f(color.getRed(), color.getGreen(), color.getBlue());
+		glCallList(wing.getGLDisplayList());
 	}
 	glPopMatrix();
 
@@ -245,16 +261,14 @@ void DrawFrame()
 
 void Resize(GLsizei width, GLsizei height)
 {
-	GLdouble xmult;
-	GLdouble ymult;
+	GLdouble xmult{ 1.0 };
+	GLdouble ymult{ 1.0 };
 	if (width > height)
 	{
 		xmult = static_cast<GLdouble>(width) / static_cast<GLdouble>(height);
-		ymult = 1.0;
 	}
 	else
 	{
-		xmult = 1.0;
 		ymult = static_cast<GLdouble>(height) / static_cast<GLdouble>(width);
 	}
 
@@ -275,12 +289,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 	{
 		// window created
-		LPCREATESTRUCTW createStruct = (LPCREATESTRUCTW)lParam;
+		LPCREATESTRUCTW createStruct{ (LPCREATESTRUCTW)lParam };
 		createStruct->cx;
 		createStruct->cy;
 		// DirectDrawCreate()
 
-		HDC hdc = GetDC(hWnd);
+		HDC hdc{ GetDC(hWnd) };
 
 		InitializeDeviceContext(hdc);
 
@@ -288,7 +302,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		InitializeOpenGLState();
 
-		InitializeDisplayList();
+		InitializeWingDisplayList();
+
+		InitializeWingList();
 
 		ReleaseDC(hWnd, hdc);
 
@@ -297,13 +313,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_DPICHANGED:
 	{
 		// GetSystemMetricsForDpi, AdjustWindowRectExForDpi, SystemParametersInfoForDpi, GetDpiForWindow
-		WORD yAxisDPI = HIWORD(wParam);
-		WORD xAxisDPI = LOWORD(wParam);
-		LPRECT suggestedSizeAndPosition = (RECT*)lParam;
+		WORD yAxisDPI{ HIWORD(wParam) };
+		WORD xAxisDPI{ LOWORD(wParam) };
+		LPRECT suggestedSizeAndPosition{ (RECT*)lParam };
 		/*
 		* TODO: Guard this call to Windows 8.1 and later.
 		*/
-		BOOL success = SetWindowPos(hWnd, NULL, suggestedSizeAndPosition->left, suggestedSizeAndPosition->top, suggestedSizeAndPosition->right - suggestedSizeAndPosition->left, suggestedSizeAndPosition->bottom - suggestedSizeAndPosition->top, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
+		BOOL success{ SetWindowPos(hWnd, NULL, suggestedSizeAndPosition->left, suggestedSizeAndPosition->top, suggestedSizeAndPosition->right - suggestedSizeAndPosition->left, suggestedSizeAndPosition->bottom - suggestedSizeAndPosition->top, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS) };
 		return 0;
 	}
 	case WM_SIZE:
@@ -320,10 +336,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 		}
 
-		HDC hdc = GetDC(hWnd);
+		HDC hdc{ GetDC(hWnd) };
 
-		GLsizei width = LOWORD(lParam);
-		GLsizei height = HIWORD(lParam);
+		GLsizei width{ LOWORD(lParam) };
+		GLsizei height{ HIWORD(lParam) };
 		Resize(width, height);
 
 		ReleaseDC(hWnd, hdc);
@@ -332,12 +348,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_TIMER:
 	{
-		//hdc = GetDC(hWnd);
-		//hdc = GetDCEx(hWnd, NULL, 0);
-		//int foo = ReleaseDC(hWnd, hdc);
+		// TODO: Is it necessary to grab the HDC before issuing OpenGL rendering commands,
+		// if those commands are merely compiling (but not executing) a new display list?
+		HDC hdc{ GetDC(hWnd) };
 		advanceAnimation();
-		//InvalidateRect(hWnd, NULL, FALSE);
 		InvalidateRgn(hWnd, NULL, FALSE);
+		ReleaseDC(hWnd, hdc);
 		return 0;
 	}
 	case WM_ERASEBKGND:
@@ -347,7 +363,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_PAINT:
 	{
 		PAINTSTRUCT paintstruct;
-		HDC hdc = BeginPaint(hWnd, &paintstruct);
+		HDC hdc{ BeginPaint(hWnd, &paintstruct) };
 		if (hdc == NULL) {
 			return -1;
 		}
@@ -362,14 +378,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_CLOSE:
 	{
-		BOOL destroyed = DestroyWindow(hWnd);
+		BOOL destroyed{ DestroyWindow(hWnd) };
 		return 0;
 	}
 	case WM_DESTROY:
 	{
 		// window about to be destroyed
-		HDC hdc = GetDC(hWnd);
-		HGLRC hglrc = wglGetCurrentContext();
+		HDC hdc{ GetDC(hWnd) };
+		HGLRC hglrc{ wglGetCurrentContext() };
 		if (hglrc != NULL)
 		{
 			wglMakeCurrent(hdc, NULL);
@@ -389,14 +405,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 int APIENTRY WinMain(
-	HINSTANCE hInstance,
-	HINSTANCE hPrevInstance,
-	LPSTR lpCmdLine,
-	int nShowCmd)
+	_In_ HINSTANCE hInstance,
+	_In_opt_ HINSTANCE hPrevInstance,
+	_In_ LPSTR lpCmdLine,
+	_In_ int nShowCmd)
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
-
-	wings.resize(40);
+	UNREFERENCED_PARAMETER(lpCmdLine);
 
 	// register the window class for the main window
 
@@ -414,7 +429,7 @@ int APIENTRY WinMain(
 	wndClassEx.lpszMenuName = NULL;
 	wndClassEx.lpszClassName = L"Project1Class";
 	wndClassEx.hIconSm = NULL;
-	ATOM wndClassIdentifier = RegisterClassExW(&wndClassEx);
+	ATOM wndClassIdentifier{ RegisterClassExW(&wndClassEx) };
 	if (wndClassIdentifier == 0)
 	{
 		return FALSE;
@@ -422,17 +437,17 @@ int APIENTRY WinMain(
 
 	// create the main window
 
-	DWORD extendedWindowStyle = WS_EX_APPWINDOW | WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_WINDOWEDGE;
-	LPCWSTR className = (LPCWSTR) wndClassIdentifier;
-	LPCWSTR windowName = L"Project1Window";
-	DWORD windowStyle = WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
-	int x = CW_USEDEFAULT;
-	int y = CW_USEDEFAULT;
-	int width = CW_USEDEFAULT;
-	int height = 600;
-	HWND windowParent = NULL;
-	HMENU menu = NULL;
-	HWND window = CreateWindowExW(extendedWindowStyle, className, windowName, windowStyle, x, y, width, height, windowParent, menu, hInstance, NULL);
+	DWORD extendedWindowStyle{ WS_EX_APPWINDOW | WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_WINDOWEDGE };
+	LPCWSTR className{ (LPCWSTR)wndClassIdentifier };
+	LPCWSTR windowName{ L"Project1Window" };
+	DWORD windowStyle{ WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS };
+	int x{ CW_USEDEFAULT };
+	int y{ CW_USEDEFAULT };
+	int width{ CW_USEDEFAULT };
+	int height{ 600 };
+	HWND windowParent{ NULL };
+	HMENU menu{ NULL };
+	HWND window{ CreateWindowExW(extendedWindowStyle, className, windowName, windowStyle, x, y, width, height, windowParent, menu, hInstance, NULL) };
 	if (window == NULL) {
 		// call GetLastError
 		return FALSE;
@@ -443,12 +458,12 @@ int APIENTRY WinMain(
 	ShowWindow(window, nShowCmd);
 	UpdateWindow(window);
 
-	SetTimer(window, 42, updateDelayMilliseconds, NULL);
+	UINT_PTR timer{ SetTimer(window, 42, updateDelayMilliseconds, NULL) };
 
 	// start the message loop
 
-	MSG msg;
-	BOOL hasMessage = GetMessageW(&msg, NULL, 0, 0);
+	MSG msg{};
+	BOOL hasMessage{ GetMessageW(&msg, NULL, 0, 0) };
 	while (hasMessage) {
 		if (hasMessage == -1) {
 			return -1;
@@ -458,6 +473,8 @@ int APIENTRY WinMain(
 
 		hasMessage = GetMessageW(&msg, NULL, 0, 0);
 	}
+
+	KillTimer(window, timer);
 
 	return (int) msg.wParam;
 }
