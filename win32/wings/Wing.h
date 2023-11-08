@@ -1,7 +1,5 @@
 #pragma once
 
-//#include <gl/GL.h>
-
 #include "Color.h"
 
 /// <summary>
@@ -34,11 +32,16 @@ public:
 	Wing(Wing&& wing) noexcept = default;
 	Wing& operator=(Wing&& wing) noexcept = default;
 public:
+	/// <summary>
+	/// Creates a new wing with the provided OpenGL display list identifier.
+	/// </summary>
+	/// <param name="displayList">the OpenGL display list identifier used for the rendering list for this wing</param>
 	Wing(unsigned int displayList) noexcept;
 
 	/// <summary>
 	/// Creates a new wing with the provided parameters.
 	/// </summary>
+	/// <param name="displayList">the OpenGL display list identifier used for the rendering list for this wing</param>
 	/// <param name="radius">the radius from the central axis</param>
 	/// <param name="angle">the angle around the central axis</param>
 	/// <param name="deltaAngle">the additional angle around the central axis as the wing receds into history</param>
@@ -55,6 +58,10 @@ public:
 		Color const& color,
 		Color const& edgeColor) noexcept;
 
+	/// <summary>
+	/// Returns the OpenGL display list identifier that renders this wing.
+	/// </summary>
+	/// <returns>the OpenGL display list identifier</returns>
 	unsigned int getGLDisplayList(void) const noexcept;
 
 	/// <summary>
