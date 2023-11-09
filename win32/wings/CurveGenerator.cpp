@@ -73,6 +73,23 @@ unsigned int CurveGenerator::getTicks(void) const noexcept
 	return ticks;
 }
 
+void CurveGenerator::setValue(float _value) noexcept
+{
+	if (valueWraps)
+	{
+		value = std::fmod(_value - minimumValue, maximumValue - minimumValue) + minimumValue;
+	}
+	else
+	{
+		value = std::clamp(_value, minimumValue, maximumValue);
+	}
+}
+
+void CurveGenerator::setVelocity(float _velocity) noexcept
+{
+	velocity = std::clamp(_velocity, -maximumVelocity, maximumVelocity);
+}
+
 void CurveGenerator::advanceTick(void)
 {
 	if (++ticks > ticksPerAccelerationChange)
@@ -80,16 +97,8 @@ void CurveGenerator::advanceTick(void)
 		acceleration = distributor(randomDevice);
 		ticks = 0;
 	}
-	velocity = std::clamp(velocity + acceleration, -maximumVelocity, maximumVelocity);
-	value += velocity;
-	if (valueWraps)
-	{
-		value = std::fmod(value - minimumValue, maximumValue - minimumValue) + minimumValue;
-	}
-	else
-	{
-		value = std::clamp(value, minimumValue, maximumValue);
-	}
+	setVelocity(velocity + acceleration);
+	setValue(value + velocity);
 }
 
 float CurveGenerator::getNextValue(void)

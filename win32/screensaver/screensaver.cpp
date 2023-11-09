@@ -1,11 +1,12 @@
 #include <Windows.h>
 #include <ScrnSave.h>
 
-//#ifdef UNICODE
-//#pragma comment (lib, "scrnsavew.lib")
-//#else
+#ifdef UNICODE
+#pragma comment (lib, "scrnsavw.lib")
+#else
 #pragma comment (lib, "scrnsave.lib")
-//#endif
+#endif
+#pragma comment (lib, "comctl32.lib")
 
 #include <gl/GL.h>
 #include <gl/GLU.h>
@@ -204,7 +205,7 @@ void advanceAnimation(void)
 		Color{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
 		Color::WHITE) };
 
-	// TODO: DO I need an HDC in order to execute these OpenGL commands?
+	// TODO: Do I need an HDC in order to execute these OpenGL commands?
 	glNewList(displayList, GL_COMPILE);
 	glPushMatrix();
 	glRotatef(wing.getAngle(), 0, 0, 1);
@@ -277,14 +278,14 @@ void Resize(GLsizei width, GLsizei height)
 }
 
 // add to EXPORTS statement in module-definition (.def) file
-LRESULT WINAPI ScreenSaverProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
 	case WM_CREATE:
 	{
 		// window created
-		//LPCREATESTRUCT createStruct{ (LPCREATESTRUCT)lParam };
+		//LPCREATESTRUCTW createStruct{ (LPCREATESTRUCTW)lParam };
 		//createStruct->cx;
 		//createStruct->cy;
 		// DirectDrawCreate()

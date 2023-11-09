@@ -205,7 +205,7 @@ void advanceAnimation(void)
 		Color{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
 		Color::WHITE) };
 
-	// TODO: DO I need an HDC in order to execute these OpenGL commands?
+	// TODO: Do I need an HDC in order to execute these OpenGL commands?
 	glNewList(displayList, GL_COMPILE);
 	glPushMatrix();
 	glRotatef(wing.getAngle(), 0, 0, 1);

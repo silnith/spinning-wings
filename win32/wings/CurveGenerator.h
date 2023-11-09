@@ -131,6 +131,9 @@ private:
 	float acceleration{ 0 };
 	unsigned int ticks{ ticksPerAccelerationChange };
 
+	void setValue(float) noexcept;
+	void setVelocity(float) noexcept;
+
 	/// <summary>
 	/// Advances the tick count, which may or may not trigger a change in acceleration.
 	/// Then applies the current acceleration to the velocity,
