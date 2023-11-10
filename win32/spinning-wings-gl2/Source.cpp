@@ -29,7 +29,6 @@ UINT const updateDelayMilliseconds{ 35 };
 GLuint glMajorVersion;
 GLuint glMinorVersion;
 
-GLuint wingDisplayList;
 wing_list wings;
 
 silnith::CurveGenerator radiusCurve{ 10.0f, -15.0f, 15.0f, false, 0.1f, 0.01f, 150 };
@@ -170,13 +169,6 @@ void InitializeOpenGLState()
 	gluLookAt(0, 50, 50, 0, 0, 13, 0, 0, 1);
 }
 
-void InitializeWingDisplayList()
-{
-	wingDisplayList = glGenLists(1);
-	glNewList(wingDisplayList, GL_COMPILE);
-	glEndList();
-}
-
 void InitializeWingList(void)
 {
 	GLuint const wingLists{ glGenLists(numWings) };
@@ -184,8 +176,6 @@ void InitializeWingList(void)
 		// This initializes the list of wings to hold the allocated GL display lists.
 		// These display list identifiers are reused throughout the lifetime of the program.
 		wings.emplace_back(displayList);
-		glNewList(displayList, GL_COMPILE);
-		glEndList();
 	}
 }
 
@@ -307,8 +297,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		InitializeRenderingContext(hdc);
 
 		InitializeOpenGLState();
-
-		InitializeWingDisplayList();
 
 		InitializeWingList();
 
