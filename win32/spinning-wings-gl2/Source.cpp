@@ -233,7 +233,14 @@ void DrawFrame()
 
 			silnith::Color const& edgeColor{ wing.getEdgeColor() };
 			glColor3f(edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
-			glCallList(wing.getGLDisplayList());
+			glPushMatrix();
+			glRotatef(wing.getAngle(), 0, 0, 1);
+			glTranslatef(wing.getRadius(), 0, 0);
+			glRotatef(-(wing.getYaw()), 0, 0, 1);
+			glRotatef(-(wing.getPitch()), 0, 1, 0);
+			glRotatef(wing.getRoll(), 1, 0, 0);
+			glCallList(wingDisplayList);
+			glPopMatrix();
 		}
 		glPopMatrix();
 		glDisable(GL_POLYGON_OFFSET_LINE);
@@ -247,7 +254,14 @@ void DrawFrame()
 
 		silnith::Color const& color{ wing.getColor() };
 		glColor3f(color.getRed(), color.getGreen(), color.getBlue());
-		glCallList(wing.getGLDisplayList());
+		glPushMatrix();
+		glRotatef(wing.getAngle(), 0, 0, 1);
+		glTranslatef(wing.getRadius(), 0, 0);
+		glRotatef(-(wing.getYaw()), 0, 0, 1);
+		glRotatef(-(wing.getPitch()), 0, 1, 0);
+		glRotatef(wing.getRoll(), 1, 0, 0);
+		glCallList(wingDisplayList);
+		glPopMatrix();
 	}
 	glPopMatrix();
 
