@@ -204,18 +204,6 @@ void advanceAnimation(void)
 		rollCurve.getNextValue(), pitchCurve.getNextValue(), yawCurve.getNextValue(),
 		silnith::Color{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
 		silnith::Color::WHITE) };
-
-	// TODO: Do I need an HDC in order to execute these OpenGL commands?
-	glNewList(displayList, GL_COMPILE);
-	glPushMatrix();
-	glRotatef(wing.getAngle(), 0, 0, 1);
-	glTranslatef(wing.getRadius(), 0, 0);
-	glRotatef(-(wing.getYaw()), 0, 0, 1);
-	glRotatef(-(wing.getPitch()), 0, 1, 0);
-	glRotatef(wing.getRoll(), 1, 0, 0);
-	glCallList(wingDisplayList);
-	glPopMatrix();
-	glEndList();
 }
 
 void DrawFrame()
