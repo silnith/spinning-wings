@@ -174,12 +174,6 @@ void InitializeWingDisplayList()
 {
 	wingDisplayList = glGenLists(1);
 	glNewList(wingDisplayList, GL_COMPILE);
-	glBegin(GL_QUADS);
-	glVertex2f(1, 1);
-	glVertex2f(-1, 1);
-	glVertex2f(-1, -1);
-	glVertex2f(1, -1);
-	glEnd();
 	glEndList();
 }
 
@@ -227,7 +221,12 @@ void DrawFrame()
 			glRotatef(-(wing.getYaw()), 0, 0, 1);
 			glRotatef(-(wing.getPitch()), 0, 1, 0);
 			glRotatef(wing.getRoll(), 1, 0, 0);
-			glCallList(wingDisplayList);
+			glBegin(GL_QUADS);
+			glVertex2f(1, 1);
+			glVertex2f(-1, 1);
+			glVertex2f(-1, -1);
+			glVertex2f(1, -1);
+			glEnd();
 			glPopMatrix();
 		}
 		glPopMatrix();
@@ -248,7 +247,12 @@ void DrawFrame()
 		glRotatef(-(wing.getYaw()), 0, 0, 1);
 		glRotatef(-(wing.getPitch()), 0, 1, 0);
 		glRotatef(wing.getRoll(), 1, 0, 0);
-		glCallList(wingDisplayList);
+		glBegin(GL_QUADS);
+		glVertex2f(1, 1);
+		glVertex2f(-1, 1);
+		glVertex2f(-1, -1);
+		glVertex2f(1, -1);
+		glEnd();
 		glPopMatrix();
 	}
 	glPopMatrix();
