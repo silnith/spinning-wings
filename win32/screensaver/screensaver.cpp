@@ -23,7 +23,7 @@
 #include <sstream>
 
 
-typedef std::deque<Wing> wing_list;
+typedef std::deque<silnith::Wing> wing_list;
 
 size_t const numWings{ 40 };
 
@@ -35,16 +35,16 @@ GLuint glMinorVersion;
 GLuint wingDisplayList;
 wing_list wings;
 
-CurveGenerator radiusCurve{ 10.0f, -15.0f, 15.0f, false, 0.1f, 0.01f, 150 };
-CurveGenerator angleCurve{ CurveGenerator::createGeneratorForAngles(0.0f, 2.0f, 0.05f, 120) };
-CurveGenerator deltaAngleCurve{ CurveGenerator::createGeneratorForAngles(15.0f, 0.2f, 0.02f, 80) };
-CurveGenerator deltaZCurve{ 0.5f, 0.4f, 0.7f, false, 0.01f, 0.001f, 200 };
-CurveGenerator rollCurve{ CurveGenerator::createGeneratorForAngles(0.0f, 1.0f, 0.25f, 80) };
-CurveGenerator pitchCurve{ CurveGenerator::createGeneratorForAngles(0.0f, 2.0f, 0.25f, 40) };
-CurveGenerator yawCurve{ CurveGenerator::createGeneratorForAngles(0.0f, 1.5f, 0.25f, 50) };
-CurveGenerator redCurve{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 95) };
-CurveGenerator greenCurve{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 40) };
-CurveGenerator blueCurve{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
+silnith::CurveGenerator radiusCurve{ 10.0f, -15.0f, 15.0f, false, 0.1f, 0.01f, 150 };
+silnith::CurveGenerator angleCurve{ silnith::CurveGenerator::createGeneratorForAngles(0.0f, 2.0f, 0.05f, 120) };
+silnith::CurveGenerator deltaAngleCurve{ silnith::CurveGenerator::createGeneratorForAngles(15.0f, 0.2f, 0.02f, 80) };
+silnith::CurveGenerator deltaZCurve{ 0.5f, 0.4f, 0.7f, false, 0.01f, 0.001f, 200 };
+silnith::CurveGenerator rollCurve{ silnith::CurveGenerator::createGeneratorForAngles(0.0f, 1.0f, 0.25f, 80) };
+silnith::CurveGenerator pitchCurve{ silnith::CurveGenerator::createGeneratorForAngles(0.0f, 2.0f, 0.25f, 40) };
+silnith::CurveGenerator yawCurve{ silnith::CurveGenerator::createGeneratorForAngles(0.0f, 1.5f, 0.25f, 50) };
+silnith::CurveGenerator redCurve{ silnith::CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 95) };
+silnith::CurveGenerator greenCurve{ silnith::CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 40) };
+silnith::CurveGenerator blueCurve{ silnith::CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
 
 UINT_PTR timer;
 
@@ -199,11 +199,11 @@ void advanceAnimation(void)
 {
 	GLuint const displayList{ wings.back().getGLDisplayList() };
 	wings.pop_back();
-	Wing const& wing{ wings.emplace_front(displayList, radiusCurve.getNextValue(), angleCurve.getNextValue(),
+	silnith::Wing const& wing{ wings.emplace_front(displayList, radiusCurve.getNextValue(), angleCurve.getNextValue(),
 		deltaAngleCurve.getNextValue(), deltaZCurve.getNextValue(),
 		rollCurve.getNextValue(), pitchCurve.getNextValue(), yawCurve.getNextValue(),
-		Color{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
-		Color::WHITE) };
+		silnith::Color{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
+		silnith::Color::WHITE) };
 
 	// TODO: Do I need an HDC in order to execute these OpenGL commands?
 	glNewList(displayList, GL_COMPILE);
@@ -227,11 +227,11 @@ void DrawFrame()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glEnable(GL_POLYGON_OFFSET_LINE);
 		glPushMatrix();
-		for (Wing const& wing : wings) {
+		for (silnith::Wing const& wing : wings) {
 			glTranslatef(0, 0, wing.getDeltaZ());
 			glRotatef(wing.getDeltaAngle(), 0, 0, 1);
 
-			Color const& edgeColor{ wing.getEdgeColor() };
+			silnith::Color const& edgeColor{ wing.getEdgeColor() };
 			glColor3f(edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
 			glCallList(wing.getGLDisplayList());
 		}
@@ -241,11 +241,11 @@ void DrawFrame()
 	}
 
 	glPushMatrix();
-	for (Wing const& wing : wings) {
+	for (silnith::Wing const& wing : wings) {
 		glTranslatef(0, 0, wing.getDeltaZ());
 		glRotatef(wing.getDeltaAngle(), 0, 0, 1);
 
-		Color const& color{ wing.getColor() };
+		silnith::Color const& color{ wing.getColor() };
 		glColor3f(color.getRed(), color.getGreen(), color.getBlue());
 		glCallList(wing.getGLDisplayList());
 	}

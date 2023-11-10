@@ -4,76 +4,76 @@
 
 #include <cmath>
 
-std::random_device CurveGenerator::randomDevice{ "default" };
+std::random_device silnith::CurveGenerator::randomDevice{ "default" };
 
-CurveGenerator::CurveGenerator(float initialValue, float minimumValue, float maximumValue, bool valueWraps,
+silnith::CurveGenerator::CurveGenerator(float initialValue, float minimumValue, float maximumValue, bool valueWraps,
 	float maximumVelocity, float maximumAcceleration, unsigned int ticksPerAccelerationChange)
 	: minimumValue{ minimumValue }, maximumValue{ maximumValue }, valueWraps{ valueWraps },
 	maximumVelocity{ maximumVelocity }, maximumAcceleration{ maximumAcceleration }, ticksPerAccelerationChange{ ticksPerAccelerationChange },
 	value{ initialValue }
 {}
 
-CurveGenerator CurveGenerator::createGeneratorForAngles(float initialValue, float maximumVelocity, float maximumAcceleration, unsigned int ticksPerAccelerationChange)
+silnith::CurveGenerator silnith::CurveGenerator::createGeneratorForAngles(float initialValue, float maximumVelocity, float maximumAcceleration, unsigned int ticksPerAccelerationChange)
 {
-	return CurveGenerator{ initialValue, 0.0f, 360.0f, true, maximumVelocity, maximumAcceleration, ticksPerAccelerationChange };
+	return silnith::CurveGenerator{ initialValue, 0.0f, 360.0f, true, maximumVelocity, maximumAcceleration, ticksPerAccelerationChange };
 }
 
-CurveGenerator CurveGenerator::createGeneratorForColorComponents(float initialValue, float maximumVelocity, float maximumAcceleration, unsigned int ticksPerAccelerationChange)
+silnith::CurveGenerator silnith::CurveGenerator::createGeneratorForColorComponents(float initialValue, float maximumVelocity, float maximumAcceleration, unsigned int ticksPerAccelerationChange)
 {
-	return CurveGenerator{ initialValue, 0.0f, 1.0f, false, maximumVelocity, maximumAcceleration, ticksPerAccelerationChange };
+	return silnith::CurveGenerator{ initialValue, 0.0f, 1.0f, false, maximumVelocity, maximumAcceleration, ticksPerAccelerationChange };
 }
 
-float CurveGenerator::getMinimumValue(void) const noexcept
+float silnith::CurveGenerator::getMinimumValue(void) const noexcept
 {
 	return minimumValue;
 }
 
-float CurveGenerator::getMaximumValue(void) const noexcept
+float silnith::CurveGenerator::getMaximumValue(void) const noexcept
 {
 	return maximumValue;
 }
 
-bool CurveGenerator::isValueWraps(void) const noexcept
+bool silnith::CurveGenerator::isValueWraps(void) const noexcept
 {
 	return valueWraps;
 }
 
-float CurveGenerator::getMaximumVelocity(void) const noexcept
+float silnith::CurveGenerator::getMaximumVelocity(void) const noexcept
 {
 	return maximumVelocity;
 }
 
-float CurveGenerator::getMaximumAcceleration(void) const noexcept
+float silnith::CurveGenerator::getMaximumAcceleration(void) const noexcept
 {
 	return maximumAcceleration;
 }
 
-unsigned int CurveGenerator::getTicksPerAccelerationChange(void) const noexcept
+unsigned int silnith::CurveGenerator::getTicksPerAccelerationChange(void) const noexcept
 {
 	return ticksPerAccelerationChange;
 }
 
-float CurveGenerator::getValue(void) const noexcept
+float silnith::CurveGenerator::getValue(void) const noexcept
 {
 	return value;
 }
 
-float CurveGenerator::getVelocity(void) const noexcept
+float silnith::CurveGenerator::getVelocity(void) const noexcept
 {
 	return velocity;
 }
 
-float CurveGenerator::getAcceleration(void) const noexcept
+float silnith::CurveGenerator::getAcceleration(void) const noexcept
 {
 	return acceleration;
 }
 
-unsigned int CurveGenerator::getTicks(void) const noexcept
+unsigned int silnith::CurveGenerator::getTicks(void) const noexcept
 {
 	return ticks;
 }
 
-void CurveGenerator::setValue(float _value) noexcept
+void silnith::CurveGenerator::setValue(float _value) noexcept
 {
 	if (valueWraps)
 	{
@@ -85,12 +85,12 @@ void CurveGenerator::setValue(float _value) noexcept
 	}
 }
 
-void CurveGenerator::setVelocity(float _velocity) noexcept
+void silnith::CurveGenerator::setVelocity(float _velocity) noexcept
 {
 	velocity = std::clamp(_velocity, -maximumVelocity, maximumVelocity);
 }
 
-void CurveGenerator::advanceTick(void)
+void silnith::CurveGenerator::advanceTick(void)
 {
 	if (++ticks > ticksPerAccelerationChange)
 	{
@@ -101,7 +101,7 @@ void CurveGenerator::advanceTick(void)
 	setValue(value + velocity);
 }
 
-float CurveGenerator::getNextValue(void)
+float silnith::CurveGenerator::getNextValue(void)
 {
 	advanceTick();
 	return getValue();

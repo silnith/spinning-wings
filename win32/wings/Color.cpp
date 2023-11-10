@@ -1,23 +1,23 @@
 #include "Color.h"
 
-Color const Color::BLACK{ 0, 0, 0 };
-Color const Color::WHITE{ 1, 1, 1 };
+silnith::Color const silnith::Color::BLACK{ 0, 0, 0 };
+silnith::Color const silnith::Color::WHITE{ 1, 1, 1 };
 
-Color::Color(float red, float green, float blue) noexcept
+silnith::Color::Color(float red, float green, float blue) noexcept
 	: red{ red }, green{ green }, blue{ blue }
 {}
 
-float Color::getRed(void) const noexcept
+float silnith::Color::getRed(void) const noexcept
 {
 	return red;
 }
 
-float Color::getGreen(void) const noexcept
+float silnith::Color::getGreen(void) const noexcept
 {
 	return green;
 }
 
-float Color::getBlue(void) const noexcept
+float silnith::Color::getBlue(void) const noexcept
 {
 	return blue;
 }
