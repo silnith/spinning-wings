@@ -60,33 +60,34 @@ BOOL MonitorEnumProc(HMONITOR hMonitor, HDC hdc, LPRECT lpRect, LPARAM d)
 /// <returns>the identifier for the pixel format</returns>
 int InitializeDeviceContext(HDC const& hdc)
 {
-	PIXELFORMATDESCRIPTOR pfd{};
-	pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
-	pfd.nVersion = 1;
-	pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-	pfd.iPixelType = PFD_TYPE_RGBA;
-	pfd.cColorBits = 24;
-	pfd.cRedBits = 8;
-	pfd.cRedShift = 0;
-	pfd.cGreenBits = 8;
-	pfd.cGreenShift = 0;
-	pfd.cBlueBits = 8;
-	pfd.cBlueShift = 0;
-	pfd.cAlphaBits = 0;
-	pfd.cAlphaShift = 0;
-	pfd.cAccumBits = 0;
-	pfd.cAccumRedBits = 0;
-	pfd.cAccumGreenBits = 0;
-	pfd.cAccumBlueBits = 0;
-	pfd.cAccumAlphaBits = 0;
-	pfd.cDepthBits = 32;
-	pfd.cStencilBits = 0;
-	pfd.cAuxBuffers = 0;
-	pfd.iLayerType = PFD_MAIN_PLANE;
-	pfd.bReserved = 0;
-	pfd.dwLayerMask = 0;
-	pfd.dwVisibleMask = 0;
-	pfd.dwDamageMask = 0;
+	PIXELFORMATDESCRIPTOR pfd{
+		.nSize = sizeof(PIXELFORMATDESCRIPTOR),
+		.nVersion = 1,
+		.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
+		.iPixelType = PFD_TYPE_RGBA,
+		.cColorBits = 24,
+		.cRedBits = 8,
+		.cRedShift = 0,
+		.cGreenBits = 8,
+		.cGreenShift = 0,
+		.cBlueBits = 8,
+		.cBlueShift = 0,
+		.cAlphaBits = 0,
+		.cAlphaShift = 0,
+		.cAccumBits = 0,
+		.cAccumRedBits = 0,
+		.cAccumGreenBits = 0,
+		.cAccumBlueBits = 0,
+		.cAccumAlphaBits = 0,
+		.cDepthBits = 32,
+		.cStencilBits = 0,
+		.cAuxBuffers = 0,
+		.iLayerType = PFD_MAIN_PLANE,
+		.bReserved = 0,
+		.dwLayerMask = 0,
+		.dwVisibleMask = 0,
+		.dwDamageMask = 0,
+	};
 
 	int pixelformat{ ChoosePixelFormat(hdc, &pfd) };
 	if (pixelformat == 0) {
