@@ -403,15 +403,15 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 	}
 	}
 
-    return DefScreenSaverProc(hWnd, message, wParam, lParam);
+	return DefScreenSaverProc(hWnd, message, wParam, lParam);
 }
 
 BOOL WINAPI RegisterDialogClasses(HANDLE hInst)
 {
-    return TRUE;
+	return TRUE;
 }
 
 BOOL WINAPI ScreenSaverConfigureDialog(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    return TRUE;
+	return TRUE;
 }
