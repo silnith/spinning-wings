@@ -410,20 +410,21 @@ int APIENTRY WinMain(
 
 	// register the window class for the main window
 
-	WNDCLASSEXW wndClassEx;
-	wndClassEx.cbSize = sizeof(WNDCLASSEXW);
-	wndClassEx.style = CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_OWNDC;
-	wndClassEx.lpfnWndProc = WndProc;
-	wndClassEx.cbClsExtra = 0;
-	wndClassEx.cbWndExtra = 0;
-	wndClassEx.hInstance = hInstance;
-	wndClassEx.hIcon = NULL;  // LoadIcon
-	wndClassEx.hCursor = NULL;  // LoadCursor
-	// GetStockObject(BLACK_BRUSH);
-	wndClassEx.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-	wndClassEx.lpszMenuName = NULL;
-	wndClassEx.lpszClassName = L"Project1Class";
-	wndClassEx.hIconSm = NULL;
+	WNDCLASSEXW wndClassEx{
+		.cbSize = sizeof(WNDCLASSEXW),
+		.style = CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_OWNDC,
+		.lpfnWndProc = WndProc,
+		.cbClsExtra = 0,
+		.cbWndExtra = 0,
+		.hInstance = hInstance,
+		.hIcon = NULL,  // LoadIcon
+		.hCursor = NULL,  // LoadCursor
+		// GetStockObject(BLACK_BRUSH);
+		.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1),
+		.lpszMenuName = NULL,
+		.lpszClassName = L"Project1Class",
+		.hIconSm = NULL,
+	};
 	ATOM wndClassIdentifier{ RegisterClassExW(&wndClassEx) };
 	if (wndClassIdentifier == 0)
 	{
