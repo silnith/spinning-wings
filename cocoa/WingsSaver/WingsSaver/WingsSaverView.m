@@ -13,13 +13,8 @@
 
 @implementation WingsSaverView
 
-- (instancetype)initWithFrame:(NSRect)frame isPreview:(BOOL)isPreview
-{
-    self = [super initWithFrame:frame isPreview:isPreview];
-    
-    NSLog(@"initWithFrame:{%f, %f, %f, %f}",
-          frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
-//    NSLog(@"initWithFrame:%@", frame);
+- (instancetype)init {
+    self = [super init];
     
     if (self) {
         NSOpenGLPixelFormatAttribute attributes[] = {
@@ -28,7 +23,120 @@
             NSOpenGLPFAAccelerated,
             NSOpenGLPFADoubleBuffer,
             NSOpenGLPFAMaximumPolicy,
-//            NSOpenGLPFAOpenGLProfile,
+            NSOpenGLPFAOpenGLProfile, kCGLOGLPVersion_Legacy,
+            NSOpenGLPFAAllowOfflineRenderers,
+        };
+        NSOpenGLPixelFormat *format = [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes];
+        
+        _glView = [[KSRWingsView alloc] initWithFrame:NSZeroRect pixelFormat:format];
+        
+        if (_glView) {
+            NSLog(@"Found OpenGL pixel format:%@", format);
+        } else {
+            NSLog(@"No OpenGL view.");
+            
+            return nil;
+        }
+        
+        [_glView setWantsBestResolutionOpenGLSurface:YES];
+        
+        [self addSubview:_glView];
+        
+        [self setAnimationTimeInterval:1/30.0];
+    }
+    
+    return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)decoder {
+    self = [super initWithCoder:decoder];
+    
+    if (self) {
+        NSOpenGLPixelFormatAttribute attributes[] = {
+            NSOpenGLPFAColorSize, 24,
+            NSOpenGLPFADepthSize, 32,
+            NSOpenGLPFAAccelerated,
+            NSOpenGLPFADoubleBuffer,
+            NSOpenGLPFAMaximumPolicy,
+            NSOpenGLPFAOpenGLProfile, kCGLOGLPVersion_Legacy,
+            NSOpenGLPFAAllowOfflineRenderers,
+        };
+        NSOpenGLPixelFormat *format = [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes];
+        
+        _glView = [[KSRWingsView alloc] initWithFrame:NSZeroRect pixelFormat:format];
+        
+        if (_glView) {
+            NSLog(@"Found OpenGL pixel format:%@", format);
+        } else {
+            NSLog(@"No OpenGL view.");
+            
+            return nil;
+        }
+        
+        [_glView setWantsBestResolutionOpenGLSurface:YES];
+        
+        [self addSubview:_glView];
+        
+        [self setAnimationTimeInterval:1/30.0];
+    }
+    
+    return self;
+}
+
+- (instancetype)initWithFrame:(NSRect)frameRect {
+    self = [super initWithFrame:frameRect];
+    
+    NSLog(@"initWithFrame:{%f, %f, %f, %f}",
+          frameRect.origin.x, frameRect.origin.y, frameRect.size.width, frameRect.size.height);
+    
+    if (self) {
+        NSOpenGLPixelFormatAttribute attributes[] = {
+            NSOpenGLPFAColorSize, 24,
+            NSOpenGLPFADepthSize, 32,
+            NSOpenGLPFAAccelerated,
+            NSOpenGLPFADoubleBuffer,
+            NSOpenGLPFAMaximumPolicy,
+            NSOpenGLPFAOpenGLProfile, kCGLOGLPVersion_Legacy,
+            NSOpenGLPFAAllowOfflineRenderers,
+        };
+        NSOpenGLPixelFormat *format = [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes];
+        
+        _glView = [[KSRWingsView alloc] initWithFrame:frameRect pixelFormat:format];
+        
+        if (_glView) {
+            NSLog(@"Found OpenGL pixel format:%@", format);
+        } else {
+            NSLog(@"No OpenGL view.");
+            
+            return nil;
+        }
+        
+        [_glView setWantsBestResolutionOpenGLSurface:YES];
+        
+        [self addSubview:_glView];
+        
+        [self setAnimationTimeInterval:1/30.0];
+    }
+    
+    return self;
+}
+
+- (instancetype)initWithFrame:(NSRect)frame isPreview:(BOOL)isPreview
+{
+    self = [super initWithFrame:frame isPreview:isPreview];
+    
+    NSLog(@"initWithFrame:{%f, %f, %f, %f}, isPreview:%d",
+          frame.origin.x, frame.origin.y, frame.size.width, frame.size.height, isPreview);
+    
+    if (self) {
+        NSOpenGLPixelFormatAttribute attributes[] = {
+            NSOpenGLPFAColorSize, 24,
+            NSOpenGLPFADepthSize, 32,
+            NSOpenGLPFAAccelerated,
+            NSOpenGLPFADoubleBuffer,
+            NSOpenGLPFAMaximumPolicy,
+            NSOpenGLPFAOpenGLProfile, kCGLOGLPVersion_Legacy,
+            NSOpenGLPFAAllowOfflineRenderers,
         };
         NSOpenGLPixelFormat *format = [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes];
         
