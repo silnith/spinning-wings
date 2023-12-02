@@ -168,7 +168,9 @@ void InitializeOpenGLState()
 	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
 	glLoadIdentity();
-	gluLookAt(0, 50, 50, 0, 0, 13, 0, 0, 1);
+	gluLookAt(0, 50, 50,
+		0, 0, 13,
+		0, 0, 1);
 }
 
 void InitializeWingDisplayList()

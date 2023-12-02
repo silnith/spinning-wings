@@ -21,8 +21,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spinning-wings-gl2", "spinn
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wings-saver", "wings-saver\wings-saver.vcxproj", "{33C54AA2-1BBF-4810-9D92-355209FA5B06}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "khronos", "khronos\khronos.vcxproj", "{51A30C5C-60A8-4E46-A090-464D62687BF0}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -63,14 +61,6 @@ Global
 		{33C54AA2-1BBF-4810-9D92-355209FA5B06}.Release|x64.Build.0 = Release|x64
 		{33C54AA2-1BBF-4810-9D92-355209FA5B06}.Release|x86.ActiveCfg = Release|Win32
 		{33C54AA2-1BBF-4810-9D92-355209FA5B06}.Release|x86.Build.0 = Release|Win32
-		{51A30C5C-60A8-4E46-A090-464D62687BF0}.Debug|x64.ActiveCfg = Debug|x64
-		{51A30C5C-60A8-4E46-A090-464D62687BF0}.Debug|x64.Build.0 = Debug|x64
-		{51A30C5C-60A8-4E46-A090-464D62687BF0}.Debug|x86.ActiveCfg = Debug|Win32
-		{51A30C5C-60A8-4E46-A090-464D62687BF0}.Debug|x86.Build.0 = Debug|Win32
-		{51A30C5C-60A8-4E46-A090-464D62687BF0}.Release|x64.ActiveCfg = Release|x64
-		{51A30C5C-60A8-4E46-A090-464D62687BF0}.Release|x64.Build.0 = Release|x64
-		{51A30C5C-60A8-4E46-A090-464D62687BF0}.Release|x86.ActiveCfg = Release|Win32
-		{51A30C5C-60A8-4E46-A090-464D62687BF0}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
