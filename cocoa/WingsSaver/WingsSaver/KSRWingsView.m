@@ -83,13 +83,20 @@
     
     NSLog(@"Preparing OpenGL context.");
     
+    GLint swapInterval = 1;
+    [self.openGLContext setValues:&swapInterval forParameter:NSOpenGLContextParameterSwapInterval];
+    
     glEnable(GL_DEPTH_TEST);
     if ([self hasOpenGLVersionMajor:1 minor:1]) {
         glPolygonOffset(-0.5, -2.0);
     }
     
     glEnable(GL_LINE_SMOOTH);
-    glLineWidth(1.0);
+    if (self.wantsBestResolutionOpenGLSurface) {
+        glLineWidth(2.0);
+    } else {
+        glLineWidth(1.0);
+    }
     
     glEnable(GL_POLYGON_SMOOTH);
     
@@ -118,26 +125,13 @@
     for (GLuint displayList = _wingDisplayLists;
          displayList < _wingDisplayLists + [KSRWingsView numWings];
          displayList++) {
-        _wingList = [_wingList arrayByAddingObject:[[KSRWing alloc] initWithGLDisplayList:displayList]];
+        KSRWing *wing = [[KSRWing alloc] initWithGLDisplayList:displayList];
+        _wingList = [_wingList arrayByAddingObject:wing];
         glNewList(displayList, GL_COMPILE);
         glEndList();
     }
     
     NSLog(@"Prepared OpenGL context.");
-}
-
-- (void)clearGLContext {
-    NSLog(@"Clearing OpenGL context.");
-    
-    _wingList = [NSArray array];
-    glDeleteLists(_wingDisplayLists, [KSRWingsView numWings]);
-    _wingDisplayLists = 0;
-    glDeleteLists(_wingDisplayList, 1);
-    _wingDisplayList = 0;
-    
-    NSLog(@"Cleared OpenGL context.");
-    
-    [super clearGLContext];
 }
 
 - (void)advanceAnimation {
@@ -148,8 +142,7 @@
              [KSRWingsView numWings], (unsigned long) _wingList.count);
     
     GLuint const displayList = _wingList.lastObject.glDisplayList;
-    NSRange range = NSMakeRange(1, _wingList.count - 1);
-    _wingList = [_wingList subarrayWithRange:range];
+    _wingList = [_wingList subarrayWithRange:NSMakeRange(0, _wingList.count - 1)];
     KSRColor *color = [[KSRColor alloc] initWithRed:[_redCurve getNextValue]
                                               green:[_greenCurve getNextValue]
                                                blue:[_blueCurve getNextValue]];
@@ -163,7 +156,7 @@
                                                        yaw:[_yawCurve getNextValue]
                                                      color:color
                                                  edgeColor:[KSRColor white]];
-    _wingList = [_wingList arrayByAddingObject:wing];
+    _wingList = [[NSArray arrayWithObject:wing] arrayByAddingObjectsFromArray:_wingList];
     
 //     TODO: Do I need this?
     [self.openGLContext makeCurrentContext];
@@ -179,6 +172,8 @@
     glPopMatrix();
     glEndList();
     
+    glFlush();
+    
     // TODO: Do I need this?
     [self.openGLContext update];
     
@@ -187,29 +182,20 @@
     NSLog(@"Advanced animation.");
 }
 
-- (void)update {
-    [super update];
-    
-    NSLog(@"Updating");
-    
-    NSLog(@"Updated");
-}
-
 - (void)reshape {
-    [super reshape];
-    
     NSLog(@"Reshaping");
     
-    NSRect backingBounds = [self convertRectToBacking:[self bounds]];
+    NSSize backingSize = [self convertSizeToBacking:self.bounds.size];
     
     GLdouble xmult = 1.0;
     GLdouble ymult = 1.0;
-    if (backingBounds.size.width > backingBounds.size.height) {
-        xmult = (GLdouble)(backingBounds.size.width) / (GLdouble)(backingBounds.size.height);
+    if (backingSize.width > backingSize.height) {
+        xmult = (GLdouble)(backingSize.width) / (GLdouble)(backingSize.height);
     } else {
-        ymult = (GLdouble)(backingBounds.size.height) / (GLdouble)(backingBounds.size.width);
+        ymult = (GLdouble)(backingSize.height) / (GLdouble)(backingSize.width);
     }
     
+    // NSOpenGLView handles calling glViewport.
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-20.0 * xmult, 20.0 * xmult,
@@ -217,12 +203,12 @@
             35.0, 105.0);
     glMatrixMode(GL_MODELVIEW);
     
+    glFlush();
+    
     NSLog(@"Reshaped");
 }
 
 - (void)drawRect:(NSRect)dirtyRect {
-    [super drawRect:dirtyRect];
-    
     NSLog(@"Drawing");
     
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -234,7 +220,7 @@
         for (KSRWing *wing in _wingList) {
             glTranslatef(0, 0, wing.deltaZ);
             glRotatef(wing.deltaAngle, 0, 0, 1);
-            
+
             KSRColor *color = wing.edgeColor;
             glColor3f(color.red, color.green, color.blue);
             glCallList(wing.glDisplayList);

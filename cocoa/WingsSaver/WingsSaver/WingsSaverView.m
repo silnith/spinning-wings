@@ -13,6 +13,11 @@
 
 @implementation WingsSaverView
 
+// The length of time, in seconds, to display each frame of animation.
++ (NSTimeInterval)frameInterval {
+    return 1.0 / 30.0;
+}
+
 - (instancetype)init {
     self = [super init];
     
@@ -39,10 +44,11 @@
         }
         
         [_glView setWantsBestResolutionOpenGLSurface:YES];
+        [_glView setWantsExtendedDynamicRangeOpenGLSurface:YES];
         
         [self addSubview:_glView];
         
-        [self setAnimationTimeInterval:1/30.0];
+        [self setAnimationTimeInterval:[WingsSaverView frameInterval]];
     }
     
     return self;
@@ -74,10 +80,11 @@
         }
         
         [_glView setWantsBestResolutionOpenGLSurface:YES];
+        [_glView setWantsExtendedDynamicRangeOpenGLSurface:YES];
         
         [self addSubview:_glView];
         
-        [self setAnimationTimeInterval:1/30.0];
+        [self setAnimationTimeInterval:[WingsSaverView frameInterval]];
     }
     
     return self;
@@ -98,6 +105,7 @@
             NSOpenGLPFAMaximumPolicy,
             NSOpenGLPFAOpenGLProfile, kCGLOGLPVersion_Legacy,
             NSOpenGLPFAAllowOfflineRenderers,
+            (NSOpenGLPixelFormatAttribute)nil,
         };
         NSOpenGLPixelFormat *format = [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes];
         
@@ -112,10 +120,11 @@
         }
         
         [_glView setWantsBestResolutionOpenGLSurface:YES];
+        [_glView setWantsExtendedDynamicRangeOpenGLSurface:YES];
         
         [self addSubview:_glView];
         
-        [self setAnimationTimeInterval:1/30.0];
+        [self setAnimationTimeInterval:[WingsSaverView frameInterval]];
     }
     
     return self;
@@ -151,10 +160,11 @@
         }
         
         [_glView setWantsBestResolutionOpenGLSurface:YES];
+        [_glView setWantsExtendedDynamicRangeOpenGLSurface:YES];
         
         [self addSubview:_glView];
         
-        [self setAnimationTimeInterval:1/30.0];
+        [self setAnimationTimeInterval:[WingsSaverView frameInterval]];
     }
     
     return self;

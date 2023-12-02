@@ -14,4 +14,6 @@
     KSRWingsView *_glView;
 }
 
++ (NSTimeInterval)frameInterval;
+
 @end
