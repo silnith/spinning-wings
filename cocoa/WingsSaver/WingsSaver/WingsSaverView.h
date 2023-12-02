@@ -11,7 +11,7 @@
 #import "KSRWingsView.h"
 
 @interface WingsSaverView : ScreenSaverView {
-    KSRWingsView *glView;
+    KSRWingsView *_glView;
 }
 
 @end

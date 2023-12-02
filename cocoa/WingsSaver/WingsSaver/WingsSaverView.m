@@ -8,13 +8,8 @@
 
 #import "WingsSaverView.h"
 
-#import "KSRWingsView.h"
-
 #import <OpenGL/gl.h>
 #import <OpenGL/glu.h>
-
-#import <Foundation/NSDebug.h>
-#import <syslog.h>
 
 @implementation WingsSaverView
 
@@ -25,8 +20,6 @@
     NSLog(@"initWithFrame:{%f, %f, %f, %f}",
           frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
 //    NSLog(@"initWithFrame:%@", frame);
-    
-//    NSDebugEnabled = true;
     
     if (self) {
         NSOpenGLPixelFormatAttribute attributes[] = {
@@ -39,22 +32,21 @@
         };
         NSOpenGLPixelFormat *format = [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes];
         
-        glView = [[KSRWingsView alloc] initWithFrame:frame pixelFormat:format];
+        _glView = [[KSRWingsView alloc] initWithFrame:frame pixelFormat:format];
         
-        if (!glView) {
+        if (_glView) {
+            NSLog(@"Found OpenGL pixel format:%@", format);
+        } else {
             NSLog(@"No OpenGL view.");
             
             return nil;
-        } else {
-            NSLog(@"Found OpenGL pixel format.");
         }
         
-        [glView setWantsBestResolutionOpenGLSurface:YES];
+        [_glView setWantsBestResolutionOpenGLSurface:YES];
         
-        [self addSubview:glView];
+        [self addSubview:_glView];
         
         [self setAnimationTimeInterval:1/30.0];
-//        [self setAnimationTimeInterval:1];
     }
     
     return self;
@@ -86,7 +78,7 @@
 {
     NSLog(@"Animating one frame.");
     
-    [glView advanceAnimation];
+    [_glView advanceAnimation];
     
     [self setNeedsDisplay:YES];
     

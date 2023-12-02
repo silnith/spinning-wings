@@ -17,52 +17,54 @@
     self = [super initWithFrame:frameRect pixelFormat:format];
     
     if (self) {
-        radiusCurve = [[KSRCurveGenerator alloc] initWithValue:10.0
+        _radiusCurve = [[KSRCurveGenerator alloc] initWithValue:10.0
                                                   minimumValue:-15.0
                                                   maximumValue:15.0
                                                          wraps:NO
                                                maximumVelocity:0.1
                                            maximumAcceleration:0.01
                                     ticksPerAccelerationChange:150];
-        angleCurve = [KSRCurveGenerator curveForAngleWithValue:0.0
+        _angleCurve = [KSRCurveGenerator curveForAngleWithValue:0.0
                                                maximumVelocity:2.0
                                            maximumAcceleration:0.05
                                     ticksPerAccelerationChange:120];
-        deltaAngleCurve = [KSRCurveGenerator curveForAngleWithValue:15.0
+        _deltaAngleCurve = [KSRCurveGenerator curveForAngleWithValue:15.0
                                                     maximumVelocity:0.2
                                                 maximumAcceleration:0.02
                                          ticksPerAccelerationChange:80];
-        deltaZCurve = [[KSRCurveGenerator alloc] initWithValue:0.5
+        _deltaZCurve = [[KSRCurveGenerator alloc] initWithValue:0.5
                                                   minimumValue:0.4
                                                   maximumValue:0.7
                                                          wraps:NO
                                                maximumVelocity:0.01
                                            maximumAcceleration:0.001
                                     ticksPerAccelerationChange:200];
-        rollCurve = [KSRCurveGenerator curveForAngleWithValue:0.0
+        _rollCurve = [KSRCurveGenerator curveForAngleWithValue:0.0
                                               maximumVelocity:1.0
                                           maximumAcceleration:0.25
                                    ticksPerAccelerationChange:80];
-        pitchCurve = [KSRCurveGenerator curveForAngleWithValue:0.0
+        _pitchCurve = [KSRCurveGenerator curveForAngleWithValue:0.0
                                                maximumVelocity:2.0
                                            maximumAcceleration:0.25
                                     ticksPerAccelerationChange:40];
-        yawCurve = [KSRCurveGenerator curveForAngleWithValue:0.0
+        _yawCurve = [KSRCurveGenerator curveForAngleWithValue:0.0
                                              maximumVelocity:1.5
                                          maximumAcceleration:0.25
                                   ticksPerAccelerationChange:50];
-        redCurve = [KSRCurveGenerator curveForColorComponentWithValue:0.0
+        _redCurve = [KSRCurveGenerator curveForColorComponentWithValue:0.0
                                                       maximumVelocity:0.04
                                                   maximumAcceleration:0.01
                                            ticksPerAccelerationChange:95];
-        greenCurve = [KSRCurveGenerator curveForColorComponentWithValue:0.0
+        _greenCurve = [KSRCurveGenerator curveForColorComponentWithValue:0.0
                                                         maximumVelocity:0.04
                                                     maximumAcceleration:0.01
                                              ticksPerAccelerationChange:40];
-        blueCurve = [KSRCurveGenerator curveForColorComponentWithValue:0.0
+        _blueCurve = [KSRCurveGenerator curveForColorComponentWithValue:0.0
                                                        maximumVelocity:0.04
                                                    maximumAcceleration:0.01
                                             ticksPerAccelerationChange:70];
+        
+        _wingList = [NSArray array];
     }
     
     return self;
@@ -78,7 +80,7 @@
     NSLog(@"Preparing OpenGL context.");
     
     // TODO: Do I need this?
-//    [self.openGLContext makeCurrentContext];
+    [self.openGLContext makeCurrentContext];
     
     glEnable(GL_DEPTH_TEST);
     if ([self hasOpenGLVersionMajor:1 minor:1]) {
@@ -101,8 +103,8 @@
               0.0, 0.0, 1.0);
     // GLKMatrix4MakeLookAt
     
-    wingDisplayList = glGenLists(1);
-    glNewList(wingDisplayList, GL_COMPILE);
+    _wingDisplayList = glGenLists(1);
+    glNewList(_wingDisplayList, GL_COMPILE);
     glBegin(GL_QUADS);
     glVertex2f(1, 1);
     glVertex2f(-1, 1);
@@ -111,12 +113,11 @@
     glEnd();
     glEndList();
     
-    wingList = [NSArray array];
-    wingDisplayLists = glGenLists(numWings);
-    for (GLuint displayList = wingDisplayLists;
-         displayList < wingDisplayLists + numWings;
+    _wingDisplayLists = glGenLists(numWings);
+    for (GLuint displayList = _wingDisplayLists;
+         displayList < _wingDisplayLists + numWings;
          displayList++) {
-        wingList = [wingList arrayByAddingObject:[[KSRWing alloc] initWithGLDisplayList:displayList]];
+        _wingList = [_wingList arrayByAddingObject:[[KSRWing alloc] initWithGLDisplayList:displayList]];
         glNewList(displayList, GL_COMPILE);
         glEndList();
     }
@@ -124,15 +125,15 @@
     NSLog(@"Prepared OpenGL context.");
     
     // TODO: Do I need this?
-//    [self.openGLContext update];
+    [self.openGLContext update];
 }
 
 - (void)clearGLContext {
     NSLog(@"Clearing OpenGL context.");
     
-    wingList = nil;
-    glDeleteLists(wingDisplayLists, numWings);
-    glDeleteLists(wingDisplayList, 1);
+    _wingList = [NSArray array];
+    glDeleteLists(_wingDisplayLists, numWings);
+    glDeleteLists(_wingDisplayList, 1);
     
     NSLog(@"Cleared OpenGL context.");
     
@@ -142,26 +143,29 @@
 - (void)advanceAnimation {
     NSLog(@"Advancing animation.");
     
-    NSAssert(wingList.count == numWings,
+    NSAssert(_wingList.count == numWings,
              @"List of wings length is incorrect.  Expected: %d, Actual: %lu",
-             numWings, (unsigned long) wingList.count);
-    GLuint displayList = wingList.lastObject.glDisplayList;
-    NSRange range = NSMakeRange(1, wingList.count - 1);
-    wingList = [wingList subarrayWithRange:range];
+             numWings, (unsigned long) _wingList.count);
+    GLuint displayList = _wingList.lastObject.glDisplayList;
+    NSRange range = NSMakeRange(1, _wingList.count - 1);
+    _wingList = [_wingList subarrayWithRange:range];
+    KSRColor *color = [[KSRColor alloc] initWithRed:[_redCurve getNextValue]
+                                              green:[_greenCurve getNextValue]
+                                               blue:[_blueCurve getNextValue]];
     KSRWing *wing = [[KSRWing alloc] initWithGLDisplayList:displayList
-                                                    radius:[radiusCurve getNextValue]
-                                                     angle:[angleCurve getNextValue]
-                                                deltaAngle:[deltaAngleCurve getNextValue]
-                                                    deltaZ:[deltaZCurve getNextValue]
-                                                      roll:[rollCurve getNextValue]
-                                                     pitch:[pitchCurve getNextValue]
-                                                       yaw:[yawCurve getNextValue]
-                                                     color:[[KSRColor alloc] initWithRed:[redCurve getNextValue] green:[greenCurve getNextValue] blue:[blueCurve getNextValue]]
+                                                    radius:[_radiusCurve getNextValue]
+                                                     angle:[_angleCurve getNextValue]
+                                                deltaAngle:[_deltaAngleCurve getNextValue]
+                                                    deltaZ:[_deltaZCurve getNextValue]
+                                                      roll:[_rollCurve getNextValue]
+                                                     pitch:[_pitchCurve getNextValue]
+                                                       yaw:[_yawCurve getNextValue]
+                                                     color:color
                                                  edgeColor:[KSRColor white]];
-    wingList = [wingList arrayByAddingObject:wing];
+    _wingList = [_wingList arrayByAddingObject:wing];
     
-    // TODO: Do I need this?
-//    [self.openGLContext makeCurrentContext];
+//     TODO: Do I need this?
+    [self.openGLContext makeCurrentContext];
     
     glNewList(displayList, GL_COMPILE);
     glPushMatrix();
@@ -170,12 +174,12 @@
     glRotatef(-wing.yaw, 0, 0, 1);
     glRotatef(-wing.pitch, 0, 1, 0);
     glRotatef(wing.roll, 1, 0, 0);
-    glCallList(wingDisplayList);
+    glCallList(_wingDisplayList);
     glPopMatrix();
     glEndList();
     
     // TODO: Do I need this?
-//    [self.openGLContext update];
+    [self.openGLContext update];
     
     [self setNeedsDisplay:YES];
     
@@ -184,7 +188,7 @@
 
 - (void)reshape {
     // TODO: Do I need this?
-//    [self.openGLContext makeCurrentContext];
+    [self.openGLContext makeCurrentContext];
     
     NSLog(@"Reshaping");
     
@@ -198,13 +202,13 @@
         ymult = (GLdouble)(backingBounds.size.height) / (GLdouble)(backingBounds.size.width);
     }
     
-//    GLint const x = 0;
-//    GLint const y = 0;
-//    GLsizei const width = backingBounds.size.width;
-//    GLsizei const height = backingBounds.size.height;
+    GLint const x = 0;
+    GLint const y = 0;
+    GLsizei const width = backingBounds.size.width;
+    GLsizei const height = backingBounds.size.height;
     
     // TODO: Do I need this?
-//    glViewport(x, y, width, height);
+    glViewport(x, y, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-20.0 * xmult, 20.0 * xmult,
@@ -213,18 +217,18 @@
     glMatrixMode(GL_MODELVIEW);
     
     // TODO: Do I need this?
-//    [self.openGLContext update];
+    [self.openGLContext update];
     
     NSLog(@"Reshaped");
 }
 
 - (void)drawRect:(NSRect)dirtyRect {
-//    [super drawRect:dirtyRect];
+    [super drawRect:dirtyRect];
     
     NSLog(@"Drawing");
     
     // TODO: Do I need this?
-//    [self.openGLContext makeCurrentContext];
+    [self.openGLContext makeCurrentContext];
     
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
@@ -232,7 +236,7 @@
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glEnable(GL_POLYGON_OFFSET_LINE);
         glPushMatrix();
-        for (KSRWing *wing in wingList) {
+        for (KSRWing *wing in _wingList) {
             glTranslatef(0, 0, wing.deltaZ);
             glRotatef(wing.deltaAngle, 0, 0, 1);
             
@@ -245,11 +249,11 @@
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
     glPushMatrix();
-    for (KSRWing *wing in wingList) {
+    for (KSRWing *wing in _wingList) {
         glTranslatef(0, 0, wing.deltaZ);
         glRotatef(wing.deltaAngle, 0, 0, 1);
         
-        KSRColor *color = wing.edgeColor;
+        KSRColor *color = wing.color;
         glColor3f(color.red, color.green, color.blue);
         glCallList(wing.glDisplayList);
     }
@@ -260,8 +264,8 @@
     NSLog(@"Drawn");
     
     // TODO: Do I need this?
-//    [self.openGLContext flushBuffer];
-//    [self.openGLContext update];
+    [self.openGLContext flushBuffer];
+    [self.openGLContext update];
 }
 
 @end

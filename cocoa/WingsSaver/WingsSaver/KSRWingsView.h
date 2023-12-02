@@ -18,20 +18,20 @@ NS_ASSUME_NONNULL_BEGIN
 static GLsizei const numWings = 40;
 
 @interface KSRWingsView : NSOpenGLView {
-    GLuint wingDisplayList;
-    GLuint wingDisplayLists;
-    NSArray<KSRWing*> *wingList;
+    GLuint _wingDisplayList;
+    GLuint _wingDisplayLists;
+    NSArray<KSRWing*> *_wingList;
     
-    KSRCurveGenerator *radiusCurve;
-    KSRCurveGenerator *angleCurve;
-    KSRCurveGenerator *deltaAngleCurve;
-    KSRCurveGenerator *deltaZCurve;
-    KSRCurveGenerator *rollCurve;
-    KSRCurveGenerator *pitchCurve;
-    KSRCurveGenerator *yawCurve;
-    KSRCurveGenerator *redCurve;
-    KSRCurveGenerator *greenCurve;
-    KSRCurveGenerator *blueCurve;
+    KSRCurveGenerator *_radiusCurve;
+    KSRCurveGenerator *_angleCurve;
+    KSRCurveGenerator *_deltaAngleCurve;
+    KSRCurveGenerator *_deltaZCurve;
+    KSRCurveGenerator *_rollCurve;
+    KSRCurveGenerator *_pitchCurve;
+    KSRCurveGenerator *_yawCurve;
+    KSRCurveGenerator *_redCurve;
+    KSRCurveGenerator *_greenCurve;
+    KSRCurveGenerator *_blueCurve;
 }
 
 - (void)advanceAnimation;
