@@ -29,7 +29,6 @@ UINT const updateDelayMilliseconds{ 35 };
 GLuint glMajorVersion;
 GLuint glMinorVersion;
 
-GLuint wingDisplayList;
 wing_list wings;
 
 silnith::CurveGenerator radiusCurve{ 10.0f, -15.0f, 15.0f, false, 0.1f, 0.01f, 150 };
@@ -59,7 +58,7 @@ BOOL MonitorEnumProc(HMONITOR hMonitor, HDC hdc, LPRECT lpRect, LPARAM d)
 /// </summary>
 /// <param name="hdc">a handle to the device context</param>
 /// <returns>the identifier for the pixel format</returns>
-int InitializeDeviceContext(HDC const & hdc)
+int InitializeDeviceContext(HDC const& hdc)
 {
 	PIXELFORMATDESCRIPTOR pfd{
 		.nSize = sizeof(PIXELFORMATDESCRIPTOR),
@@ -171,19 +170,6 @@ void InitializeOpenGLState()
 	gluLookAt(0, 50, 50, 0, 0, 13, 0, 0, 1);
 }
 
-void InitializeWingDisplayList()
-{
-	wingDisplayList = glGenLists(1);
-	glNewList(wingDisplayList, GL_COMPILE);
-	glBegin(GL_QUADS);
-	glVertex2f(1, 1);
-	glVertex2f(-1, 1);
-	glVertex2f(-1, -1);
-	glVertex2f(1, -1);
-	glEnd();
-	glEndList();
-}
-
 void InitializeWingList(void)
 {
 	GLuint const wingLists{ glGenLists(numWings) };
@@ -191,8 +177,6 @@ void InitializeWingList(void)
 		// This initializes the list of wings to hold the allocated GL display lists.
 		// These display list identifiers are reused throughout the lifetime of the program.
 		wings.emplace_back(displayList);
-		glNewList(displayList, GL_COMPILE);
-		glEndList();
 	}
 }
 
@@ -205,18 +189,6 @@ void advanceAnimation(void)
 		rollCurve.getNextValue(), pitchCurve.getNextValue(), yawCurve.getNextValue(),
 		silnith::Color{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
 		silnith::Color::WHITE) };
-
-	// TODO: Do I need an HDC in order to execute these OpenGL commands?
-	glNewList(displayList, GL_COMPILE);
-	glPushMatrix();
-	glRotatef(wing.getAngle(), 0, 0, 1);
-	glTranslatef(wing.getRadius(), 0, 0);
-	glRotatef(-(wing.getYaw()), 0, 0, 1);
-	glRotatef(-(wing.getPitch()), 0, 1, 0);
-	glRotatef(wing.getRoll(), 1, 0, 0);
-	glCallList(wingDisplayList);
-	glPopMatrix();
-	glEndList();
 }
 
 void DrawFrame()
@@ -234,7 +206,19 @@ void DrawFrame()
 
 			silnith::Color const& edgeColor{ wing.getEdgeColor() };
 			glColor3f(edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
-			glCallList(wing.getGLDisplayList());
+			glPushMatrix();
+			glRotatef(wing.getAngle(), 0, 0, 1);
+			glTranslatef(wing.getRadius(), 0, 0);
+			glRotatef(-(wing.getYaw()), 0, 0, 1);
+			glRotatef(-(wing.getPitch()), 0, 1, 0);
+			glRotatef(wing.getRoll(), 1, 0, 0);
+			glBegin(GL_QUADS);
+			glVertex2f(1, 1);
+			glVertex2f(-1, 1);
+			glVertex2f(-1, -1);
+			glVertex2f(1, -1);
+			glEnd();
+			glPopMatrix();
 		}
 		glPopMatrix();
 		glDisable(GL_POLYGON_OFFSET_LINE);
@@ -248,7 +232,19 @@ void DrawFrame()
 
 		silnith::Color const& color{ wing.getColor() };
 		glColor3f(color.getRed(), color.getGreen(), color.getBlue());
-		glCallList(wing.getGLDisplayList());
+		glPushMatrix();
+		glRotatef(wing.getAngle(), 0, 0, 1);
+		glTranslatef(wing.getRadius(), 0, 0);
+		glRotatef(-(wing.getYaw()), 0, 0, 1);
+		glRotatef(-(wing.getPitch()), 0, 1, 0);
+		glRotatef(wing.getRoll(), 1, 0, 0);
+		glBegin(GL_QUADS);
+		glVertex2f(1, 1);
+		glVertex2f(-1, 1);
+		glVertex2f(-1, -1);
+		glVertex2f(1, -1);
+		glEnd();
+		glPopMatrix();
 	}
 	glPopMatrix();
 
@@ -302,8 +298,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		InitializeRenderingContext(hdc);
 
 		InitializeOpenGLState();
-
-		InitializeWingDisplayList();
 
 		InitializeWingList();
 
@@ -371,7 +365,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		//EnumDisplayMonitors(hdc, NULL, MonitorEnumProc, 0);
 
 		DrawFrame();
-		
+
 		SwapBuffers(hdc);
 
 		EndPaint(hWnd, &paintstruct);
@@ -478,5 +472,5 @@ int APIENTRY WinMain(
 
 	KillTimer(window, timer);
 
-	return (int) msg.wParam;
+	return (int)msg.wParam;
 }

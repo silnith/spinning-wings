@@ -1,24 +1,27 @@
-/*
-* TODO: Disable PCA in manifest.
-* mark as DPI-aware
-*/
-
 #include <Windows.h>
+#include <ScrnSave.h>
+
+#ifdef UNICODE
+#pragma comment (lib, "scrnsavw.lib")
+#else
+#pragma comment (lib, "scrnsave.lib")
+#endif
+#pragma comment (lib, "comctl32.lib")
+
 #include <gl/GL.h>
 #include <gl/GLU.h>
 
 #pragma comment (lib, "opengl32.lib")
 #pragma comment (lib, "glu32.lib")
 
-#include <deque>
-#include <string>
-#include <sstream>
-
-#include <cassert>
-
 #include "Color.h"
 #include "Wing.h"
 #include "CurveGenerator.h"
+
+#include <cassert>
+#include <deque>
+#include <sstream>
+
 
 typedef std::deque<silnith::Wing> wing_list;
 
@@ -43,15 +46,24 @@ silnith::CurveGenerator redCurve{ silnith::CurveGenerator::createGeneratorForCol
 silnith::CurveGenerator greenCurve{ silnith::CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 40) };
 silnith::CurveGenerator blueCurve{ silnith::CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
 
+UINT_PTR timer;
+
 bool hasOpenGL(GLuint major, GLuint minor)
 {
 	return (glMajorVersion > major)
 		|| (glMajorVersion == major && glMinorVersion >= minor);
 }
 
-BOOL MonitorEnumProc(HMONITOR hMonitor, HDC hdc, LPRECT lpRect, LPARAM d)
+void ParseOpenGLVersion(GLubyte const* glVersion)
 {
-	return TRUE;
+	std::istringstream versionStringInput{ std::string{ reinterpret_cast<char const*>(glVersion) } };
+	//std::basic_istringstream<GLubyte> versionStringInput{ std::basic_string<GLubyte>{glVersion} };
+
+	versionStringInput >> glMajorVersion;
+	GLubyte period;
+	versionStringInput >> period;
+	assert(period == '.');
+	versionStringInput >> glMinorVersion;
 }
 
 /// <summary>
@@ -59,7 +71,7 @@ BOOL MonitorEnumProc(HMONITOR hMonitor, HDC hdc, LPRECT lpRect, LPARAM d)
 /// </summary>
 /// <param name="hdc">a handle to the device context</param>
 /// <returns>the identifier for the pixel format</returns>
-int InitializeDeviceContext(HDC const & hdc)
+int InitializeDeviceContext(HDC const& hdc)
 {
 	PIXELFORMATDESCRIPTOR pfd{
 		.nSize = sizeof(PIXELFORMATDESCRIPTOR),
@@ -123,18 +135,6 @@ HGLRC InitializeRenderingContext(HDC const& hdc)
 	HGLRC hglrc{ wglCreateContext(hdc) };
 	BOOL success{ wglMakeCurrent(hdc, hglrc) };
 	return hglrc;
-}
-
-void ParseOpenGLVersion(GLubyte const* glVersion)
-{
-	std::istringstream versionStringInput{ std::string{ reinterpret_cast<char const*>(glVersion) } };
-	//std::basic_istringstream<GLubyte> versionStringInput{ std::basic_string<GLubyte>{glVersion} };
-
-	versionStringInput >> glMajorVersion;
-	GLubyte period;
-	versionStringInput >> period;
-	assert(period == '.');
-	versionStringInput >> glMinorVersion;
 }
 
 void InitializeOpenGLState()
@@ -278,21 +278,17 @@ void Resize(GLsizei width, GLsizei height)
 	// check GL errors
 }
 
-void TimerProc(HWND hWnd, UINT message, UINT_PTR bar, DWORD baz)
-{
-	advanceAnimation();
-}
-
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+// add to EXPORTS statement in module-definition (.def) file
+LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
 	case WM_CREATE:
 	{
 		// window created
-		LPCREATESTRUCTW createStruct{ (LPCREATESTRUCTW)lParam };
-		createStruct->cx;
-		createStruct->cy;
+		//LPCREATESTRUCTW createStruct{ (LPCREATESTRUCTW)lParam };
+		//createStruct->cx;
+		//createStruct->cy;
 		// DirectDrawCreate()
 
 		HDC hdc{ GetDC(hWnd) };
@@ -308,6 +304,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		InitializeWingList();
 
 		ReleaseDC(hWnd, hdc);
+
+		timer = SetTimer(hWnd, 42, updateDelayMilliseconds, NULL);
 
 		return 0;
 	}
@@ -334,7 +332,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case SIZE_MINIMIZED:
 		default:
-			return DefWindowProcW(hWnd, message, wParam, lParam);
+			return DefScreenSaverProc(hWnd, message, wParam, lParam);
 		}
 
 		HDC hdc{ GetDC(hWnd) };
@@ -371,7 +369,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		//EnumDisplayMonitors(hdc, NULL, MonitorEnumProc, 0);
 
 		DrawFrame();
-		
+
 		SwapBuffers(hdc);
 
 		EndPaint(hWnd, &paintstruct);
@@ -384,6 +382,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_DESTROY:
 	{
+		KillTimer(hWnd, timer);
+
 		// window about to be destroyed
 		HDC hdc{ GetDC(hWnd) };
 		HGLRC hglrc{ wglGetCurrentContext() };
@@ -393,90 +393,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			wglDeleteContext(hglrc);
 		}
 		ReleaseDC(hWnd, hdc);
-		PostQuitMessage(0);
-		return 0;
+
+		//PostQuitMessage(0);
+		return DefScreenSaverProc(hWnd, message, wParam, lParam);
 	}
 	default:
 	{
-		return DefWindowProcW(hWnd, message, wParam, lParam);
+		return DefScreenSaverProc(hWnd, message, wParam, lParam);
 	}
 	}
 
-	return 0;
+	return DefScreenSaverProc(hWnd, message, wParam, lParam);
 }
 
-int APIENTRY WinMain(
-	_In_ HINSTANCE hInstance,
-	_In_opt_ HINSTANCE hPrevInstance,
-	_In_ LPSTR lpCmdLine,
-	_In_ int nShowCmd)
+BOOL WINAPI RegisterDialogClasses(HANDLE hInst)
 {
-	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
+	return TRUE;
+}
 
-	// register the window class for the main window
-
-	WNDCLASSEXW wndClassEx{
-		.cbSize = sizeof(WNDCLASSEXW),
-		.style = CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_OWNDC,
-		.lpfnWndProc = WndProc,
-		.cbClsExtra = 0,
-		.cbWndExtra = 0,
-		.hInstance = hInstance,
-		.hIcon = NULL,  // LoadIcon
-		.hCursor = NULL,  // LoadCursor
-		// GetStockObject(BLACK_BRUSH);
-		.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1),
-		.lpszMenuName = NULL,
-		.lpszClassName = L"Project1Class",
-		.hIconSm = NULL,
-	};
-	ATOM wndClassIdentifier{ RegisterClassExW(&wndClassEx) };
-	if (wndClassIdentifier == 0)
-	{
-		return FALSE;
-	}
-
-	// create the main window
-
-	DWORD extendedWindowStyle{ WS_EX_APPWINDOW | WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_WINDOWEDGE };
-	LPCWSTR className{ (LPCWSTR)wndClassIdentifier };
-	LPCWSTR windowName{ L"Project1Window" };
-	DWORD windowStyle{ WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS };
-	int x{ CW_USEDEFAULT };
-	int y{ CW_USEDEFAULT };
-	int width{ CW_USEDEFAULT };
-	int height{ 600 };
-	HWND windowParent{ NULL };
-	HMENU menu{ NULL };
-	HWND window{ CreateWindowExW(extendedWindowStyle, className, windowName, windowStyle, x, y, width, height, windowParent, menu, hInstance, NULL) };
-	if (window == NULL) {
-		// call GetLastError
-		return FALSE;
-	}
-
-	// show the window
-
-	ShowWindow(window, nShowCmd);
-	UpdateWindow(window);
-
-	UINT_PTR timer{ SetTimer(window, 42, updateDelayMilliseconds, NULL) };
-
-	// start the message loop
-
-	MSG msg{};
-	BOOL hasMessage{ GetMessageW(&msg, NULL, 0, 0) };
-	while (hasMessage) {
-		if (hasMessage == -1) {
-			return -1;
-		}
-		TranslateMessage(&msg);
-		DispatchMessageW(&msg);
-
-		hasMessage = GetMessageW(&msg, NULL, 0, 0);
-	}
-
-	KillTimer(window, timer);
-
-	return (int) msg.wParam;
+BOOL WINAPI ScreenSaverConfigureDialog(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	return TRUE;
 }
