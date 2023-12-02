@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "container:WingsSaver/WingsSaver.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "container:Wings/Wings.xcodeproj">
+   </FileRef>
+</Workspace>

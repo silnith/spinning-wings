@@ -1,0 +1,395 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3700913B2B1737F5001D9D78 /* WingsSaverView.h in Headers */ = {isa = PBXBuildFile; fileRef = 3700913A2B1737F5001D9D78 /* WingsSaverView.h */; };
+		3700913D2B1737F5001D9D78 /* WingsSaverView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3700913C2B1737F5001D9D78 /* WingsSaverView.m */; };
+		370091512B1745E4001D9D78 /* libWings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3700914F2B17396B001D9D78 /* libWings.a */; };
+		370091532B1745F1001D9D78 /* ScreenSaver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 370091522B1745F1001D9D78 /* ScreenSaver.framework */; };
+		370091592B182BFD001D9D78 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 370091582B182BFD001D9D78 /* OpenGL.framework */; };
+		37E0E5492B19735800B405A0 /* KSRWingsView.h in Headers */ = {isa = PBXBuildFile; fileRef = 37E0E5472B19735800B405A0 /* KSRWingsView.h */; };
+		37E0E54A2B19735800B405A0 /* KSRWingsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 37E0E5482B19735800B405A0 /* KSRWingsView.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3700914E2B17396B001D9D78 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3700914A2B17396B001D9D78 /* Wings.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 370090932B1734D6001D9D78;
+			remoteInfo = Wings;
+		};
+		37E0E5442B19686900B405A0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3700914A2B17396B001D9D78 /* Wings.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 370090922B1734D6001D9D78;
+			remoteInfo = Wings;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		370091372B1737F5001D9D78 /* WingsSaver.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WingsSaver.saver; sourceTree = BUILT_PRODUCTS_DIR; };
+		3700913A2B1737F5001D9D78 /* WingsSaverView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WingsSaverView.h; sourceTree = "<group>"; };
+		3700913C2B1737F5001D9D78 /* WingsSaverView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WingsSaverView.m; sourceTree = "<group>"; };
+		3700913E2B1737F5001D9D78 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3700914A2B17396B001D9D78 /* Wings.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Wings.xcodeproj; path = ../Wings/Wings.xcodeproj; sourceTree = "<group>"; };
+		370091522B1745F1001D9D78 /* ScreenSaver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScreenSaver.framework; path = System/Library/Frameworks/ScreenSaver.framework; sourceTree = SDKROOT; };
+		370091582B182BFD001D9D78 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		37E0E5472B19735800B405A0 /* KSRWingsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KSRWingsView.h; sourceTree = "<group>"; };
+		37E0E5482B19735800B405A0 /* KSRWingsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KSRWingsView.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		370091342B1737F5001D9D78 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				370091592B182BFD001D9D78 /* OpenGL.framework in Frameworks */,
+				370091532B1745F1001D9D78 /* ScreenSaver.framework in Frameworks */,
+				370091512B1745E4001D9D78 /* libWings.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3700912D2B1737F5001D9D78 = {
+			isa = PBXGroup;
+			children = (
+				3700914A2B17396B001D9D78 /* Wings.xcodeproj */,
+				370091392B1737F5001D9D78 /* WingsSaver */,
+				370091382B1737F5001D9D78 /* Products */,
+				370091502B1745E4001D9D78 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		370091382B1737F5001D9D78 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				370091372B1737F5001D9D78 /* WingsSaver.saver */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		370091392B1737F5001D9D78 /* WingsSaver */ = {
+			isa = PBXGroup;
+			children = (
+				3700913A2B1737F5001D9D78 /* WingsSaverView.h */,
+				3700913C2B1737F5001D9D78 /* WingsSaverView.m */,
+				3700913E2B1737F5001D9D78 /* Info.plist */,
+				37E0E5472B19735800B405A0 /* KSRWingsView.h */,
+				37E0E5482B19735800B405A0 /* KSRWingsView.m */,
+			);
+			path = WingsSaver;
+			sourceTree = "<group>";
+		};
+		3700914B2B17396B001D9D78 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3700914F2B17396B001D9D78 /* libWings.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		370091502B1745E4001D9D78 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				370091582B182BFD001D9D78 /* OpenGL.framework */,
+				370091522B1745F1001D9D78 /* ScreenSaver.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		370091322B1737F5001D9D78 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3700913B2B1737F5001D9D78 /* WingsSaverView.h in Headers */,
+				37E0E5492B19735800B405A0 /* KSRWingsView.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		370091362B1737F5001D9D78 /* WingsSaver */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 370091412B1737F5001D9D78 /* Build configuration list for PBXNativeTarget "WingsSaver" */;
+			buildPhases = (
+				370091322B1737F5001D9D78 /* Headers */,
+				370091332B1737F5001D9D78 /* Sources */,
+				370091342B1737F5001D9D78 /* Frameworks */,
+				370091352B1737F5001D9D78 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				37E0E5452B19686900B405A0 /* PBXTargetDependency */,
+			);
+			name = WingsSaver;
+			productName = WingsSaver;
+			productReference = 370091372B1737F5001D9D78 /* WingsSaver.saver */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3700912E2B1737F5001D9D78 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = KSR;
+				LastUpgradeCheck = 1010;
+				ORGANIZATIONNAME = Silnith.org;
+				TargetAttributes = {
+					370091362B1737F5001D9D78 = {
+						CreatedOnToolsVersion = 10.1;
+					};
+				};
+			};
+			buildConfigurationList = 370091312B1737F5001D9D78 /* Build configuration list for PBXProject "WingsSaver" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 3700912D2B1737F5001D9D78;
+			productRefGroup = 370091382B1737F5001D9D78 /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 3700914B2B17396B001D9D78 /* Products */;
+					ProjectRef = 3700914A2B17396B001D9D78 /* Wings.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				370091362B1737F5001D9D78 /* WingsSaver */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		3700914F2B17396B001D9D78 /* libWings.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libWings.a;
+			remoteRef = 3700914E2B17396B001D9D78 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		370091352B1737F5001D9D78 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		370091332B1737F5001D9D78 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				37E0E54A2B19735800B405A0 /* KSRWingsView.m in Sources */,
+				3700913D2B1737F5001D9D78 /* WingsSaverView.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		37E0E5452B19686900B405A0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Wings;
+			targetProxy = 37E0E5442B19686900B405A0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		3700913F2B1737F5001D9D78 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		370091402B1737F5001D9D78 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		370091422B1737F5001D9D78 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 6F5HB64879;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				HEADER_SEARCH_PATHS = ../Wings;
+				INFOPLIST_FILE = WingsSaver/Info.plist;
+				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
+				PRODUCT_BUNDLE_IDENTIFIER = org.silnith.WingsSaver;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = "ppc ppc64 i386 x86_64 arm arm64";
+				WRAPPER_EXTENSION = saver;
+			};
+			name = Debug;
+		};
+		370091432B1737F5001D9D78 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 6F5HB64879;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				HEADER_SEARCH_PATHS = ../Wings;
+				INFOPLIST_FILE = WingsSaver/Info.plist;
+				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
+				PRODUCT_BUNDLE_IDENTIFIER = org.silnith.WingsSaver;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = "ppc ppc64 i386 x86_64 arm arm64";
+				WRAPPER_EXTENSION = saver;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		370091312B1737F5001D9D78 /* Build configuration list for PBXProject "WingsSaver" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3700913F2B1737F5001D9D78 /* Debug */,
+				370091402B1737F5001D9D78 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		370091412B1737F5001D9D78 /* Build configuration list for PBXNativeTarget "WingsSaver" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				370091422B1737F5001D9D78 /* Debug */,
+				370091432B1737F5001D9D78 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 3700912E2B1737F5001D9D78 /* Project object */;
+}

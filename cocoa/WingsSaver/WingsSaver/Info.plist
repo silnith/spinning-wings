@@ -21,6 +21,6 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2023 Silnith.org. All rights reserved.</string>
 	<key>NSPrincipalClass</key>
-	<string>SpinningWingsView</string>
+	<string>WingsSaverView</string>
 </dict>
 </plist>
