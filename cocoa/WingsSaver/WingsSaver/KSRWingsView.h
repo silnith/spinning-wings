@@ -15,8 +15,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-static GLsizei const numWings = 40;
-
 @interface KSRWingsView : NSOpenGLView {
     GLuint _wingDisplayList;
     GLuint _wingDisplayLists;
@@ -35,6 +33,8 @@ static GLsizei const numWings = 40;
 }
 
 - (void)advanceAnimation;
+
++ (GLsizei) numWings;
 
 @end
 

@@ -13,6 +13,10 @@
 
 @implementation KSRWingsView
 
++ (GLsizei)numWings {
+    return 40;
+}
+
 - (instancetype)initWithFrame:(NSRect)frameRect pixelFormat:(NSOpenGLPixelFormat *)format {
     self = [super initWithFrame:frameRect pixelFormat:format];
     
@@ -79,9 +83,6 @@
     
     NSLog(@"Preparing OpenGL context.");
     
-    // TODO: Do I need this?
-    [self.openGLContext makeCurrentContext];
-    
     glEnable(GL_DEPTH_TEST);
     if ([self hasOpenGLVersionMajor:1 minor:1]) {
         glPolygonOffset(-0.5, -2.0);
@@ -98,10 +99,10 @@
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
     
     glLoadIdentity();
+    // GLKMatrix4MakeLookAt
     gluLookAt(0.0, 50.0, 50.0,
               0.0, 0.0, 13.0,
               0.0, 0.0, 1.0);
-    // GLKMatrix4MakeLookAt
     
     _wingDisplayList = glGenLists(1);
     glNewList(_wingDisplayList, GL_COMPILE);
@@ -113,9 +114,9 @@
     glEnd();
     glEndList();
     
-    _wingDisplayLists = glGenLists(numWings);
+    _wingDisplayLists = glGenLists([KSRWingsView numWings]);
     for (GLuint displayList = _wingDisplayLists;
-         displayList < _wingDisplayLists + numWings;
+         displayList < _wingDisplayLists + [KSRWingsView numWings];
          displayList++) {
         _wingList = [_wingList arrayByAddingObject:[[KSRWing alloc] initWithGLDisplayList:displayList]];
         glNewList(displayList, GL_COMPILE);
@@ -123,17 +124,16 @@
     }
     
     NSLog(@"Prepared OpenGL context.");
-    
-    // TODO: Do I need this?
-    [self.openGLContext update];
 }
 
 - (void)clearGLContext {
     NSLog(@"Clearing OpenGL context.");
     
     _wingList = [NSArray array];
-    glDeleteLists(_wingDisplayLists, numWings);
+    glDeleteLists(_wingDisplayLists, [KSRWingsView numWings]);
+    _wingDisplayLists = 0;
     glDeleteLists(_wingDisplayList, 1);
+    _wingDisplayList = 0;
     
     NSLog(@"Cleared OpenGL context.");
     
@@ -143,10 +143,11 @@
 - (void)advanceAnimation {
     NSLog(@"Advancing animation.");
     
-    NSAssert(_wingList.count == numWings,
+    NSAssert(_wingList.count == [KSRWingsView numWings],
              @"List of wings length is incorrect.  Expected: %d, Actual: %lu",
-             numWings, (unsigned long) _wingList.count);
-    GLuint displayList = _wingList.lastObject.glDisplayList;
+             [KSRWingsView numWings], (unsigned long) _wingList.count);
+    
+    GLuint const displayList = _wingList.lastObject.glDisplayList;
     NSRange range = NSMakeRange(1, _wingList.count - 1);
     _wingList = [_wingList subarrayWithRange:range];
     KSRColor *color = [[KSRColor alloc] initWithRed:[_redCurve getNextValue]
@@ -186,9 +187,16 @@
     NSLog(@"Advanced animation.");
 }
 
+- (void)update {
+    [super update];
+    
+    NSLog(@"Updating");
+    
+    NSLog(@"Updated");
+}
+
 - (void)reshape {
-    // TODO: Do I need this?
-    [self.openGLContext makeCurrentContext];
+    [super reshape];
     
     NSLog(@"Reshaping");
     
@@ -202,22 +210,12 @@
         ymult = (GLdouble)(backingBounds.size.height) / (GLdouble)(backingBounds.size.width);
     }
     
-    GLint const x = 0;
-    GLint const y = 0;
-    GLsizei const width = backingBounds.size.width;
-    GLsizei const height = backingBounds.size.height;
-    
-    // TODO: Do I need this?
-    glViewport(x, y, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-20.0 * xmult, 20.0 * xmult,
             -20.0 * ymult, 20.0 * ymult,
             35.0, 105.0);
     glMatrixMode(GL_MODELVIEW);
-    
-    // TODO: Do I need this?
-    [self.openGLContext update];
     
     NSLog(@"Reshaped");
 }
@@ -226,9 +224,6 @@
     [super drawRect:dirtyRect];
     
     NSLog(@"Drawing");
-    
-    // TODO: Do I need this?
-    [self.openGLContext makeCurrentContext];
     
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
@@ -262,10 +257,6 @@
     glFlush();
     
     NSLog(@"Drawn");
-    
-    // TODO: Do I need this?
-    [self.openGLContext flushBuffer];
-    [self.openGLContext update];
 }
 
 @end
