@@ -13,6 +13,54 @@
 
 @implementation KSRWingsView
 
++ (void)describePixelFormat:(NSOpenGLPixelFormat *)format {
+    for (GLint virtualScreen = 0; virtualScreen < format.numberOfVirtualScreens; virtualScreen++) {
+        NSLog(@"KSRWingsView:%@:Virtual Screen: %d", format, virtualScreen);
+        
+        GLint glProfile;
+        [format getValues:&glProfile forAttribute:NSOpenGLPFAOpenGLProfile forVirtualScreen:virtualScreen];
+        NSString * glProfileString;
+        switch (glProfile) {
+            case NSOpenGLProfileVersionLegacy:
+                glProfileString = @"Legacy";
+                break;
+                
+            case NSOpenGLProfileVersion3_2Core:
+                glProfileString = @"3.2 Core";
+                break;
+                
+            case NSOpenGLProfileVersion4_1Core:
+                glProfileString = @"4.1 Core";
+                break;
+                
+            default:
+                glProfileString = [[NSNumber numberWithLong:glProfile] stringValue];
+                break;
+        }
+        NSLog(@"KSRWingsView:%@:OpenGL Profile: %@", format, glProfileString);
+        
+        GLint compliant;
+        [format getValues:&compliant forAttribute:NSOpenGLPFACompliant forVirtualScreen:virtualScreen];
+        NSLog(@"KSRWingsView:%@:Compliant: %d", format, compliant);
+        
+        GLint accelerated;
+        [format getValues:&accelerated forAttribute:NSOpenGLPFAAccelerated forVirtualScreen:virtualScreen];
+        NSLog(@"KSRWingsView:%@:Accelerated: %d", format, accelerated);
+        
+        GLint doubleBuffer;
+        [format getValues:&doubleBuffer forAttribute:NSOpenGLPFADoubleBuffer forVirtualScreen:virtualScreen];
+        NSLog(@"KSRWingsView:%@:Double Buffer: %d", format, doubleBuffer);
+        
+        GLint colorSize;
+        [format getValues:&colorSize forAttribute:NSOpenGLPFAColorSize forVirtualScreen:virtualScreen];
+        NSLog(@"KSRWingsView:%@:Color Size: %d", format, colorSize);
+        
+        GLint depthSize;
+        [format getValues:&depthSize forAttribute:NSOpenGLPFADepthSize forVirtualScreen:virtualScreen];
+        NSLog(@"KSRWingsView:%@:Depth Size: %d", format, depthSize);
+    }
+}
+
 + (GLsizei)numWings {
     return 40;
 }
@@ -20,7 +68,26 @@
 - (instancetype)initWithFrame:(NSRect)frameRect pixelFormat:(NSOpenGLPixelFormat *)format {
     self = [super initWithFrame:frameRect pixelFormat:format];
     
+    NSLog(@"%@:initWithFrame:{%f, %f, %f, %f} pixelFormat:%@",
+          self,
+          frameRect.origin.x, frameRect.origin.y, frameRect.size.width, frameRect.size.height,
+          format);
+    
+//    [KSRWingsView describePixelFormat:format];
+    
     if (self) {
+        [self setFrameOrigin:NSZeroPoint];
+        
+        GLint swapInterval = 1;
+        [self.openGLContext setValues:&swapInterval forParameter:NSOpenGLContextParameterSwapInterval];
+        
+        _glMajorVersion = 1;
+        _glMinorVersion = 0;
+        
+        _wingDisplayList = 0;
+        
+        _wingList = [NSArray array];
+        
         _radiusCurve = [[KSRCurveGenerator alloc] initWithValue:10.0
                                                   minimumValue:-15.0
                                                   maximumValue:15.0
@@ -67,24 +134,40 @@
                                                        maximumVelocity:0.04
                                                    maximumAcceleration:0.01
                                             ticksPerAccelerationChange:70];
-        
-        _wingList = [NSArray array];
     }
     
     return self;
 }
 
+- (void)parseOpenGLVersion:(NSString *)versionString {
+    NSLog(@"%@:parseOpenGLVersion:%@",
+          self, versionString);
+    
+    NSScanner * scanner = [NSScanner scannerWithString:versionString];
+    unsigned long long majorVersion;
+    if ([scanner scanUnsignedLongLong:&majorVersion]) {
+        self.glMajorVersion = [[NSNumber numberWithUnsignedLongLong:majorVersion] unsignedIntValue];
+        if ([scanner scanCharactersFromSet:[NSCharacterSet characterSetWithCharactersInString:@"."] intoString:nil]) {
+            unsigned long long minorVersion;
+            if ([scanner scanUnsignedLongLong:&minorVersion]) {
+                self.glMinorVersion = [[NSNumber numberWithUnsignedLongLong:minorVersion] unsignedIntValue];
+            }
+        }
+    }
+}
+
 - (BOOL)hasOpenGLVersionMajor:(GLuint)major minor:(GLuint)minor {
-    return YES;
+    return (self.glMajorVersion > major) || (self.glMajorVersion == major && self.glMinorVersion >= minor);
 }
 
 - (void)prepareOpenGL {
     [super prepareOpenGL];
     
-    NSLog(@"Preparing OpenGL context.");
+    NSLog(@"%@:prepareOpenGL", self);
     
-    GLint swapInterval = 1;
-    [self.openGLContext setValues:&swapInterval forParameter:NSOpenGLContextParameterSwapInterval];
+    GLubyte const * const glVersion = glGetString(GL_VERSION);
+    [self parseOpenGLVersion:[NSString stringWithCString:(char const *)glVersion
+                                                encoding:NSASCIIStringEncoding]];
     
     glEnable(GL_DEPTH_TEST);
     if ([self hasOpenGLVersionMajor:1 minor:1]) {
@@ -92,11 +175,7 @@
     }
     
     glEnable(GL_LINE_SMOOTH);
-    if (self.wantsBestResolutionOpenGLSurface) {
-        glLineWidth(2.0);
-    } else {
-        glLineWidth(1.0);
-    }
+    glLineWidth(1.0);
     
     glEnable(GL_POLYGON_SMOOTH);
     
@@ -111,8 +190,8 @@
               0.0, 0.0, 13.0,
               0.0, 0.0, 1.0);
     
-    _wingDisplayList = glGenLists(1);
-    glNewList(_wingDisplayList, GL_COMPILE);
+    self.wingDisplayList = glGenLists(1);
+    glNewList(self.wingDisplayList, GL_COMPILE);
     glBegin(GL_QUADS);
     glVertex2f(1, 1);
     glVertex2f(-1, 1);
@@ -120,46 +199,34 @@
     glVertex2f(1, -1);
     glEnd();
     glEndList();
-    
-    _wingDisplayLists = glGenLists([KSRWingsView numWings]);
-    for (GLuint displayList = _wingDisplayLists;
-         displayList < _wingDisplayLists + [KSRWingsView numWings];
-         displayList++) {
-        KSRWing *wing = [[KSRWing alloc] initWithGLDisplayList:displayList];
-        _wingList = [_wingList arrayByAddingObject:wing];
-        glNewList(displayList, GL_COMPILE);
-        glEndList();
-    }
-    
-    NSLog(@"Prepared OpenGL context.");
 }
 
 - (void)advanceAnimation {
-    NSLog(@"Advancing animation.");
+//    NSLog(@"%@:advanceAnimation", self);
     
-    NSAssert(_wingList.count == [KSRWingsView numWings],
-             @"List of wings length is incorrect.  Expected: %d, Actual: %lu",
-             [KSRWingsView numWings], (unsigned long) _wingList.count);
+    [self.openGLContext makeCurrentContext];
     
-    GLuint const displayList = _wingList.lastObject.glDisplayList;
-    _wingList = [_wingList subarrayWithRange:NSMakeRange(0, _wingList.count - 1)];
-    KSRColor *color = [[KSRColor alloc] initWithRed:[_redCurve getNextValue]
-                                              green:[_greenCurve getNextValue]
-                                               blue:[_blueCurve getNextValue]];
+    GLuint displayList;
+    if (self.wingList.count == 0 || self.wingList.count < [KSRWingsView numWings]) {
+        displayList = glGenLists(1);
+    } else {
+        displayList = self.wingList.lastObject.glDisplayList;
+        self.wingList = [self.wingList subarrayWithRange:NSMakeRange(0, self.wingList.count - 1)];
+    }
+    KSRColor *color = [[KSRColor alloc] initWithRed:[self.redCurve getNextValue]
+                                              green:[self.greenCurve getNextValue]
+                                               blue:[self.blueCurve getNextValue]];
     KSRWing *wing = [[KSRWing alloc] initWithGLDisplayList:displayList
-                                                    radius:[_radiusCurve getNextValue]
-                                                     angle:[_angleCurve getNextValue]
-                                                deltaAngle:[_deltaAngleCurve getNextValue]
-                                                    deltaZ:[_deltaZCurve getNextValue]
-                                                      roll:[_rollCurve getNextValue]
-                                                     pitch:[_pitchCurve getNextValue]
-                                                       yaw:[_yawCurve getNextValue]
+                                                    radius:[self.radiusCurve getNextValue]
+                                                     angle:[self.angleCurve getNextValue]
+                                                deltaAngle:[self.deltaAngleCurve getNextValue]
+                                                    deltaZ:[self.deltaZCurve getNextValue]
+                                                      roll:[self.rollCurve getNextValue]
+                                                     pitch:[self.pitchCurve getNextValue]
+                                                       yaw:[self.yawCurve getNextValue]
                                                      color:color
                                                  edgeColor:[KSRColor white]];
-    _wingList = [[NSArray arrayWithObject:wing] arrayByAddingObjectsFromArray:_wingList];
-    
-//     TODO: Do I need this?
-    [self.openGLContext makeCurrentContext];
+    self.wingList = [[NSArray arrayWithObject:wing] arrayByAddingObjectsFromArray:self.wingList];
     
     glNewList(displayList, GL_COMPILE);
     glPushMatrix();
@@ -168,24 +235,26 @@
     glRotatef(-wing.yaw, 0, 0, 1);
     glRotatef(-wing.pitch, 0, 1, 0);
     glRotatef(wing.roll, 1, 0, 0);
-    glCallList(_wingDisplayList);
+    glCallList(self.wingDisplayList);
     glPopMatrix();
     glEndList();
     
-    glFlush();
-    
-    // TODO: Do I need this?
-    [self.openGLContext update];
+//    glFlush();
     
     [self setNeedsDisplay:YES];
-    
-    NSLog(@"Advanced animation.");
 }
 
 - (void)reshape {
-    NSLog(@"Reshaping");
+    [super reshape];
     
-    NSSize backingSize = [self convertSizeToBacking:self.bounds.size];
+//    NSLog(@"%@:reshape:bounds:{%f, %f, %f, %f} frame:{%f, %f, %f, %f}",
+//          self,
+//          self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height,
+//          self.frame.origin.x, self.frame.origin.y, self.frame.size.width, self.frame.size.height);
+    
+    [self.openGLContext makeCurrentContext];
+    
+    NSSize const backingSize = [self convertSizeToBacking:self.bounds.size];
     
     GLdouble xmult = 1.0;
     GLdouble ymult = 1.0;
@@ -196,6 +265,7 @@
     }
     
     // NSOpenGLView handles calling glViewport.
+    
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-20.0 * xmult, 20.0 * xmult,
@@ -203,13 +273,14 @@
             35.0, 105.0);
     glMatrixMode(GL_MODELVIEW);
     
-    glFlush();
-    
-    NSLog(@"Reshaped");
+    [self.openGLContext update];
 }
 
 - (void)drawRect:(NSRect)dirtyRect {
-    NSLog(@"Drawing");
+//    NSLog(@"%@:drawRect:{%f, %f, %f, %f}",
+//          self, dirtyRect.origin.x, dirtyRect.origin.y, dirtyRect.size.width, dirtyRect.size.height);
+    
+    [self.openGLContext makeCurrentContext];
     
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
@@ -217,10 +288,10 @@
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glEnable(GL_POLYGON_OFFSET_LINE);
         glPushMatrix();
-        for (KSRWing *wing in _wingList) {
+        for (KSRWing *wing in self.wingList) {
             glTranslatef(0, 0, wing.deltaZ);
             glRotatef(wing.deltaAngle, 0, 0, 1);
-
+            
             KSRColor *color = wing.edgeColor;
             glColor3f(color.red, color.green, color.blue);
             glCallList(wing.glDisplayList);
@@ -230,7 +301,7 @@
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
     glPushMatrix();
-    for (KSRWing *wing in _wingList) {
+    for (KSRWing *wing in self.wingList) {
         glTranslatef(0, 0, wing.deltaZ);
         glRotatef(wing.deltaAngle, 0, 0, 1);
         
@@ -240,9 +311,9 @@
     }
     glPopMatrix();
     
-    glFlush();
+//    glFlush();
     
-    NSLog(@"Drawn");
+    [self.openGLContext flushBuffer];
 }
 
 @end

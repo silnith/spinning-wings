@@ -15,26 +15,29 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface KSRWingsView : NSOpenGLView {
-    GLuint _wingDisplayList;
-    GLuint _wingDisplayLists;
-    NSArray<KSRWing*> *_wingList;
-    
-    KSRCurveGenerator *_radiusCurve;
-    KSRCurveGenerator *_angleCurve;
-    KSRCurveGenerator *_deltaAngleCurve;
-    KSRCurveGenerator *_deltaZCurve;
-    KSRCurveGenerator *_rollCurve;
-    KSRCurveGenerator *_pitchCurve;
-    KSRCurveGenerator *_yawCurve;
-    KSRCurveGenerator *_redCurve;
-    KSRCurveGenerator *_greenCurve;
-    KSRCurveGenerator *_blueCurve;
-}
+@interface KSRWingsView : NSOpenGLView
+
+@property GLuint glMajorVersion;
+@property GLuint glMinorVersion;
+
+@property GLuint wingDisplayList;
+
+@property NSArray<KSRWing *> * wingList;
+
+@property KSRCurveGenerator * radiusCurve;
+@property KSRCurveGenerator * angleCurve;
+@property KSRCurveGenerator * deltaAngleCurve;
+@property KSRCurveGenerator * deltaZCurve;
+@property KSRCurveGenerator * rollCurve;
+@property KSRCurveGenerator * pitchCurve;
+@property KSRCurveGenerator * yawCurve;
+@property KSRCurveGenerator * redCurve;
+@property KSRCurveGenerator * greenCurve;
+@property KSRCurveGenerator * blueCurve;
 
 - (void)advanceAnimation;
 
-+ (GLsizei) numWings;
++ (GLsizei)numWings;
 
 @end
 

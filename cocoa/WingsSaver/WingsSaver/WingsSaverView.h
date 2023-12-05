@@ -10,10 +10,8 @@
 
 #import "KSRWingsView.h"
 
-@interface WingsSaverView : ScreenSaverView {
-    KSRWingsView *_glView;
-}
+@interface WingsSaverView : ScreenSaverView
 
-+ (NSTimeInterval)frameInterval;
+@property KSRWingsView * glView;
 
 @end
