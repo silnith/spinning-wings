@@ -11,6 +11,14 @@
 #import <OpenGL/gl.h>
 #import <OpenGL/glu.h>
 
+@interface WingsSaverView ()
+
+@property (readonly) KSRWingsView * glView;
+
++ (NSTimeInterval)frameInterval;
+
+@end
+
 @implementation WingsSaverView
 
 // The length of time, in seconds, to display each frame of animation.
@@ -183,16 +191,11 @@
 
 - (void)animateOneFrame
 {
-//    NSLog(@"%@:animateOneFrame", self);
-    
     [self.glView advanceAnimation];
 }
 
 - (void)drawRect:(NSRect)rect
 {
-//    NSLog(@"%@:drawRect:{%f, %f, %f, %f}",
-//          self, rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
-    
     [super drawRect:rect];
 }
 

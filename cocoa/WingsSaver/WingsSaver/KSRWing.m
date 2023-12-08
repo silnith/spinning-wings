@@ -14,7 +14,7 @@
     return [self initWithGLDisplayList:0];
 }
 
-- (id)initWithGLDisplayList:(unsigned int)glDisplayList {
+- (id)initWithGLDisplayList:(GLuint)glDisplayList {
     return [self initWithGLDisplayList:glDisplayList
                                 radius:10 angle:0
                             deltaAngle:15 deltaZ:0.5
@@ -22,10 +22,10 @@
                                  color:[KSRColor black] edgeColor:[KSRColor white]];
 }
 
-- (id)initWithGLDisplayList:(unsigned int)glDisplayList
-                     radius:(float)radius angle:(float)angle
-                 deltaAngle:(float)deltaAngle deltaZ:(float)deltaZ
-                       roll:(float)roll pitch:(float)pitch yaw:(float)yaw
+- (id)initWithGLDisplayList:(GLuint)glDisplayList
+                     radius:(GLfloat)radius angle:(GLfloat)angle
+                 deltaAngle:(GLfloat)deltaAngle deltaZ:(GLfloat)deltaZ
+                       roll:(GLfloat)roll pitch:(GLfloat)pitch yaw:(GLfloat)yaw
                       color:(KSRColor *)color edgeColor:(KSRColor *)edgeColor {
     self = [super init];
     

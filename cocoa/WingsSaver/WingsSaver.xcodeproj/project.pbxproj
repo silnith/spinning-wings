@@ -9,40 +9,33 @@
 /* Begin PBXBuildFile section */
 		3700913B2B1737F5001D9D78 /* WingsSaverView.h in Headers */ = {isa = PBXBuildFile; fileRef = 3700913A2B1737F5001D9D78 /* WingsSaverView.h */; };
 		3700913D2B1737F5001D9D78 /* WingsSaverView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3700913C2B1737F5001D9D78 /* WingsSaverView.m */; };
-		370091512B1745E4001D9D78 /* libWings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3700914F2B17396B001D9D78 /* libWings.a */; };
-		370091532B1745F1001D9D78 /* ScreenSaver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 370091522B1745F1001D9D78 /* ScreenSaver.framework */; };
-		370091592B182BFD001D9D78 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 370091582B182BFD001D9D78 /* OpenGL.framework */; };
 		37E0E5492B19735800B405A0 /* KSRWingsView.h in Headers */ = {isa = PBXBuildFile; fileRef = 37E0E5472B19735800B405A0 /* KSRWingsView.h */; };
 		37E0E54A2B19735800B405A0 /* KSRWingsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 37E0E5482B19735800B405A0 /* KSRWingsView.m */; };
+		37E3BAEA2B201D980029E50A /* KSRWing.m in Sources */ = {isa = PBXBuildFile; fileRef = 37E3BAE62B201D970029E50A /* KSRWing.m */; };
+		37E3BAEB2B201D980029E50A /* KSRWing.h in Headers */ = {isa = PBXBuildFile; fileRef = 37E3BAE72B201D970029E50A /* KSRWing.h */; };
+		37E3BAEC2B201D980029E50A /* KSRCurveGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 37E3BAE82B201D970029E50A /* KSRCurveGenerator.h */; };
+		37E3BAED2B201D980029E50A /* KSRCurveGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 37E3BAE92B201D970029E50A /* KSRCurveGenerator.m */; };
+		37E3BAEE2B201DB40029E50A /* ScreenSaver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 370091522B1745F1001D9D78 /* ScreenSaver.framework */; };
+		37E3BAEF2B201DB80029E50A /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 370091582B182BFD001D9D78 /* OpenGL.framework */; };
+		37E3BAF22B2024E90029E50A /* KSRColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 37E3BAF02B2024E90029E50A /* KSRColor.m */; };
+		37E3BAF32B2024E90029E50A /* KSRColor.h in Headers */ = {isa = PBXBuildFile; fileRef = 37E3BAF12B2024E90029E50A /* KSRColor.h */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		3700914E2B17396B001D9D78 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3700914A2B17396B001D9D78 /* Wings.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 370090932B1734D6001D9D78;
-			remoteInfo = Wings;
-		};
-		37E0E5442B19686900B405A0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3700914A2B17396B001D9D78 /* Wings.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 370090922B1734D6001D9D78;
-			remoteInfo = Wings;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		370091372B1737F5001D9D78 /* WingsSaver.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WingsSaver.saver; sourceTree = BUILT_PRODUCTS_DIR; };
 		3700913A2B1737F5001D9D78 /* WingsSaverView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WingsSaverView.h; sourceTree = "<group>"; };
 		3700913C2B1737F5001D9D78 /* WingsSaverView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WingsSaverView.m; sourceTree = "<group>"; };
 		3700913E2B1737F5001D9D78 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3700914A2B17396B001D9D78 /* Wings.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Wings.xcodeproj; path = ../Wings/Wings.xcodeproj; sourceTree = "<group>"; };
 		370091522B1745F1001D9D78 /* ScreenSaver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScreenSaver.framework; path = System/Library/Frameworks/ScreenSaver.framework; sourceTree = SDKROOT; };
 		370091582B182BFD001D9D78 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		37E0E5472B19735800B405A0 /* KSRWingsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KSRWingsView.h; sourceTree = "<group>"; };
 		37E0E5482B19735800B405A0 /* KSRWingsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KSRWingsView.m; sourceTree = "<group>"; };
+		37E3BAE62B201D970029E50A /* KSRWing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KSRWing.m; sourceTree = "<group>"; };
+		37E3BAE72B201D970029E50A /* KSRWing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KSRWing.h; sourceTree = "<group>"; };
+		37E3BAE82B201D970029E50A /* KSRCurveGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KSRCurveGenerator.h; sourceTree = "<group>"; };
+		37E3BAE92B201D970029E50A /* KSRCurveGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KSRCurveGenerator.m; sourceTree = "<group>"; };
+		37E3BAF02B2024E90029E50A /* KSRColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KSRColor.m; sourceTree = "<group>"; };
+		37E3BAF12B2024E90029E50A /* KSRColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KSRColor.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,9 +43,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				370091592B182BFD001D9D78 /* OpenGL.framework in Frameworks */,
-				370091532B1745F1001D9D78 /* ScreenSaver.framework in Frameworks */,
-				370091512B1745E4001D9D78 /* libWings.a in Frameworks */,
+				37E3BAEF2B201DB80029E50A /* OpenGL.framework in Frameworks */,
+				37E3BAEE2B201DB40029E50A /* ScreenSaver.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,7 +54,6 @@
 		3700912D2B1737F5001D9D78 = {
 			isa = PBXGroup;
 			children = (
-				3700914A2B17396B001D9D78 /* Wings.xcodeproj */,
 				370091392B1737F5001D9D78 /* WingsSaver */,
 				370091382B1737F5001D9D78 /* Products */,
 				370091502B1745E4001D9D78 /* Frameworks */,
@@ -80,21 +71,19 @@
 		370091392B1737F5001D9D78 /* WingsSaver */ = {
 			isa = PBXGroup;
 			children = (
-				3700913A2B1737F5001D9D78 /* WingsSaverView.h */,
-				3700913C2B1737F5001D9D78 /* WingsSaverView.m */,
 				3700913E2B1737F5001D9D78 /* Info.plist */,
+				37E3BAF12B2024E90029E50A /* KSRColor.h */,
+				37E3BAF02B2024E90029E50A /* KSRColor.m */,
+				37E3BAE82B201D970029E50A /* KSRCurveGenerator.h */,
+				37E3BAE92B201D970029E50A /* KSRCurveGenerator.m */,
+				37E3BAE72B201D970029E50A /* KSRWing.h */,
+				37E3BAE62B201D970029E50A /* KSRWing.m */,
 				37E0E5472B19735800B405A0 /* KSRWingsView.h */,
 				37E0E5482B19735800B405A0 /* KSRWingsView.m */,
+				3700913A2B1737F5001D9D78 /* WingsSaverView.h */,
+				3700913C2B1737F5001D9D78 /* WingsSaverView.m */,
 			);
 			path = WingsSaver;
-			sourceTree = "<group>";
-		};
-		3700914B2B17396B001D9D78 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				3700914F2B17396B001D9D78 /* libWings.a */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		370091502B1745E4001D9D78 /* Frameworks */ = {
@@ -113,6 +102,9 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37E3BAEB2B201D980029E50A /* KSRWing.h in Headers */,
+				37E3BAF32B2024E90029E50A /* KSRColor.h in Headers */,
+				37E3BAEC2B201D980029E50A /* KSRCurveGenerator.h in Headers */,
 				3700913B2B1737F5001D9D78 /* WingsSaverView.h in Headers */,
 				37E0E5492B19735800B405A0 /* KSRWingsView.h in Headers */,
 			);
@@ -133,7 +125,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				37E0E5452B19686900B405A0 /* PBXTargetDependency */,
 			);
 			name = WingsSaver;
 			productName = WingsSaver;
@@ -165,28 +156,12 @@
 			mainGroup = 3700912D2B1737F5001D9D78;
 			productRefGroup = 370091382B1737F5001D9D78 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 3700914B2B17396B001D9D78 /* Products */;
-					ProjectRef = 3700914A2B17396B001D9D78 /* Wings.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				370091362B1737F5001D9D78 /* WingsSaver */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		3700914F2B17396B001D9D78 /* libWings.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libWings.a;
-			remoteRef = 3700914E2B17396B001D9D78 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		370091352B1737F5001D9D78 /* Resources */ = {
@@ -203,20 +178,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37E3BAEA2B201D980029E50A /* KSRWing.m in Sources */,
+				37E3BAF22B2024E90029E50A /* KSRColor.m in Sources */,
 				37E0E54A2B19735800B405A0 /* KSRWingsView.m in Sources */,
+				37E3BAED2B201D980029E50A /* KSRCurveGenerator.m in Sources */,
 				3700913D2B1737F5001D9D78 /* WingsSaverView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		37E0E5452B19686900B405A0 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = Wings;
-			targetProxy = 37E0E5442B19686900B405A0 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		3700913F2B1737F5001D9D78 /* Debug */ = {
@@ -273,8 +243,9 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = macosx;
+				VALID_ARCHS = "ppc ppc64 i386 x86_64 arm arm64";
 			};
 			name = Debug;
 		};
@@ -327,6 +298,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
+				VALID_ARCHS = "ppc ppc64 i386 x86_64 arm arm64";
 			};
 			name = Release;
 		};

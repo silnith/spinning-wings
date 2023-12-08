@@ -12,6 +12,4 @@
 
 @interface WingsSaverView : ScreenSaverView
 
-@property KSRWingsView * glView;
-
 @end
