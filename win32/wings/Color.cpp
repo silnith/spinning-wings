@@ -7,6 +7,7 @@ silnith::Color::Color(float red, float green, float blue) noexcept
 	: red{ red }, green{ green }, blue{ blue }
 {}
 
+
 float silnith::Color::getRed(void) const noexcept
 {
 	return red;
