@@ -137,17 +137,14 @@ namespace silnith {
 			"void main() {\n"\
 			"    gl_FrontColor = gl_Color;\n"\
 			"    gl_BackColor = gl_Color;\n"\
-			"    gl_Position = gl_Vertex;\n"\
+			"    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"\
 			"}\n"
 		};
 		std::string const fragmentShaderSource{
 			"#version 110\n"\
 			"\n"\
 			"void main() {\n"\
-			"    //gl_FragColor = gl_Color;\n"\
-			"    gl_FragColor.r = 1.0;\n"\
-			"    gl_FragColor.g = 0.0;\n"\
-			"    gl_FragColor.b = 0.0;\n"\
+			"    gl_FragColor = gl_Color;\n"\
 			"    gl_FragDepth = gl_FragCoord.z;\n"\
 			"}\n"
 		};
@@ -158,12 +155,12 @@ namespace silnith {
 		CompileShader(fragmentShader, fragmentShaderSource);
 
 		GLuint program{ glCreateProgram() };
-		//glAttachShader(program, vertexShader);
+		glAttachShader(program, vertexShader);
 		glAttachShader(program, fragmentShader);
 
 		glLinkProgram(program);
 
-		//glDetachShader(program, vertexShader);
+		glDetachShader(program, vertexShader);
 		glDetachShader(program, fragmentShader);
 
 		glDeleteShader(vertexShader);
