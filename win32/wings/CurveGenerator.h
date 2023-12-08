@@ -11,7 +11,7 @@ namespace silnith
 	{
 	public:
 		CurveGenerator(void) = delete;
-		~CurveGenerator(void) = default;
+		~CurveGenerator(void) noexcept = default;
 		CurveGenerator(CurveGenerator const& curveGenerator) = delete;
 		CurveGenerator& operator=(CurveGenerator const& curveGenerator) = delete;
 		CurveGenerator(CurveGenerator&& curveGenerator) = delete;
