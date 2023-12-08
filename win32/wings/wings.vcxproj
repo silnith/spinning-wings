@@ -174,11 +174,15 @@
     <ClInclude Include="Color.h" />
     <ClInclude Include="CurveGenerator.h" />
     <ClInclude Include="Wing.h" />
+    <ClInclude Include="WingsView.h" />
+    <ClInclude Include="WingsPixelFormat.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="CurveGenerator.cpp" />
     <ClCompile Include="Wing.cpp" />
+    <ClCompile Include="WingsView.cpp" />
+    <ClCompile Include="WingsPixelFormat.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
