@@ -3,14 +3,17 @@
 * mark as DPI-aware
 */
 
+#include <GL/glew.h>
+
 #include <Windows.h>
-#include <gl/GL.h>
-#include <gl/GLU.h>
+//#include <gl/GL.h>
+//#include <gl/GLU.h>
 
 #pragma comment (lib, "opengl32.lib")
 #pragma comment (lib, "glu32.lib")
 
 #include <deque>
+#include <list>
 #include <string>
 #include <sstream>
 
@@ -121,6 +124,12 @@ HGLRC InitializeRenderingContext(HDC const& hdc)
 {
 	HGLRC hglrc{ wglCreateContext(hdc) };
 	BOOL success{ wglMakeCurrent(hdc, hglrc) };
+
+	if (success)
+	{
+		glewInit();
+	}
+
 	return hglrc;
 }
 
@@ -193,6 +202,168 @@ void advanceAnimation(void)
 
 void DrawFrame()
 {
+	/*
+	std::vector<std::string> vertexShaderSources{
+		"in vec4 vertexPosition;",
+		"in vec4 vertexColor;",
+		"in uint wingIndex;",
+		"in float deltaAngle;",
+		"in float deltaZ;",
+		"in float radius;",
+		"in float angle;",
+		"in float roll;",
+		"in float pitch;",
+		"in float yaw;",
+		"smooth out vec4 color;",
+		"uniform mat4 modelviewMatrix;",
+		"void main() {",
+		"gl_Position = modelviewMatrix * vertexPosition;",
+		"color = vertexColor;",
+		"}"
+	};
+	std::vector<std::string> fragmentShaderSources{
+		"smooth in vec4 color;",
+		"out vec4 fragmentColor;",
+		"void main() {",
+		"fragmentColor = color;",
+		"}"
+	};
+	char const** vs = new char const* [vertexShaderSources.size()];
+	char const** fs;
+	for (std::string const& str : vertexShaderSources) {
+		auto x{ str.c_str() };
+		vs[0] = x;
+	}
+	*/
+
+	GLint success{ 0 };
+	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
+	std::string vertexShaderSource{ "in vec4 vertexPosition;"\
+		"in vec4 vertexColor;"\
+		"in uint wingIndex;"\
+		"in float deltaAngle;"\
+		"in float deltaZ;"\
+		"in float radius;"\
+		"in float angle;"\
+		"in float roll;"\
+		"in float pitch;"\
+		"in float yaw;"\
+		"smooth out vec4 color;"\
+		"uniform mat4 modelviewMatrix;"\
+		"void main() {"\
+		"gl_Position = vertexPosition;"\
+		"color = vertexColor;"\
+		"}" };
+	GLchar const* vertexShaderSourcePointer{ vertexShaderSource.c_str() };
+
+	glShaderSource(vertexShader, 1, &vertexShaderSourcePointer, NULL);
+	glCompileShader(vertexShader);
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+	if (success == GL_FALSE) {
+		// glGetShaderInfoLog();
+		char logOutput[1024];
+		GLsizei logSize{};
+		glGetShaderInfoLog(vertexShader, 1024, &logSize, logOutput);
+		assert(0 == 1);
+	}
+
+	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+	std::string fragmentShaderSource = "smooth in vec4 color;out vec4 fragmentColor;void main() {fragmentColor = color;}";
+	GLchar const* fragmentShaderSourcePointer{ fragmentShaderSource.c_str() };
+
+	glShaderSource(fragmentShader, 1, &fragmentShaderSourcePointer, NULL);
+	glCompileShader(fragmentShader);
+	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+	if (success == GL_FALSE) {
+		// glGetShaderInfoLog();
+	}
+
+	GLuint program = glCreateProgram();
+	glAttachShader(program, vertexShader);
+	glAttachShader(program, fragmentShader);
+
+	glBindAttribLocation(program, 0, "vertexPosition");
+	glBindAttribLocation(program, 1, "vertexColor");
+	glBindAttribLocation(program, 2, "wingIndex");
+	glBindAttribLocation(program, 3, "deltaAngle");
+	glBindAttribLocation(program, 4, "deltaZ");
+	glBindAttribLocation(program, 5, "radius");
+	glBindAttribLocation(program, 6, "angle");
+	glBindAttribLocation(program, 7, "roll");
+	glBindAttribLocation(program, 8, "pitch");
+	glBindAttribLocation(program, 9, "yaw");
+
+	glLinkProgram(program);
+	glGetProgramiv(program, GL_LINK_STATUS, &success);
+	if (success == GL_FALSE) {
+		// glGetProgramInfoLog()
+	}
+
+	glDetachShader(program, vertexShader);
+	glDetachShader(program, fragmentShader);
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+
+	glValidateProgram(program);
+
+	GLint uniformLocation{ glGetUniformLocation(program, "modelviewMatrix") };
+
+	glUseProgram(program);
+
+	// do stuff
+	GLfloat modelviewMatrix[16]{};
+	glUniformMatrix4fv(uniformLocation, 1, GL_TRUE, modelviewMatrix);
+
+	glUseProgram(NULL);
+
+	glDeleteProgram(program);
+
+	GLuint vao[1];
+	glGenVertexArrays(1, vao);
+	glBindVertexArray(vao[0]);
+
+	GLuint buffer[1];
+	glGenBuffers(1, buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer[0]);
+	// glBufferData, glMapBuffer, glCopyBuffer
+	// glVertexAttribPointer();
+
+	GLuint vertexBufferId;
+	glGenBuffers(1, &vertexBufferId);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferId);
+	GLfloat const quad[12]{
+		1, 1, 0,
+		-1, 1, 0,
+		-1, -1, 0,
+		1, -1, 0,
+	};
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * 3, quad, GL_STATIC_DRAW);
+	GLfloat* arrayBufferData{ (GLfloat*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY) };
+	arrayBufferData[0] = 1;
+	arrayBufferData[1] = 1;
+	arrayBufferData[2] = 0;
+	arrayBufferData[3] = -1;
+	arrayBufferData[4] = 1;
+	arrayBufferData[5] = 0;
+	arrayBufferData[6] = -1;
+	arrayBufferData[7] = -1;
+	arrayBufferData[8] = 0;
+	arrayBufferData[9] = 1;
+	arrayBufferData[10] = -1;
+	arrayBufferData[11] = 0;
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+	glVertexPointer(3, GL_FLOAT, 0, nullptr);
+	glEnableClientState(GL_VERTEX_ARRAY);
+
+	//glDrawArrays(GL_QUADS, 0, 4);
+	//glDrawElements
+
+	GLuint buffers[40]{};
+	glGenBuffers(40, buffers);
+
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	if (hasOpenGL(1, 1))
