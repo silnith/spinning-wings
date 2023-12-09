@@ -9,7 +9,7 @@
 #include "CurveGenerator.h"
 #include "Wing.h"
 
-namespace silnith::gl
+namespace silnith::wings::gl
 {
 
 	typedef std::deque<Wing> wing_list;
@@ -110,12 +110,12 @@ namespace silnith::gl
 	{
 		GLuint const displayList{ wings.back().getGLDisplayList() };
 		wings.pop_back();
-		silnith::Wing const& wing{ wings.emplace_front(displayList,
+		Wing const& wing{ wings.emplace_front(displayList,
 			radiusCurve.getNextValue(), angleCurve.getNextValue(),
 			deltaAngleCurve.getNextValue(), deltaZCurve.getNextValue(),
 			rollCurve.getNextValue(), pitchCurve.getNextValue(), yawCurve.getNextValue(),
-			silnith::Color{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
-			silnith::Color::WHITE) };
+			Color{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
+			Color::WHITE) };
 
 		// TODO: Do I need an HDC in order to execute these OpenGL commands?
 		glNewList(displayList, GL_COMPILE);
@@ -139,11 +139,11 @@ namespace silnith::gl
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glEnable(GL_POLYGON_OFFSET_LINE);
 			glPushMatrix();
-			for (silnith::Wing const& wing : wings) {
+			for (Wing const& wing : wings) {
 				glTranslatef(0, 0, wing.getDeltaZ());
 				glRotatef(wing.getDeltaAngle(), 0, 0, 1);
 
-				silnith::Color const& edgeColor{ wing.getEdgeColor() };
+				Color const& edgeColor{ wing.getEdgeColor() };
 				glColor3f(edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
 				glCallList(wing.getGLDisplayList());
 			}
@@ -153,11 +153,11 @@ namespace silnith::gl
 		}
 
 		glPushMatrix();
-		for (silnith::Wing const& wing : wings) {
+		for (Wing const& wing : wings) {
 			glTranslatef(0, 0, wing.getDeltaZ());
 			glRotatef(wing.getDeltaAngle(), 0, 0, 1);
 
-			silnith::Color const& color{ wing.getColor() };
+			Color const& color{ wing.getColor() };
 			glColor3f(color.getRed(), color.getGreen(), color.getBlue());
 			glCallList(wing.getGLDisplayList());
 		}
@@ -189,4 +189,4 @@ namespace silnith::gl
 		// check GL errors
 	}
 
-};
+}

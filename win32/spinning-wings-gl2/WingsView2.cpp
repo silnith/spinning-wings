@@ -11,7 +11,7 @@
 #include "Program.h"
 #include "VertexShader.h"
 
-namespace silnith::gl2
+namespace silnith::wings::gl2
 {
 
 	typedef std::deque<Wing> wing_list;
@@ -224,4 +224,4 @@ namespace silnith::gl2
 		// check GL errors
 	}
 
-};
+}

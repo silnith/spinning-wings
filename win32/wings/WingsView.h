@@ -3,7 +3,7 @@
 #include <Windows.h>
 #include <gl/GL.h>
 
-namespace silnith::gl
+namespace silnith::wings::gl
 {
 
     /// <summary>
@@ -43,4 +43,4 @@ namespace silnith::gl
     /// <param name="height">the new viewport height</param>
     void Resize(GLsizei width, GLsizei height);
 
-};
+}

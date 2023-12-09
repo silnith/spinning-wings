@@ -10,8 +10,8 @@
 #pragma comment (lib, "opengl32.lib")
 #pragma comment (lib, "glu32.lib")
 
-#include "WingsView.h"
 #include "WingsPixelFormat.h"
+#include "WingsView.h"
 
 #include <cassert>
 
@@ -33,7 +33,7 @@ BOOL MonitorEnumProc(HMONITOR hMonitor, HDC hdc, LPRECT lpRect, LPARAM d)
 
 void TimerProc(HWND hWnd, UINT message, UINT_PTR bar, DWORD baz)
 {
-	silnith::gl::AdvanceAnimation();
+	silnith::wings::gl::AdvanceAnimation();
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -78,7 +78,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return -1;
 		}
 
-		silnith::gl::InitializeOpenGLState();
+		silnith::wings::gl::InitializeOpenGLState();
 
 		ReleaseDC(hWnd, hdc);
 
@@ -114,7 +114,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		GLsizei const width{ LOWORD(lParam) };
 		GLsizei const height{ HIWORD(lParam) };
-		silnith::gl::Resize(width, height);
+		silnith::wings::gl::Resize(width, height);
 
 		return 0;
 	}
@@ -122,7 +122,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		assert(hglrc == wglGetCurrentContext());
 
-		silnith::gl::AdvanceAnimation();
+		silnith::wings::gl::AdvanceAnimation();
 
 		InvalidateRgn(hWnd, NULL, FALSE);
 		return 0;
@@ -143,7 +143,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		 */
 		assert(hglrc == wglGetCurrentContext());
 
-		silnith::gl::DrawFrame();
+		silnith::wings::gl::DrawFrame();
 
 		PAINTSTRUCT paintstruct;
 		HDC const hdc{ BeginPaint(hWnd, &paintstruct) };
@@ -154,7 +154,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		//wglMakeCurrent(hdc, hglrc);
 
-		//silnith::DrawFrame();
+		//silnith::wings::gl::DrawFrame();
 
 		SwapBuffers(hdc);
 

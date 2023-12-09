@@ -2,8 +2,9 @@
 
 #include <random>
 
-namespace silnith
+namespace silnith::wings
 {
+
 	/// <summary>
 	/// A class that produces a sequence of numbers that slowly shift within predefined boundaries.
 	/// </summary>
@@ -146,4 +147,5 @@ namespace silnith
 	private:
 		static std::random_device randomDevice;
 	};
-};
+
+}

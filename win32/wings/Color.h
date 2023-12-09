@@ -1,7 +1,8 @@
 #pragma once
 
-namespace silnith
+namespace silnith::wings
 {
+
 	/// <summary>
 	/// A simple RGB color value.
 	/// </summary>
@@ -60,4 +61,5 @@ namespace silnith
 		float const green{ 0 };
 		float const blue{ 0 };
 	};
-};
+
+}

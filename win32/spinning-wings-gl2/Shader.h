@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-namespace silnith::gl2
+namespace silnith::wings::gl2
 {
     /// <summary>
     /// Manages a single GLSL shader.  Use <c>FragmentShader</c>
@@ -38,4 +38,4 @@ namespace silnith::gl2
         std::string compilationLog{};
     };
 
-};
+}

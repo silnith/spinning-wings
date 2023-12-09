@@ -76,7 +76,7 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 			return -1;
 		}
 
-		silnith::gl::InitializeOpenGLState();
+		silnith::wings::gl::InitializeOpenGLState();
 
 		ReleaseDC(hWnd, hdc);
 
@@ -114,7 +114,7 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 		GLsizei const width{ LOWORD(lParam) };
 		GLsizei const height{ HIWORD(lParam) };
-		silnith::gl::Resize(width, height);
+		silnith::wings::gl::Resize(width, height);
 
 		return 0;
 	}
@@ -122,7 +122,7 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 	{
 		assert(hglrc == wglGetCurrentContext());
 
-		silnith::gl::AdvanceAnimation();
+		silnith::wings::gl::AdvanceAnimation();
 
 		InvalidateRgn(hWnd, NULL, FALSE);
 		return 0;
@@ -143,7 +143,7 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		 */
 		assert(hglrc == wglGetCurrentContext());
 
-		silnith::gl::DrawFrame();
+		silnith::wings::gl::DrawFrame();
 
 		PAINTSTRUCT paintstruct;
 		HDC const hdc{ BeginPaint(hWnd, &paintstruct) };
@@ -154,7 +154,7 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 		//wglMakeCurrent(hdc, hglrc);
 
-		//silnith::DrawFrame();
+		//silnith::wings::gl::DrawFrame();
 
 		SwapBuffers(hdc);
 

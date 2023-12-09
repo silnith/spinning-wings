@@ -2,8 +2,9 @@
 
 #include "Color.h"
 
-namespace silnith
+namespace silnith::wings
 {
+
 	/// <summary>
 	/// A single quad spinning around the central axis.
 	/// </summary>
@@ -137,4 +138,5 @@ namespace silnith
 		Color const color{ Color::BLACK };
 		Color const edgeColor{ Color::WHITE };
 	};
-};
+
+}

@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace silnith::gl2
+namespace silnith::wings::gl2
 {
     /// <summary>
     /// Manages a single GLSL vertex shader.
@@ -30,4 +30,4 @@ namespace silnith::gl2
     private:
     };
 
-};
+}

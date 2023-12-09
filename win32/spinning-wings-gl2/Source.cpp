@@ -35,7 +35,7 @@ BOOL MonitorEnumProc(HMONITOR hMonitor, HDC hdc, LPRECT lpRect, LPARAM d)
 
 void TimerProc(HWND hWnd, UINT message, UINT_PTR bar, DWORD baz)
 {
-	silnith::gl2::AdvanceAnimation();
+	silnith::wings::gl2::AdvanceAnimation();
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -85,7 +85,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		try
 		{
-			silnith::gl2::InitializeOpenGLState();
+			silnith::wings::gl2::InitializeOpenGLState();
 		}
 		catch ([[maybe_unused]] std::exception const& e)
 		{
@@ -127,7 +127,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		GLsizei const width{ LOWORD(lParam) };
 		GLsizei const height{ HIWORD(lParam) };
-		silnith::gl2::Resize(width, height);
+		silnith::wings::gl2::Resize(width, height);
 
 		ReleaseDC(hWnd, hdc);
 
@@ -135,7 +135,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_TIMER:
 	{
-		silnith::gl2::AdvanceAnimation();
+		silnith::wings::gl2::AdvanceAnimation();
 
 		InvalidateRgn(hWnd, NULL, FALSE);
 		return 0;
@@ -153,7 +153,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		//EnumDisplayMonitors(hdc, NULL, MonitorEnumProc, 0);
 
-		silnith::gl2::DrawFrame();
+		silnith::wings::gl2::DrawFrame();
 
 		SwapBuffers(hdc);
 

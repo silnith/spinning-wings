@@ -11,4 +11,4 @@ namespace silnith::gl
     /// </summary>
     extern PIXELFORMATDESCRIPTOR const desiredPixelFormat;
 
-};
+}

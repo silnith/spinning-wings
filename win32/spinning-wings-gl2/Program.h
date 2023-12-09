@@ -7,7 +7,7 @@
 
 #include <string>
 
-namespace silnith::gl2
+namespace silnith::wings::gl2
 {
     /// <summary>
     /// Manages a GLSL program.  This is composed of shaders.
@@ -38,4 +38,4 @@ namespace silnith::gl2
         std::string linkLog{};
     };
 
-};
+}
