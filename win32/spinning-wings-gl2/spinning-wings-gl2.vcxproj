@@ -168,7 +168,7 @@
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="VertexShader.cpp" />
-    <ClCompile Include="WingsView2.cpp" />
+    <ClCompile Include="WingsViewGL2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\wings\wings.vcxproj">
@@ -185,7 +185,7 @@
     <ClInclude Include="Program.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="VertexShader.h" />
-    <ClInclude Include="WingsView2.h" />
+    <ClInclude Include="WingsViewGL2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

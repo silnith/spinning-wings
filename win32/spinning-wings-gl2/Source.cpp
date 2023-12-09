@@ -15,7 +15,7 @@
 
 #include "WingsPixelFormat.h"
 
-#include "WingsView2.h"
+#include "WingsViewGL2.h"
 
 UINT const updateDelayMilliseconds{ 33 };
 

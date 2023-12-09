@@ -1,4 +1,4 @@
-#include "WingsView2.h"
+#include "WingsViewGL2.h"
 
 #include <cassert>
 #include <deque>
