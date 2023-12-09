@@ -3,14 +3,14 @@
 #include <cstddef>
 #include <stdexcept>
 
-silnith::Program::Program(Program&& program) noexcept
+silnith::gl2::Program::Program(Program&& program) noexcept
     : id{ program.id }, linkLog{ program.linkLog }
 {
     program.id = 0;
     program.linkLog = {};
 }
 
-silnith::Program& silnith::Program::operator=(Program&& program) noexcept
+silnith::gl2::Program& silnith::gl2::Program::operator=(Program&& program) noexcept
 {
     id = program.id;
     linkLog = program.linkLog;
@@ -19,7 +19,7 @@ silnith::Program& silnith::Program::operator=(Program&& program) noexcept
     return *this;
 }
 
-silnith::Program::Program(silnith::Shader const& s1, silnith::Shader const& s2)
+silnith::gl2::Program::Program(silnith::gl2::Shader const& s1, silnith::gl2::Shader const& s2)
     : id{ glCreateProgram() }, linkLog{}
 {
     glAttachShader(id, s1.getShader());
@@ -60,17 +60,17 @@ silnith::Program::Program(silnith::Shader const& s1, silnith::Shader const& s2)
     }
 }
 
-silnith::Program::~Program(void) noexcept
+silnith::gl2::Program::~Program(void) noexcept
 {
     glDeleteProgram(id);
 }
 
-GLuint silnith::Program::getProgram(void) const noexcept
+GLuint silnith::gl2::Program::getProgram(void) const noexcept
 {
     return id;
 }
 
-void silnith::Program::useProgram(void) const noexcept
+void silnith::gl2::Program::useProgram(void) const noexcept
 {
     glUseProgram(id);
 }

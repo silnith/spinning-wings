@@ -1,6 +1,6 @@
 #include "WingsPixelFormat.h"
 
-PIXELFORMATDESCRIPTOR const silnith::desiredPixelFormat{
+PIXELFORMATDESCRIPTOR const silnith::gl::desiredPixelFormat{
     .nSize = sizeof(PIXELFORMATDESCRIPTOR),
     .nVersion = 1,
     .dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,

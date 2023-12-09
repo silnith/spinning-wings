@@ -3,7 +3,8 @@
 #include <Windows.h>
 #include <gl/GL.h>
 
-namespace silnith {
+namespace silnith::gl
+{
 
     /// <summary>
     /// Configures the OpenGL state machine for rendering the spinning wings animation.

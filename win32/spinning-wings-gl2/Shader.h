@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-namespace silnith
+namespace silnith::gl2
 {
     /// <summary>
     /// Manages a single GLSL shader.  Use <c>FragmentShader</c>

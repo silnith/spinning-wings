@@ -3,14 +3,14 @@
 #include <cstddef>
 #include <stdexcept>
 
-silnith::Shader::Shader(Shader&& shader) noexcept
+silnith::gl2::Shader::Shader(Shader&& shader) noexcept
     : id{ shader.id }, compilationLog{ shader.compilationLog }
 {
     shader.id = 0;
     shader.compilationLog = {};
 }
 
-silnith::Shader& silnith::Shader::operator=(Shader&& shader) noexcept
+silnith::gl2::Shader& silnith::gl2::Shader::operator=(Shader&& shader) noexcept
 {
     id = shader.id;
     compilationLog = shader.compilationLog;
@@ -19,7 +19,7 @@ silnith::Shader& silnith::Shader::operator=(Shader&& shader) noexcept
     return *this;
 }
 
-silnith::Shader::Shader(GLenum type, std::vector<std::string> const& sources_)
+silnith::gl2::Shader::Shader(GLenum type, std::vector<std::string> const& sources_)
     : id{ glCreateShader(type) }, compilationLog{}
 {
     {
@@ -70,12 +70,12 @@ silnith::Shader::Shader(GLenum type, std::vector<std::string> const& sources_)
     }
 }
 
-silnith::Shader::~Shader(void) noexcept
+silnith::gl2::Shader::~Shader(void) noexcept
 {
     glDeleteShader(id);
 }
 
-GLuint silnith::Shader::getShader(void) const noexcept
+GLuint silnith::gl2::Shader::getShader(void) const noexcept
 {
     return id;
 }

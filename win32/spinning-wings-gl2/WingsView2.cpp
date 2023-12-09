@@ -11,7 +11,8 @@
 #include "Program.h"
 #include "VertexShader.h"
 
-namespace silnith {
+namespace silnith::gl2
+{
 
 	typedef std::deque<Wing> wing_list;
 
@@ -54,7 +55,7 @@ namespace silnith {
 		versionStringInput >> glMinorVersion;
 	}
 
-	void InitializeOpenGLState2(void)
+	void InitializeOpenGLState(void)
 	{
 		GLubyte const* const glVendor{ glGetString(GL_VENDOR) };
 		GLubyte const* const glRenderer{ glGetString(GL_RENDERER) };
@@ -110,13 +111,13 @@ namespace silnith {
 				"}",
 			};
 
-			glslProgram = { silnith::VertexShader{ vertexSources }, silnith::FragmentShader{ fragmentSources } };
+			glslProgram = { VertexShader{ vertexSources }, FragmentShader{ fragmentSources } };
 
 			glslProgram.useProgram();
 		}
 	}
 
-	void AdvanceAnimation2(void)
+	void AdvanceAnimation(void)
 	{
 		GLuint displayList{ 0 };
 		if (wings.size() < numWings) {}
@@ -124,15 +125,15 @@ namespace silnith {
 		{
 			wings.pop_back();
 		}
-		silnith::Wing const& wing{ wings.emplace_front(displayList,
+		Wing const& wing{ wings.emplace_front(displayList,
 			radiusCurve.getNextValue(), angleCurve.getNextValue(),
 			deltaAngleCurve.getNextValue(), deltaZCurve.getNextValue(),
 			rollCurve.getNextValue(), pitchCurve.getNextValue(), yawCurve.getNextValue(),
-			silnith::Color{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
-			silnith::Color::WHITE) };
+			Color{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
+			Color::WHITE) };
 	}
 
-	void DrawFrame2(void)
+	void DrawFrame(void)
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -156,11 +157,11 @@ namespace silnith {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glEnable(GL_POLYGON_OFFSET_LINE);
 			glPushMatrix();
-			for (silnith::Wing const& wing : wings) {
+			for (Wing const& wing : wings) {
 				glTranslatef(0, 0, wing.getDeltaZ());
 				glRotatef(wing.getDeltaAngle(), 0, 0, 1);
 
-				silnith::Color const& edgeColor{ wing.getEdgeColor() };
+				Color const& edgeColor{ wing.getEdgeColor() };
 				glColor3f(edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
 				glPushMatrix();
 				glRotatef(wing.getAngle(), 0, 0, 1);
@@ -178,11 +179,11 @@ namespace silnith {
 		}
 
 		glPushMatrix();
-		for (silnith::Wing const& wing : wings) {
+		for (Wing const& wing : wings) {
 			glTranslatef(0, 0, wing.getDeltaZ());
 			glRotatef(wing.getDeltaAngle(), 0, 0, 1);
 
-			silnith::Color const& color{ wing.getColor() };
+			Color const& color{ wing.getColor() };
 			glColor3f(color.getRed(), color.getGreen(), color.getBlue());
 			glPushMatrix();
 			glRotatef(wing.getAngle(), 0, 0, 1);
@@ -200,7 +201,7 @@ namespace silnith {
 		glFlush();
 	}
 
-	void Resize2(GLsizei width, GLsizei height)
+	void Resize(GLsizei width, GLsizei height)
 	{
 		GLdouble xmult{ 1.0 };
 		GLdouble ymult{ 1.0 };

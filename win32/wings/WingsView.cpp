@@ -9,7 +9,8 @@
 #include "CurveGenerator.h"
 #include "Wing.h"
 
-namespace silnith {
+namespace silnith::gl
+{
 
 	typedef std::deque<Wing> wing_list;
 

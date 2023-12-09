@@ -7,7 +7,7 @@
 
 #include <string>
 
-namespace silnith
+namespace silnith::gl2
 {
     /// <summary>
     /// Manages a GLSL program.  This is composed of shaders.

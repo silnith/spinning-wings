@@ -2,7 +2,8 @@
 
 #include <Windows.h>
 
-namespace silnith {
+namespace silnith::gl
+{
 
     /// <summary>
     /// A descriptor for a pixel format that supports OpenGL rendering

@@ -33,7 +33,7 @@ BOOL MonitorEnumProc(HMONITOR hMonitor, HDC hdc, LPRECT lpRect, LPARAM d)
 
 void TimerProc(HWND hWnd, UINT message, UINT_PTR bar, DWORD baz)
 {
-	silnith::AdvanceAnimation();
+	silnith::gl::AdvanceAnimation();
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -44,7 +44,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		HDC const hdc{ GetDC(hWnd) };
 
-		int const pixelformat{ ChoosePixelFormat(hdc, &silnith::desiredPixelFormat) };
+		int const pixelformat{ ChoosePixelFormat(hdc, &silnith::gl::desiredPixelFormat) };
 		if (pixelformat == 0) {
 			DWORD error{ GetLastError() };
 			PostQuitMessage(-1);
@@ -53,7 +53,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		//int foo = DescribePixelFormat(hdc, pixelformat, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
 
-		BOOL const didSetPixelFormat{ SetPixelFormat(hdc, pixelformat, &silnith::desiredPixelFormat) };
+		BOOL const didSetPixelFormat{ SetPixelFormat(hdc, pixelformat, &silnith::gl::desiredPixelFormat) };
 		if (didSetPixelFormat) {}
 		else
 		{
@@ -78,7 +78,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return -1;
 		}
 
-		silnith::InitializeOpenGLState();
+		silnith::gl::InitializeOpenGLState();
 
 		ReleaseDC(hWnd, hdc);
 
@@ -114,7 +114,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		GLsizei const width{ LOWORD(lParam) };
 		GLsizei const height{ HIWORD(lParam) };
-		silnith::Resize(width, height);
+		silnith::gl::Resize(width, height);
 
 		return 0;
 	}
@@ -122,7 +122,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		assert(hglrc == wglGetCurrentContext());
 
-		silnith::AdvanceAnimation();
+		silnith::gl::AdvanceAnimation();
 
 		InvalidateRgn(hWnd, NULL, FALSE);
 		return 0;
@@ -143,7 +143,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		 */
 		assert(hglrc == wglGetCurrentContext());
 
-		silnith::DrawFrame();
+		silnith::gl::DrawFrame();
 
 		PAINTSTRUCT paintstruct;
 		HDC const hdc{ BeginPaint(hWnd, &paintstruct) };

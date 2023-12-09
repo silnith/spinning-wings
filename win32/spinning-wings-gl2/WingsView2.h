@@ -3,12 +3,13 @@
 #include <Windows.h>
 #include <GL/glew.h>
 
-namespace silnith {
+namespace silnith::gl2
+{
 
     /// <summary>
     /// Configures the OpenGL state machine for rendering the spinning wings animation.
     /// </summary>
-    void InitializeOpenGLState2(void);
+    void InitializeOpenGLState(void);
 
     /// <summary>
     /// Advances the spinning wings animation by one frame.
@@ -19,7 +20,7 @@ namespace silnith {
     /// context that was initialized previously.
     /// </para>
     /// </remarks>
-    void AdvanceAnimation2(void);
+    void AdvanceAnimation(void);
 
     /// <summary>
     /// Renders the current spinning wings animation frame into the current
@@ -33,13 +34,13 @@ namespace silnith {
     /// <c>SwapBuffers</c> afterwards.
     /// </para>
     /// </remarks>
-    void DrawFrame2(void);
+    void DrawFrame(void);
 
     /// <summary>
     /// Updates the OpenGL rendering context for the new viewport size.
     /// </summary>
     /// <param name="width">the new viewport width</param>
     /// <param name="height">the new viewport height</param>
-    void Resize2(GLsizei width, GLsizei height);
+    void Resize(GLsizei width, GLsizei height);
 
 };
