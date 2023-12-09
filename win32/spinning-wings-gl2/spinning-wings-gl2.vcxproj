@@ -163,7 +163,11 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FragmentShader.cpp" />
+    <ClCompile Include="Program.cpp" />
+    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="VertexShader.cpp" />
     <ClCompile Include="WingsView2.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -177,6 +181,10 @@
     <None Include="vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FragmentShader.h" />
+    <ClInclude Include="Program.h" />
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="VertexShader.h" />
     <ClInclude Include="WingsView2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

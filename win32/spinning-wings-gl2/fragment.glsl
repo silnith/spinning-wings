@@ -1,7 +1,6 @@
-smooth in vec4 color;
-
-out vec4 fragmentColor;
+#version 110
 
 void main() {
-    fragmentColor = color;
+    gl_FragColor = gl_Color;
+    gl_FragDepth = gl_FragCoord.z;
 }

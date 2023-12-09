@@ -11,6 +11,7 @@
 #pragma comment (lib, "glu32.lib")
 
 #include <cassert>
+#include <stdexcept>
 
 #include "WingsPixelFormat.h"
 #include "WingsView2.h"
@@ -81,7 +82,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return -1;
 		}
 
-		silnith::InitializeOpenGLState2();
+		try
+		{
+			silnith::InitializeOpenGLState2();
+		}
+		catch ([[maybe_unused]] std::exception const& e)
+		{
+			PostQuitMessage(-1);
+			return -1;
+		}
 
 		ReleaseDC(hWnd, hdc);
 

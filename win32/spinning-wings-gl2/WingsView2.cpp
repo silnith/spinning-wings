@@ -7,6 +7,10 @@
 #include "CurveGenerator.h"
 #include "Wing.h"
 
+#include "FragmentShader.h"
+#include "Program.h"
+#include "VertexShader.h"
+
 namespace silnith {
 
 	typedef std::deque<Wing> wing_list;
@@ -30,6 +34,8 @@ namespace silnith {
 	CurveGenerator greenCurve{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 40) };
 	CurveGenerator blueCurve{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
 
+	Program glslProgram{};
+
 	bool hasOpenGL(GLuint major, GLuint minor)
 	{
 		return (glMajorVersion > major)
@@ -46,47 +52,6 @@ namespace silnith {
 		versionStringInput >> period;
 		assert(period == '.');
 		versionStringInput >> glMinorVersion;
-	}
-
-	void FetchShaderError(GLuint const shader)
-	{
-		GLint messageSize{ 0 };
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &messageSize);
-		GLchar* log = new GLchar[messageSize];
-		glGetShaderInfoLog(shader, messageSize, NULL, log);
-		// TODO: print it out somehow
-		delete[] log;
-	}
-
-	void CompileShader(GLuint const shader, std::string const& source)
-	{
-		GLchar const* cSource{ source.c_str() };
-		glShaderSource(shader, 1, &cSource, NULL);
-		glCompileShader(shader);
-
-		GLint compilationSuccess{ 0 };
-		glGetShaderiv(shader, GL_COMPILE_STATUS, &compilationSuccess);
-		switch (compilationSuccess)
-		{
-		case GL_TRUE:
-			break;
-		case GL_FALSE:
-			FetchShaderError(shader);
-			break;
-		default:
-			assert(false);
-			break;
-		}
-	}
-
-	void FetchProgramError(GLuint const program)
-	{
-		GLint messageSize{ 0 };
-		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &messageSize);
-		GLchar* log = new GLchar[messageSize];
-		glGetProgramInfoLog(program, messageSize, NULL, log);
-		// TODO: print it out somehow
-		delete[] log;
 	}
 
 	void InitializeOpenGLState2(void)
@@ -124,177 +89,31 @@ namespace silnith {
 			0, 0, 13,
 			0, 0, 1);
 
-		GLuint const wingLists{ glGenLists(numWings) };
-		for (GLuint displayList{ wingLists }; displayList < wingLists + numWings; displayList++) {
-			// This initializes the list of wings to hold the allocated GL display lists.
-			// These display list identifiers are reused throughout the lifetime of the program.
-			wings.emplace_back(displayList);
-		}
-
-		std::string const vertexShaderSource{
-			"#version 110\n"\
-			"\n"\
-			"void main() {\n"\
-			"    gl_FrontColor = gl_Color;\n"\
-			"    gl_BackColor = gl_Color;\n"\
-			"    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"\
-			"}\n"
-		};
-		std::string const fragmentShaderSource{
-			"#version 110\n"\
-			"\n"\
-			"void main() {\n"\
-			"    gl_FragColor = gl_Color;\n"\
-			"    gl_FragDepth = gl_FragCoord.z;\n"\
-			"}\n"
-		};
-		GLuint vertexShader{ glCreateShader(GL_VERTEX_SHADER) };
-		GLuint fragmentShader{ glCreateShader(GL_FRAGMENT_SHADER) };
-
-		CompileShader(vertexShader, vertexShaderSource);
-		CompileShader(fragmentShader, fragmentShaderSource);
-
-		GLuint program{ glCreateProgram() };
-		glAttachShader(program, vertexShader);
-		glAttachShader(program, fragmentShader);
-
-		glLinkProgram(program);
-
-		glDetachShader(program, vertexShader);
-		glDetachShader(program, fragmentShader);
-
-		glDeleteShader(vertexShader);
-		glDeleteShader(fragmentShader);
-
-		GLint linkStatus{ 0 };
-		glGetProgramiv(program, GL_LINK_STATUS, &linkStatus);
-		switch (linkStatus)
+		if (hasOpenGL(2, 0))
 		{
-		case GL_TRUE:
-			break;
-		case GL_FALSE:
-			FetchProgramError(program);
-			break;
-		default:
-			assert(false);
-			break;
+			std::vector<std::string> vertexSources{
+				"#version 110",
+				"",
+				"void main() {",
+				"    gl_FrontColor = gl_Color;",
+				"    gl_BackColor = gl_Color;",
+				"    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;",
+				"}",
+			};
+
+			std::vector<std::string> fragmentSources{
+				"#version 110",
+				"",
+				"void main() {",
+				"    gl_FragColor = gl_Color;",
+				"    gl_FragDepth = gl_FragCoord.z;",
+				"}",
+			};
+
+			glslProgram = { silnith::VertexShader{ vertexSources }, silnith::FragmentShader{ fragmentSources } };
+
+			glslProgram.useProgram();
 		}
-
-		glUseProgram(program);
-	}
-
-	void Temp(void)
-	{
-		GLint success{ 0 };
-		GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-		std::string const vertexShaderSource{ "#version 110\n"\
-			"attribute vec4 vertexPosition;\n"\
-			"in vec4 vertexColor;\n"\
-			"in uint wingIndex;\n"\
-			"in float deltaAngle;\n"\
-			"in float deltaZ;\n"\
-			"in float radius;\n"\
-			"in float angle;\n"\
-			"in float roll;\n"\
-			"in float pitch;\n"\
-			"in float yaw;\n"\
-			"smooth out vec4 color;\n"\
-			"uniform mat4 modelviewMatrix;\n"\
-			"void main() {\n"\
-			"gl_Position = vertexPosition;\n"\
-			"color = vertexColor;\n"\
-			"}\n" };
-		GLchar const* vertexShaderSourcePointer{ vertexShaderSource.c_str() };
-
-		glShaderSource(vertexShader, 1, &vertexShaderSourcePointer, NULL);
-		glCompileShader(vertexShader);
-		glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-		if (success == GL_FALSE) {
-			// glGetShaderInfoLog();
-			char logOutput[1024];
-			GLsizei logSize{};
-			glGetShaderInfoLog(vertexShader, 1024, &logSize, logOutput);
-			assert(0 == 1);
-		}
-
-		GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-		std::string const fragmentShaderSource = "#version 110\n"\
-			"smooth in vec4 color;\n"\
-			"out vec4 fragmentColor;\n"\
-			"void main() {\n"\
-			"fragmentColor = color;\n"\
-			"}\n";
-		GLchar const* fragmentShaderSourcePointer{ fragmentShaderSource.c_str() };
-
-		glShaderSource(fragmentShader, 1, &fragmentShaderSourcePointer, NULL);
-		glCompileShader(fragmentShader);
-		glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-		if (success == GL_FALSE) {
-			// glGetShaderInfoLog();
-		}
-
-		GLuint program = glCreateProgram();
-		glAttachShader(program, vertexShader);
-		glAttachShader(program, fragmentShader);
-
-		glBindAttribLocation(program, 0, "vertexPosition");
-		glBindAttribLocation(program, 1, "vertexColor");
-		glBindAttribLocation(program, 2, "wingIndex");
-		glBindAttribLocation(program, 3, "deltaAngle");
-		glBindAttribLocation(program, 4, "deltaZ");
-		glBindAttribLocation(program, 5, "radius");
-		glBindAttribLocation(program, 6, "angle");
-		glBindAttribLocation(program, 7, "roll");
-		glBindAttribLocation(program, 8, "pitch");
-		glBindAttribLocation(program, 9, "yaw");
-
-		glLinkProgram(program);
-		glGetProgramiv(program, GL_LINK_STATUS, &success);
-		if (success == GL_FALSE) {
-			// glGetProgramInfoLog()
-		}
-
-		glDetachShader(program, vertexShader);
-		glDetachShader(program, fragmentShader);
-		glDeleteShader(vertexShader);
-		glDeleteShader(fragmentShader);
-
-		glValidateProgram(program);
-
-		GLint uniformLocation{ glGetUniformLocation(program, "modelviewMatrix") };
-
-		glUseProgram(program);
-
-		// do stuff
-		GLfloat modelviewMatrix[16]{};
-		glUniformMatrix4fv(uniformLocation, 1, GL_TRUE, modelviewMatrix);
-
-		glUseProgram(NULL);
-
-		glDeleteProgram(program);
-
-		GLuint vao[1];
-		glGenVertexArrays(1, vao);
-		glBindVertexArray(vao[0]);
-
-		//GLuint buffer[1];
-		//glGenBuffers(1, buffer);
-		//glBindBuffer(GL_ARRAY_BUFFER, buffer[0]);
-		// glBufferData, glMapBuffer, glCopyBuffer
-		// glVertexAttribPointer();
-
-		glVertexPointer(3, GL_FLOAT, 0, nullptr);
-		glEnableClientState(GL_VERTEX_ARRAY);
-
-		//glDrawArrays(GL_QUADS, 0, 4);
-		//glDrawElements
-
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 0, 0);
-
-		GLuint buffers[40]{};
-		glGenBuffers(40, buffers);
 	}
 
 	void InitializeOpenGLBuffers(void)
@@ -314,8 +133,12 @@ namespace silnith {
 
 	void AdvanceAnimation2(void)
 	{
-		GLuint const displayList{ wings.back().getGLDisplayList() };
-		wings.pop_back();
+		GLuint displayList{ 0 };
+		if (wings.size() < numWings) {}
+		else
+		{
+			wings.pop_back();
+		}
 		silnith::Wing const& wing{ wings.emplace_front(displayList,
 			radiusCurve.getNextValue(), angleCurve.getNextValue(),
 			deltaAngleCurve.getNextValue(), deltaZCurve.getNextValue(),
