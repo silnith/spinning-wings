@@ -116,21 +116,6 @@ namespace silnith {
 		}
 	}
 
-	void InitializeOpenGLBuffers(void)
-	{
-		GLuint singleQuadVertexBuffer;
-		glGenBuffers(1, &singleQuadVertexBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, singleQuadVertexBuffer);
-		GLfloat const quad[12]{
-			1, 1, 0,
-			-1, 1, 0,
-			-1, -1, 0,
-			1, -1, 0,
-		};
-		GLsizeiptr const quadSize{ sizeof(GLfloat) * 4 * 3 };
-		glBufferData(GL_ARRAY_BUFFER, quadSize, quad, GL_STATIC_DRAW);
-	}
-
 	void AdvanceAnimation2(void)
 	{
 		GLuint displayList{ 0 };
