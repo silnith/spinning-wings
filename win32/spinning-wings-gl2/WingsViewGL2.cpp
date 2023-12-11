@@ -89,10 +89,12 @@ namespace silnith::wings::gl2
 		-1, -1, 0,
 		1, -1, 0,
 	};
+	GLsizeiptr const quadVerticesSize{ sizeof(GLfloat) * 12 };
 	GLuint const quadIndices[4]
 	{
 		0, 1, 2, 3,
 	};
+	GLsizeiptr const quadIndicesSize{ sizeof(GLuint) * 4 };
 
 	void DrawQuadGL1_1(void)
 	{
@@ -120,9 +122,7 @@ namespace silnith::wings::gl2
 
 	void InitializeDrawQuadGL1_5(void)
 	{
-		GLsizeiptr const quadVerticesSize{ sizeof(GLfloat) * 12 };
 		assert(quadVerticesSize == sizeof(quadVertices));
-		GLsizeiptr const quadIndicesSize{ sizeof(GLuint) * 4 };
 		assert(quadIndicesSize == sizeof(quadIndices));
 		
 		glGenBuffers(1, &wingBufferObject);
@@ -174,7 +174,6 @@ namespace silnith::wings::gl2
 			0, 0, 13,
 			0, 0, 1);
 
-		// Initialize draw quad function pointer.
 		if (hasOpenGL(1, 5))
 		{
 			InitializeDrawQuadGL1_5();
@@ -218,9 +217,13 @@ namespace silnith::wings::gl2
 	void AdvanceAnimation(void)
 	{
 		GLuint displayList{ 0 };
-		if (wings.size() < numWings) {}
+		if (wings.empty() || wings.size() < numWings)
+		{
+			displayList = glGenLists(1);
+		}
 		else
 		{
+			displayList = wings.back().getGLDisplayList();
 			wings.pop_back();
 		}
 		Wing const& wing{ wings.emplace_front(displayList,
@@ -229,6 +232,17 @@ namespace silnith::wings::gl2
 			rollCurve.getNextValue(), pitchCurve.getNextValue(), yawCurve.getNextValue(),
 			Color{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
 			Color::WHITE) };
+
+		glNewList(displayList, GL_COMPILE);
+		glPushMatrix();
+		glRotatef(wing.getAngle(), 0, 0, 1);
+		glTranslatef(wing.getRadius(), 0, 0);
+		glRotatef(-(wing.getYaw()), 0, 0, 1);
+		glRotatef(-(wing.getPitch()), 0, 1, 0);
+		glRotatef(wing.getRoll(), 1, 0, 0);
+		drawQuad();
+		glPopMatrix();
+		glEndList();
 	}
 
 	void DrawFrame(void)
@@ -246,14 +260,7 @@ namespace silnith::wings::gl2
 
 				Color const& edgeColor{ wing.getEdgeColor() };
 				glColor3f(edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
-				glPushMatrix();
-				glRotatef(wing.getAngle(), 0, 0, 1);
-				glTranslatef(wing.getRadius(), 0, 0);
-				glRotatef(-(wing.getYaw()), 0, 0, 1);
-				glRotatef(-(wing.getPitch()), 0, 1, 0);
-				glRotatef(wing.getRoll(), 1, 0, 0);
-				drawQuad();
-				glPopMatrix();
+				glCallList(wing.getGLDisplayList());
 			}
 			glPopMatrix();
 			glDisable(GL_POLYGON_OFFSET_LINE);
@@ -267,14 +274,7 @@ namespace silnith::wings::gl2
 
 			Color const& color{ wing.getColor() };
 			glColor3f(color.getRed(), color.getGreen(), color.getBlue());
-			glPushMatrix();
-			glRotatef(wing.getAngle(), 0, 0, 1);
-			glTranslatef(wing.getRadius(), 0, 0);
-			glRotatef(-(wing.getYaw()), 0, 0, 1);
-			glRotatef(-(wing.getPitch()), 0, 1, 0);
-			glRotatef(wing.getRoll(), 1, 0, 0);
-			drawQuad();
-			glPopMatrix();
+			glCallList(wing.getGLDisplayList());
 		}
 		glPopMatrix();
 
