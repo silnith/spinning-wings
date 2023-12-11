@@ -20,6 +20,11 @@ namespace silnith::wings::gl2
         return *this;
     }
 
+    Program::~Program(void) noexcept
+    {
+        glDeleteProgram(id);
+    }
+
     Program::Program(Shader const& s1, Shader const& s2)
         : id{ glCreateProgram() }, linkLog{}
     {
@@ -59,11 +64,6 @@ namespace silnith::wings::gl2
             throw std::runtime_error{ "Unknown link status: " + linkSuccess };
         }
         }
-    }
-
-    Program::~Program(void) noexcept
-    {
-        glDeleteProgram(id);
     }
 
     GLuint Program::getProgram(void) const noexcept

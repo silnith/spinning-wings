@@ -20,6 +20,11 @@ namespace silnith::wings::gl2
         return *this;
     }
 
+    Shader::~Shader(void) noexcept
+    {
+        glDeleteShader(id);
+    }
+
     Shader::Shader(GLenum type, std::vector<std::string> const& sources_)
         : id{ glCreateShader(type) }, compilationLog{}
     {
@@ -69,11 +74,6 @@ namespace silnith::wings::gl2
             throw std::runtime_error{ "Unknown compilation status: " + compilationSuccess };
         }
         }
-    }
-
-    Shader::~Shader(void) noexcept
-    {
-        glDeleteShader(id);
     }
 
     GLuint Shader::getShader(void) const noexcept
