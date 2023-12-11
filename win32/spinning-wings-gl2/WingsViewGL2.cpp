@@ -111,21 +111,28 @@ namespace silnith::wings::gl2
 
 	void DrawQuadGL1_5(void)
 	{
-		glDrawArrays(GL_QUADS, 0, 4);
-		//glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, quadIndices);
+		//glDrawArrays(GL_QUADS, 0, 4);
+		glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, 0);
 	}
 
 	GLuint wingBufferObject{ 0 };
+	GLuint wingIndicesBufferObject{ 0 };
 
 	void InitializeDrawQuadGL1_5(void)
 	{
 		GLsizeiptr const quadVerticesSize{ sizeof(GLfloat) * 12 };
 		assert(quadVerticesSize == sizeof(quadVertices));
+		GLsizeiptr const quadIndicesSize{ sizeof(GLuint) * 4 };
+		assert(quadIndicesSize == sizeof(quadIndices));
 		
 		glGenBuffers(1, &wingBufferObject);
 		glBindBuffer(GL_ARRAY_BUFFER, wingBufferObject);
 		glBufferData(GL_ARRAY_BUFFER, quadVerticesSize, quadVertices, GL_STATIC_DRAW);
 		glVertexPointer(3, GL_FLOAT, 0, 0);
+
+		glGenBuffers(1, &wingIndicesBufferObject);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBufferObject);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesSize, quadIndices, GL_STATIC_DRAW);
 
 		glEnableClientState(GL_VERTEX_ARRAY);
 
