@@ -107,7 +107,6 @@ namespace silnith::wings::gl2
 
 	void DrawQuadGL1_1(void)
 	{
-		//glDrawArrays(GL_QUADS, 0, 4);
 		glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, quadIndices);
 	}
 
@@ -128,7 +127,6 @@ namespace silnith::wings::gl2
 
 	void DrawQuadGL1_5(void)
 	{
-		//glDrawArrays(GL_QUADS, 0, 4);
 		glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, 0);
 	}
 
@@ -251,6 +249,7 @@ namespace silnith::wings::gl2
 		cleanupDrawQuad();
 
 		delete glslProgram;
+		glslProgram = nullptr;
 	}
 
 	void AdvanceAnimation(void)
