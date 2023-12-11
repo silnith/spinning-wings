@@ -20,7 +20,7 @@ namespace silnith::wings::gl2
     class Program
     {
     public:
-        Program(void) noexcept = default;
+        Program(void) noexcept = delete;
         Program(Program const&) noexcept = delete;
         Program& operator=(Program const&) noexcept = delete;
         Program(Program&&) noexcept;
