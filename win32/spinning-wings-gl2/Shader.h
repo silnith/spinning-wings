@@ -21,11 +21,11 @@ namespace silnith::wings::gl2
     {
     public:
         Shader(void) noexcept = delete;
-        ~Shader(void) noexcept;
         Shader(Shader const&) noexcept = delete;
         Shader& operator=(Shader const&) noexcept = delete;
         Shader(Shader&&) noexcept;
         Shader& operator=(Shader&&) noexcept;
+        ~Shader(void) noexcept;
 
     protected:
         Shader(GLenum type, std::vector<std::string> const &);

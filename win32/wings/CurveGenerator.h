@@ -12,11 +12,11 @@ namespace silnith::wings
 	{
 	public:
 		CurveGenerator(void) = delete;
-		~CurveGenerator(void) noexcept = default;
 		CurveGenerator(CurveGenerator const& curveGenerator) = delete;
 		CurveGenerator& operator=(CurveGenerator const& curveGenerator) = delete;
 		CurveGenerator(CurveGenerator&& curveGenerator) = delete;
 		CurveGenerator& operator=(CurveGenerator&& curveGenerator) = delete;
+		~CurveGenerator(void) noexcept = default;
 	public:
 		/// <summary>
 		/// Creates a new curve generator.

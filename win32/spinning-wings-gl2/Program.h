@@ -21,11 +21,11 @@ namespace silnith::wings::gl2
     {
     public:
         Program(void) noexcept = default;
-        ~Program(void) noexcept;
         Program(Program const&) noexcept = delete;
         Program& operator=(Program const&) noexcept = delete;
         Program(Program&&) noexcept;
         Program& operator=(Program&&) noexcept;
+        ~Program(void) noexcept;
     public:
         Program(Shader const&, Shader const&);
 

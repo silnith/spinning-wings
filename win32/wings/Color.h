@@ -10,11 +10,11 @@ namespace silnith::wings
 	{
 	public:
 		Color(void) noexcept = default;
-		~Color(void) noexcept = default;
 		Color(Color const&) noexcept = default;
 		Color& operator=(Color const&) noexcept = default;
 		Color(Color&&) noexcept = default;
 		Color& operator=(Color&&) noexcept = default;
+		~Color(void) noexcept = default;
 	public:
 		/// <summary>
 		/// Initializes a new color structure.

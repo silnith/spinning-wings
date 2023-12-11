@@ -29,11 +29,11 @@ namespace silnith::wings
 	{
 	public:
 		Wing(void) noexcept = default;
-		~Wing(void) noexcept = default;
 		Wing(Wing const& wing) noexcept = default;
 		Wing& operator=(Wing const& wing) noexcept = default;
 		Wing(Wing&& wing) noexcept = default;
 		Wing& operator=(Wing&& wing) noexcept = default;
+		~Wing(void) noexcept = default;
 	public:
 		/// <summary>
 		/// Creates a new wing with the provided OpenGL display list identifier.

@@ -19,11 +19,11 @@ namespace silnith::wings::gl2
     {
     public:
         VertexShader(void) noexcept = delete;
-        ~VertexShader(void) noexcept = default;
         VertexShader(VertexShader const&) noexcept = delete;
         VertexShader& operator=(VertexShader const&) noexcept = delete;
         VertexShader(VertexShader&&) noexcept = delete;
         VertexShader& operator=(VertexShader&&) noexcept = delete;
+        ~VertexShader(void) noexcept = default;
     public:
         VertexShader(std::vector<std::string> const&);
 
