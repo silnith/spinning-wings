@@ -34,7 +34,7 @@ namespace silnith::wings::gl2
 	CurveGenerator greenCurve{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 40) };
 	CurveGenerator blueCurve{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
 
-	Program glslProgram{};
+	Program* glslProgram{ nullptr };
 
 	bool hasOpenGL(GLuint major, GLuint minor)
 	{
@@ -66,7 +66,14 @@ namespace silnith::wings::gl2
 	// The rendering path for rendering a single quad.
 	// This points to the appropriate rendering path for the
 	// active version of the GL.
-	void (*drawQuad) (void) { DrawQuadGL1_0 };
+	void (*drawQuad)(void) { DrawQuadGL1_0 };
+
+	void CleanupDrawQuadGL1_0(void)
+	{
+		glDeleteLists(quadDisplayList, 1);
+	}
+
+	void (*cleanupDrawQuad)(void) { CleanupDrawQuadGL1_0 };
 
 	void InitializeDrawQuadGL1_0(void)
 	{
@@ -79,7 +86,9 @@ namespace silnith::wings::gl2
 		glVertex2f(1, -1);
 		glEnd();
 		glEndList();
+
 		drawQuad = DrawQuadGL1_0;
+		cleanupDrawQuad = CleanupDrawQuadGL1_0;
 	}
 
 	GLfloat const quadVertices[12]
@@ -102,6 +111,11 @@ namespace silnith::wings::gl2
 		glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, quadIndices);
 	}
 
+	void CleanupDrawQuadGL1_1(void)
+	{
+		glDisableClientState(GL_VERTEX_ARRAY);
+	}
+
 	void InitializeDrawQuadGL1_1(void)
 	{
 		glVertexPointer(3, GL_FLOAT, 0, quadVertices);
@@ -109,6 +123,7 @@ namespace silnith::wings::gl2
 		glEnableClientState(GL_VERTEX_ARRAY);
 
 		drawQuad = DrawQuadGL1_1;
+		cleanupDrawQuad = CleanupDrawQuadGL1_1;
 	}
 
 	void DrawQuadGL1_5(void)
@@ -119,6 +134,17 @@ namespace silnith::wings::gl2
 
 	GLuint wingBufferObject{ 0 };
 	GLuint wingIndicesBufferObject{ 0 };
+
+	void CleanupDrawQuadGL1_5(void)
+	{
+		glDisableClientState(GL_VERTEX_ARRAY);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glDeleteBuffers(1, &wingIndicesBufferObject);
+		glDeleteBuffers(1, &wingBufferObject);
+	}
 
 	void InitializeDrawQuadGL1_5(void)
 	{
@@ -137,6 +163,7 @@ namespace silnith::wings::gl2
 		glEnableClientState(GL_VERTEX_ARRAY);
 
 		drawQuad = DrawQuadGL1_5;
+		cleanupDrawQuad = CleanupDrawQuadGL1_5;
 	}
 
 	void InitializeOpenGLState(void)
@@ -208,10 +235,22 @@ namespace silnith::wings::gl2
 				"}",
 			};
 
-			glslProgram = { VertexShader{ vertexSources }, FragmentShader{ fragmentSources } };
+			glslProgram = new Program{ VertexShader{ vertexSources }, FragmentShader{ fragmentSources } };
 
-			glslProgram.useProgram();
+			glslProgram->useProgram();
 		}
+	}
+
+	void CleanupOpenGLState(void)
+	{
+		for (Wing const& wing : wings)
+		{
+			glDeleteLists(wing.getGLDisplayList(), 1);
+		}
+
+		cleanupDrawQuad();
+
+		delete glslProgram;
 	}
 
 	void AdvanceAnimation(void)

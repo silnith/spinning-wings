@@ -167,6 +167,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_DESTROY:
 	{
+		silnith::wings::gl2::CleanupOpenGLState();
+
 		// window about to be destroyed
 		HDC const hdc{ GetDC(hWnd) };
 		wglMakeCurrent(hdc, NULL);
