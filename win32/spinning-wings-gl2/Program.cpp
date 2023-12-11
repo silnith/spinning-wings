@@ -1,24 +1,22 @@
 #include "Program.h"
 
+#include <cassert>
 #include <cstddef>
 #include <stdexcept>
+#include <utility>
 
 namespace silnith::wings::gl2
 {
 
     Program::Program(Program&& program) noexcept
-        : id{ program.id }, linkLog{ program.linkLog }
-    {
-        program.id = 0;
-        program.linkLog = {};
-    }
+        : id{ std::exchange(program.id, 0) }, linkLog{ std::exchange(program.linkLog, {}) }
+    {}
 
     Program& Program::operator=(Program&& program) noexcept
     {
-        id = program.id;
-        linkLog = program.linkLog;
-        program.id = 0;
-        program.linkLog = {};
+        assert(this != &program);
+        id = std::exchange(program.id, 0);
+        linkLog = std::exchange(program.linkLog, {});
         return *this;
     }
 

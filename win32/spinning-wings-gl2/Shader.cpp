@@ -1,24 +1,22 @@
 #include "Shader.h"
 
+#include <cassert>
 #include <cstddef>
 #include <stdexcept>
+#include <utility>
 
 namespace silnith::wings::gl2
 {
 
     Shader::Shader(Shader&& shader) noexcept
-        : id{ shader.id }, compilationLog{ shader.compilationLog }
-    {
-        shader.id = 0;
-        shader.compilationLog = {};
-    }
+        : id{ std::exchange(shader.id, 0) }, compilationLog{ std::exchange(shader.compilationLog, {}) }
+    {}
 
     Shader& Shader::operator=(Shader&& shader) noexcept
     {
-        id = shader.id;
-        compilationLog = shader.compilationLog;
-        shader.id = 0;
-        shader.compilationLog = {};
+        assert(this != &shader);
+        id = std::exchange(shader.id, 0);
+        compilationLog = std::exchange(shader.compilationLog, {});
         return *this;
     }
 
