@@ -21,8 +21,8 @@ namespace silnith::wings::gl2
         FragmentShader(void) noexcept = delete;
         FragmentShader(FragmentShader const&) noexcept = delete;
         FragmentShader& operator=(FragmentShader const&) noexcept = delete;
-        FragmentShader(FragmentShader&&) noexcept = default;
-        FragmentShader& operator=(FragmentShader&&) noexcept = default;
+        FragmentShader(FragmentShader&&) noexcept = delete;
+        FragmentShader& operator=(FragmentShader&&) noexcept = delete;
         ~FragmentShader(void) noexcept = default;
     public:
         FragmentShader(std::vector<std::string> const&);

@@ -23,8 +23,8 @@ namespace silnith::wings::gl2
         Shader(void) noexcept = delete;
         Shader(Shader const&) noexcept = delete;
         Shader& operator=(Shader const&) noexcept = delete;
-        Shader(Shader&&) noexcept;
-        Shader& operator=(Shader&&) noexcept;
+        Shader(Shader&&) noexcept = delete;
+        Shader& operator=(Shader&&) noexcept = delete;
         ~Shader(void) noexcept;
 
     protected:
