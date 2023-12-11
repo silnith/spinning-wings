@@ -103,8 +103,33 @@ namespace silnith::wings::gl2
 	void InitializeDrawQuadGL1_1(void)
 	{
 		glVertexPointer(3, GL_FLOAT, 0, quadVertices);
+
 		glEnableClientState(GL_VERTEX_ARRAY);
+
 		drawQuad = DrawQuadGL1_1;
+	}
+
+	void DrawQuadGL1_5(void)
+	{
+		glDrawArrays(GL_QUADS, 0, 4);
+		//glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, quadIndices);
+	}
+
+	GLuint wingBufferObject{ 0 };
+
+	void InitializeDrawQuadGL1_5(void)
+	{
+		GLsizeiptr const quadVerticesSize{ sizeof(GLfloat) * 12 };
+		assert(quadVerticesSize == sizeof(quadVertices));
+		
+		glGenBuffers(1, &wingBufferObject);
+		glBindBuffer(GL_ARRAY_BUFFER, wingBufferObject);
+		glBufferData(GL_ARRAY_BUFFER, quadVerticesSize, quadVertices, GL_STATIC_DRAW);
+		glVertexPointer(3, GL_FLOAT, 0, 0);
+
+		glEnableClientState(GL_VERTEX_ARRAY);
+
+		drawQuad = DrawQuadGL1_5;
 	}
 
 	void InitializeOpenGLState(void)
@@ -143,7 +168,11 @@ namespace silnith::wings::gl2
 			0, 0, 1);
 
 		// Initialize draw quad function pointer.
-		if (hasOpenGL(1, 1))
+		if (hasOpenGL(1, 5))
+		{
+			InitializeDrawQuadGL1_5();
+		}
+		else if (hasOpenGL(1, 1))
 		{
 			InitializeDrawQuadGL1_1();
 		}
