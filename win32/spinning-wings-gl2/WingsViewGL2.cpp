@@ -21,7 +21,6 @@ namespace silnith::wings::gl2
 	GLuint glMajorVersion{ 1 };
 	GLuint glMinorVersion{ 0 };
 
-	GLuint wingDisplayList{ 0 };
 	wing_list wings{};
 
 	CurveGenerator radiusCurve{ 10.0f, -15.0f, 15.0f, false, 0.1f, 0.01f, 150 };
@@ -53,6 +52,59 @@ namespace silnith::wings::gl2
 		versionStringInput >> period;
 		assert(period == '.');
 		versionStringInput >> glMinorVersion;
+	}
+
+	// The GL display list for rendering a single quad.
+	// This is used for the GL 1.0 rendering path.
+	GLuint quadDisplayList{ 0 };
+
+	void DrawQuadGL1_0(void)
+	{
+		glCallList(quadDisplayList);
+	}
+
+	// The rendering path for rendering a single quad.
+	// This points to the appropriate rendering path for the
+	// active version of the GL.
+	void (*drawQuad) (void) { DrawQuadGL1_0 };
+
+	void InitializeDrawQuadGL1_0(void)
+	{
+		quadDisplayList = glGenLists(1);
+		glNewList(quadDisplayList, GL_COMPILE);
+		glBegin(GL_QUADS);
+		glVertex2f(1, 1);
+		glVertex2f(-1, 1);
+		glVertex2f(-1, -1);
+		glVertex2f(1, -1);
+		glEnd();
+		glEndList();
+		drawQuad = DrawQuadGL1_0;
+	}
+
+	GLfloat const quadVertices[12]
+	{
+		1, 1, 0,
+		-1, 1, 0,
+		-1, -1, 0,
+		1, -1, 0,
+	};
+	GLuint const quadIndices[4]
+	{
+		0, 1, 2, 3,
+	};
+
+	void DrawQuadGL1_1(void)
+	{
+		//glDrawArrays(GL_QUADS, 0, 4);
+		glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, quadIndices);
+	}
+
+	void InitializeDrawQuadGL1_1(void)
+	{
+		glVertexPointer(3, GL_FLOAT, 0, quadVertices);
+		glEnableClientState(GL_VERTEX_ARRAY);
+		drawQuad = DrawQuadGL1_1;
 	}
 
 	void InitializeOpenGLState(void)
@@ -89,6 +141,16 @@ namespace silnith::wings::gl2
 		gluLookAt(0, 50, 50,
 			0, 0, 13,
 			0, 0, 1);
+
+		// Initialize draw quad function pointer.
+		if (hasOpenGL(1, 1))
+		{
+			InitializeDrawQuadGL1_1();
+		}
+		else
+		{
+			InitializeDrawQuadGL1_0();
+		}
 
 		if (hasOpenGL(2, 0))
 		{
@@ -137,21 +199,6 @@ namespace silnith::wings::gl2
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		static GLfloat const quadVertices[12]
-		{
-			1, 1, 0,
-			-1, 1, 0,
-			-1, -1, 0,
-			1, -1, 0,
-		};
-		glVertexPointer(3, GL_FLOAT, 0, quadVertices);
-
-		static GLuint const quadIndices[4]
-		{
-			0, 1, 2, 3,
-		};
-
-		glEnableClientState(GL_VERTEX_ARRAY);
 		if (hasOpenGL(1, 1))
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -169,8 +216,7 @@ namespace silnith::wings::gl2
 				glRotatef(-(wing.getYaw()), 0, 0, 1);
 				glRotatef(-(wing.getPitch()), 0, 1, 0);
 				glRotatef(wing.getRoll(), 1, 0, 0);
-				//glDrawArrays(GL_QUADS, 0, 4);
-				glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, quadIndices);
+				drawQuad();
 				glPopMatrix();
 			}
 			glPopMatrix();
@@ -191,12 +237,10 @@ namespace silnith::wings::gl2
 			glRotatef(-(wing.getYaw()), 0, 0, 1);
 			glRotatef(-(wing.getPitch()), 0, 1, 0);
 			glRotatef(wing.getRoll(), 1, 0, 0);
-			//glDrawArrays(GL_QUADS, 0, 4);
-			glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, quadIndices);
+			drawQuad();
 			glPopMatrix();
 		}
 		glPopMatrix();
-		glDisableClientState(GL_VERTEX_ARRAY);
 
 		glFlush();
 	}
