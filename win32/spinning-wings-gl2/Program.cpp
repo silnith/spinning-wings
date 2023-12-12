@@ -57,6 +57,16 @@ namespace silnith::wings::gl2
         return id;
     }
 
+    GLuint Program::getAttributeLocation(std::string const& name) const
+    {
+        GLint const attributeLocation{ glGetAttribLocation(id, name.c_str()) };
+        if (attributeLocation < 0)
+        {
+            throw new std::runtime_error{ "Attribute " + name + " not bound." };
+        }
+        return static_cast<GLuint>(attributeLocation);
+    }
+
     void Program::useProgram(void) const noexcept
     {
         glUseProgram(id);

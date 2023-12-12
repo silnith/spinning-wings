@@ -201,6 +201,10 @@ namespace silnith::wings::gl2
 		cleanupDrawQuad = CleanupDrawQuadGL1_5;
 	}
 
+	GLuint deltaZAttribLocation{ 0 };
+	GLuint radiusAngleAttribLocation{ 0 };
+	GLuint rollPitchYawAttribLocation{ 0 };
+
 	void InitializeOpenGLState(void)
 	{
 		GLubyte const* const glVendor{ glGetString(GL_VENDOR) };
@@ -249,20 +253,68 @@ namespace silnith::wings::gl2
 			InitializeDrawQuadGL1_0();
 		}
 
-		if (hasOpenGL(2, 0))
+		if (hasOpenGL(2, 1))
 		{
 			std::vector<std::string> vertexSources{
-				"#version 110",
+				"#version 120",
+				"",
+				"attribute vec2 deltaZ;",
+				"attribute vec2 radiusAngle;",
+				"attribute vec3 rollPitchYaw;",
+				"",
+				"mat4 rotate(in float angle, in vec3 axis) {",
+				"    float c = cos(radians(angle));",
+				"    float s = sin(radians(angle));",
+				"",
+				"    mat3 initial = outerProduct(axis, axis) * (1 - c);",
+				"",
+				"    mat3 c_part = mat3(c);",
+				"",
+				"    mat3 s_part = mat3(0, axis.z, -axis.y, -axis.z, 0, axis.x, axis.y, -axis.x, 0) * s;",
+				"",
+				"    mat3 temp = initial + c_part + s_part;",
+				"",
+				"    mat4 rotation = mat4(1.0);",
+				"    rotation[0].xyz = temp[0];",
+				"    rotation[1].xyz = temp[1];",
+				"    rotation[2].xyz = temp[2];",
+				"",
+				"    return rotation;",
+				"}",
+				"",
+				"mat4 translate(in vec3 move) {",
+				"    mat4 trans = mat4(1.0);",
+				"    trans[3].xyz = move;",
+				"    return trans;",
+				"}",
 				"",
 				"void main() {",
+				"    float radius = radiusAngle[0];",
+				"    float angle = radiusAngle[1];",
+				"    float deltaAngle = deltaZ[0];",
+				"    float deltaZ = deltaZ[1];",
+				"    float roll = rollPitchYaw[0];",
+				"    float pitch = rollPitchYaw[1];",
+				"    float yaw = rollPitchYaw[2];",
+				"    ",
+				"    mat4 deltaZ_trans = translate(vec3(0, 0, deltaZ));",
+				"    mat4 deltaAngle_rot = rotate(deltaAngle, vec3(0, 0, 1));",
+				"    ",
+				"    mat4 angle_rot = rotate(angle, vec3(0, 0, 1));",
+				"    mat4 radius_trans = translate(vec3(radius, 0, 0));",
+				"    ",
+				"    mat4 yaw_rot = rotate(-yaw, vec3(0, 0, 1));",
+				"    mat4 pitch_rot = rotate(-pitch, vec3(0, 1, 0));",
+				"    mat4 roll_rot = rotate(roll, vec3(1, 0, 0));",
+				"    ",
 				"    gl_FrontColor = gl_Color;",
 				"    gl_BackColor = gl_Color;",
-				"    gl_Position = ftransform();",
+				"    gl_Position = gl_ModelViewProjectionMatrix * deltaZ_trans * deltaAngle_rot * angle_rot * radius_trans * yaw_rot * pitch_rot * roll_rot * gl_Vertex;",
 				"}",
 			};
 
 			std::vector<std::string> fragmentSources{
-				"#version 110",
+				"#version 120",
 				"",
 				"void main() {",
 				"    gl_FragColor = gl_Color;",
@@ -271,6 +323,10 @@ namespace silnith::wings::gl2
 			};
 
 			glslProgram = new Program{ VertexShader{ vertexSources }, FragmentShader{ fragmentSources } };
+
+			deltaZAttribLocation = glslProgram->getAttributeLocation("deltaZ");
+			radiusAngleAttribLocation = glslProgram->getAttributeLocation("radiusAngle");
+			rollPitchYawAttribLocation = glslProgram->getAttributeLocation("rollPitchYaw");
 
 			glslProgram->useProgram();
 		}
@@ -309,14 +365,9 @@ namespace silnith::wings::gl2
 			Color::WHITE) };
 
 		glNewList(displayList, GL_COMPILE);
-		glPushMatrix();
-		glRotatef(wing.getAngle(), 0, 0, 1);
-		glTranslatef(wing.getRadius(), 0, 0);
-		glRotatef(-(wing.getYaw()), 0, 0, 1);
-		glRotatef(-(wing.getPitch()), 0, 1, 0);
-		glRotatef(wing.getRoll(), 1, 0, 0);
+		glVertexAttrib2f(radiusAngleAttribLocation, wing.getRadius(), wing.getAngle());
+		glVertexAttrib3f(rollPitchYawAttribLocation, wing.getRoll(), wing.getPitch(), wing.getYaw());
 		drawQuad();
-		glPopMatrix();
 		glEndList();
 	}
 
@@ -328,30 +379,32 @@ namespace silnith::wings::gl2
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glEnable(GL_POLYGON_OFFSET_LINE);
-			glPushMatrix();
+			GLfloat deltaZ{ 0 };
+			GLfloat deltaAngle{ 0 };
 			for (Wing const& wing : wings) {
-				glTranslatef(0, 0, wing.getDeltaZ());
-				glRotatef(wing.getDeltaAngle(), 0, 0, 1);
+				deltaZ += wing.getDeltaZ();
+				deltaAngle += wing.getDeltaAngle();
 
 				Color const& edgeColor{ wing.getEdgeColor() };
 				glColor3f(edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
+				glVertexAttrib2f(deltaZAttribLocation, deltaAngle, deltaZ);
 				glCallList(wing.getGLDisplayList());
 			}
-			glPopMatrix();
 			glDisable(GL_POLYGON_OFFSET_LINE);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
 
-		glPushMatrix();
+		GLfloat deltaZ{ 0 };
+		GLfloat deltaAngle{ 0 };
 		for (Wing const& wing : wings) {
-			glTranslatef(0, 0, wing.getDeltaZ());
-			glRotatef(wing.getDeltaAngle(), 0, 0, 1);
+			deltaZ += wing.getDeltaZ();
+			deltaAngle += wing.getDeltaAngle();
 
 			Color const& color{ wing.getColor() };
 			glColor3f(color.getRed(), color.getGreen(), color.getBlue());
+			glVertexAttrib2f(deltaZAttribLocation, deltaAngle, deltaZ);
 			glCallList(wing.getGLDisplayList());
 		}
-		glPopMatrix();
 
 		glFlush();
 	}

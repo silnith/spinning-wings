@@ -31,6 +31,8 @@ namespace silnith::wings::gl2
 
         GLuint getProgram(void) const noexcept;
 
+        GLuint getAttributeLocation(std::string const&) const;
+
         void useProgram(void) const noexcept;
 
     private:
