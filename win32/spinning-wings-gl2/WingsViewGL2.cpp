@@ -11,6 +11,8 @@
 #include "Program.h"
 #include "VertexShader.h"
 
+#include <map>
+
 namespace silnith::wings::gl2
 {
 
@@ -35,6 +37,35 @@ namespace silnith::wings::gl2
 	CurveGenerator blueCurve{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
 
 	Program* glslProgram{ nullptr };
+
+	void CheckForGLErrors(std::map<GLenum, std::string> const& errors)
+	{
+		GLenum error{ glGetError() };
+		//assert(error == GL_NO_ERROR);
+		while (error != GL_NO_ERROR)
+		{
+			std::map<GLenum, std::string>::const_iterator const errorLookup{ errors.find(error) };
+			if (errorLookup == errors.cend())
+			{
+			}
+			else
+			{
+				throw new std::runtime_error{ errorLookup->second };
+			}
+			//switch (error)
+			//{
+			//case GL_INVALID_ENUM: break;
+			//case GL_INVALID_VALUE: break;
+			//case GL_INVALID_OPERATION: break;
+			//case GL_STACK_OVERFLOW: break;
+			//case GL_STACK_UNDERFLOW: break;
+			//case GL_OUT_OF_MEMORY: break;
+			//case GL_TABLE_TOO_LARGE: break;
+			//default: break;
+			//}
+			error = glGetError();
+		}
+	}
 
 	bool hasOpenGL(GLuint major, GLuint minor)
 	{
@@ -61,6 +92,12 @@ namespace silnith::wings::gl2
 	void DrawQuadGL1_0(void)
 	{
 		glCallList(quadDisplayList);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_VALUE, "Called list 0." },
+		});
+#endif
 	}
 
 	// The rendering path for rendering a single quad.
@@ -71,6 +108,13 @@ namespace silnith::wings::gl2
 	void CleanupDrawQuadGL1_0(void)
 	{
 		glDeleteLists(quadDisplayList, 1);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_VALUE, "Range is negative." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 	}
 
 	void (*cleanupDrawQuad)(void) { CleanupDrawQuadGL1_0 };
@@ -78,14 +122,53 @@ namespace silnith::wings::gl2
 	void InitializeDrawQuadGL1_0(void)
 	{
 		quadDisplayList = glGenLists(1);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_VALUE, "Range is negative." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glNewList(quadDisplayList, GL_COMPILE);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_VALUE, "List is 0." },
+			{ GL_INVALID_ENUM, "Invalid mode." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd, or display list is already being defined." },
+			{ GL_OUT_OF_MEMORY, "Insufficient memory to compile display list." },
+		});
+#endif
 		glBegin(GL_QUADS);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid mode." },
+			{ GL_INVALID_OPERATION, "Invalid nesting of glBegin or glEnd, or invalid command between glBegin and glEnd." },
+		});
+#endif
 		glVertex2f(1, 1);
 		glVertex2f(-1, 1);
 		glVertex2f(-1, -1);
 		glVertex2f(1, -1);
 		glEnd();
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid mode." },
+			{ GL_INVALID_OPERATION, "Invalid nesting of glBegin or glEnd, or invalid command between glBegin and glEnd." },
+		});
+#endif
 		glEndList();
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_VALUE, "List is 0." },
+			{ GL_INVALID_ENUM, "Invalid mode." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd, or display list is already being defined." },
+			{ GL_OUT_OF_MEMORY, "Insufficient memory to compile display list." },
+		});
+#endif
 
 		drawQuad = DrawQuadGL1_0;
 		cleanupDrawQuad = CleanupDrawQuadGL1_0;
@@ -118,13 +201,33 @@ namespace silnith::wings::gl2
 		 * display list.
 		 */
 		glEnableClientState(GL_VERTEX_ARRAY);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid mode." },
+		});
+#endif
 
 		/*
 		 * Elements are interpreted according to the current VertexPointer.
 		 */
 		glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, quadIndices);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid mode." },
+			{ GL_INVALID_VALUE, "Count is negative." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd, or buffer object name something something, or buffer is mapped." },
+		});
+#endif
 
 		glDisableClientState(GL_VERTEX_ARRAY);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid mode." },
+		});
+#endif
 	}
 
 	void CleanupDrawQuadGL1_1(void)
@@ -138,6 +241,13 @@ namespace silnith::wings::gl2
 		 * DrawArrays and DrawElements.
 		 */
 		glVertexPointer(3, GL_FLOAT, 0, quadVertices);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid type." },
+			{ GL_INVALID_VALUE, "Size is not 2, 3, or 4, or stride is negative." },
+		});
+#endif
 
 		drawQuad = DrawQuadGL1_1;
 		cleanupDrawQuad = CleanupDrawQuadGL1_1;
@@ -153,18 +263,38 @@ namespace silnith::wings::gl2
 		 * display list.
 		 */
 		glEnableClientState(GL_VERTEX_ARRAY);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid mode." },
+		});
+#endif
 
 		/*
 		 * If there is an ELEMENT_ARRAY_BUFFER bound, then the last parameter
 		 * to DrawElements is interpreted as an index/offset into the
 		 * ELEMENT_ARRAY_BUFFER.
-		 * 
+		 *
 		 * Elements of the ELEMENT_ARRAY_BUFFER are interpreted according to
 		 * the current VertexPointer.
 		 */
 		glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, 0);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid mode." },
+			{ GL_INVALID_VALUE, "Count is negative." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd, or buffer object name something something, or buffer is mapped." },
+		});
+#endif
 
 		glDisableClientState(GL_VERTEX_ARRAY);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid mode." },
+		});
+#endif
 	}
 
 	GLuint wingBufferObject{ 0 };
@@ -173,29 +303,110 @@ namespace silnith::wings::gl2
 	void CleanupDrawQuadGL1_5(void)
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid target." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid target." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 
 		glDeleteBuffers(1, &wingIndicesBufferObject);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_VALUE, "Value is negative." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glDeleteBuffers(1, &wingBufferObject);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_VALUE, "Value is negative." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 	}
 
 	void InitializeDrawQuadGL1_5(void)
 	{
 		glGenBuffers(1, &wingBufferObject);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_VALUE, "Value is negative." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glBindBuffer(GL_ARRAY_BUFFER, wingBufferObject);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid target." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glBufferData(GL_ARRAY_BUFFER, quadVerticesSize, quadVertices, GL_STATIC_DRAW);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid target, or usage." },
+			{ GL_INVALID_VALUE, "Value is negative." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd, or using reserved buffer object name 0." },
+			{ GL_OUT_OF_MEMORY, "Out of memory." },
+		});
+#endif
 		/*
 		 * Specifies vertex data to be used by subsequent calls to
 		 * DrawArrays and DrawElements.
-		 * 
+		 *
 		 * If there is an ARRAY_BUFFER bound, then the last parameter is interpreted
 		 * as an index/offset into the ARRAY_BUFFER.
 		 */
 		glVertexPointer(3, GL_FLOAT, 0, 0);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid type." },
+			{ GL_INVALID_VALUE, "Size is not 2, 3, or 4, or stride is negative." },
+		});
+#endif
 
 		glGenBuffers(1, &wingIndicesBufferObject);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_VALUE, "Value is negative." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBufferObject);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid target." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesSize, quadIndices, GL_STATIC_DRAW);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid target, or usage." },
+			{ GL_INVALID_VALUE, "Value is negative." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd, or using reserved buffer object name 0." },
+			{ GL_OUT_OF_MEMORY, "Out of memory." },
+		});
+#endif
 
 		drawQuad = DrawQuadGL1_5;
 		cleanupDrawQuad = CleanupDrawQuadGL1_5;
@@ -204,9 +415,37 @@ namespace silnith::wings::gl2
 	void InitializeOpenGLState(void)
 	{
 		GLubyte const* const glVendor{ glGetString(GL_VENDOR) };
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid name." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		GLubyte const* const glRenderer{ glGetString(GL_RENDERER) };
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid name." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		GLubyte const* const glVersion{ glGetString(GL_VERSION) };
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid name." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		GLubyte const* const glExtensions{ glGetString(GL_EXTENSIONS) };
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid name." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 
 		assert(glVendor != NULL);
 		assert(glRenderer != NULL);
@@ -216,25 +455,99 @@ namespace silnith::wings::gl2
 		ParseOpenGLVersion(glVersion);
 
 		glEnable(GL_DEPTH_TEST);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid value." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		if (hasOpenGL(1, 1))
 		{
 			glPolygonOffset(-0.5, -2);
+#ifndef NDEBUG
+			CheckForGLErrors(std::map<GLenum, std::string>
+			{
+				{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+			});
+#endif
 		}
 
 		glEnable(GL_LINE_SMOOTH);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid value." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glLineWidth(1.0);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_VALUE, "Width is less than or equal to 0." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 
 		glEnable(GL_POLYGON_SMOOTH);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid value." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 
 		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid target or mode." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid target or mode." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid target or mode." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid target or mode." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 
 		glLoadIdentity();
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		gluLookAt(0, 50, 50,
 			0, 0, 13,
 			0, 0, 1);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 
 		if (hasOpenGL(1, 5))
 		{
@@ -281,6 +594,13 @@ namespace silnith::wings::gl2
 		for (Wing const& wing : wings)
 		{
 			glDeleteLists(wing.getGLDisplayList(), 1);
+#ifndef NDEBUG
+			CheckForGLErrors(std::map<GLenum, std::string>
+			{
+				{ GL_INVALID_VALUE, "Range is negative." },
+				{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+			});
+#endif
 		}
 
 		cleanupDrawQuad();
@@ -295,6 +615,13 @@ namespace silnith::wings::gl2
 		if (wings.empty() || wings.size() < numWings)
 		{
 			displayList = glGenLists(1);
+#ifndef NDEBUG
+			CheckForGLErrors(std::map<GLenum, std::string>
+			{
+				{ GL_INVALID_VALUE, "Range is negative." },
+				{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+			});
+#endif
 		}
 		else
 		{
@@ -309,51 +636,224 @@ namespace silnith::wings::gl2
 			Color::WHITE) };
 
 		glNewList(displayList, GL_COMPILE);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_VALUE, "List is 0." },
+			{ GL_INVALID_ENUM, "Invalid mode." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd, or display list is already being defined." },
+			{ GL_OUT_OF_MEMORY, "Insufficient memory to compile display list." },
+		});
+#endif
 		glPushMatrix();
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_STACK_OVERFLOW, "Matrix stack is full." },
+			{ GL_STACK_UNDERFLOW, "Matrix stack is empty." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glRotatef(wing.getAngle(), 0, 0, 1);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glTranslatef(wing.getRadius(), 0, 0);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glRotatef(-(wing.getYaw()), 0, 0, 1);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glRotatef(-(wing.getPitch()), 0, 1, 0);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glRotatef(wing.getRoll(), 1, 0, 0);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		drawQuad();
 		glPopMatrix();
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_STACK_OVERFLOW, "Matrix stack is full." },
+			{ GL_STACK_UNDERFLOW, "Matrix stack is empty." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glEndList();
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_VALUE, "List is 0." },
+			{ GL_INVALID_ENUM, "Invalid mode." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd, or display list is already being defined." },
+			{ GL_OUT_OF_MEMORY, "Insufficient memory to compile display list." },
+		});
+#endif
 	}
 
 	void DrawFrame(void)
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_VALUE, "Invalid bit." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 
 		if (hasOpenGL(1, 1))
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+#ifndef NDEBUG
+			CheckForGLErrors(std::map<GLenum, std::string>
+			{
+				{ GL_INVALID_ENUM, "Invalid face or mode." },
+				{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+			});
+#endif
 			glEnable(GL_POLYGON_OFFSET_LINE);
+#ifndef NDEBUG
+			CheckForGLErrors(std::map<GLenum, std::string>
+			{
+				{ GL_INVALID_ENUM, "Invalid value." },
+				{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+			});
+#endif
 			glPushMatrix();
+#ifndef NDEBUG
+			CheckForGLErrors(std::map<GLenum, std::string>
+			{
+				{ GL_STACK_OVERFLOW, "Matrix stack is full." },
+				{ GL_STACK_UNDERFLOW, "Matrix stack is empty." },
+				{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+			});
+#endif
 			for (Wing const& wing : wings) {
 				glTranslatef(0, 0, wing.getDeltaZ());
+#ifndef NDEBUG
+				CheckForGLErrors(std::map<GLenum, std::string>
+				{
+					{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+				});
+#endif
 				glRotatef(wing.getDeltaAngle(), 0, 0, 1);
+#ifndef NDEBUG
+				CheckForGLErrors(std::map<GLenum, std::string>
+				{
+					{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+				});
+#endif
 
 				Color const& edgeColor{ wing.getEdgeColor() };
 				glColor3f(edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
 				glCallList(wing.getGLDisplayList());
+#ifndef NDEBUG
+				CheckForGLErrors(std::map<GLenum, std::string>
+				{
+					{ GL_INVALID_VALUE, "Called list 0." },
+				});
+#endif
 			}
 			glPopMatrix();
+#ifndef NDEBUG
+			CheckForGLErrors(std::map<GLenum, std::string>
+			{
+				{ GL_STACK_OVERFLOW, "Matrix stack is full." },
+				{ GL_STACK_UNDERFLOW, "Matrix stack is empty." },
+				{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+			});
+#endif
 			glDisable(GL_POLYGON_OFFSET_LINE);
+#ifndef NDEBUG
+			CheckForGLErrors(std::map<GLenum, std::string>
+			{
+				{ GL_INVALID_ENUM, "Invalid value." },
+				{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+			});
+#endif
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+#ifndef NDEBUG
+			CheckForGLErrors(std::map<GLenum, std::string>
+			{
+				{ GL_INVALID_ENUM, "Invalid face or mode." },
+				{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+			});
+#endif
 		}
 
 		glPushMatrix();
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_STACK_OVERFLOW, "Matrix stack is full." },
+			{ GL_STACK_UNDERFLOW, "Matrix stack is empty." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		for (Wing const& wing : wings) {
 			glTranslatef(0, 0, wing.getDeltaZ());
+#ifndef NDEBUG
+			CheckForGLErrors(std::map<GLenum, std::string>
+			{
+				{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+			});
+#endif
 			glRotatef(wing.getDeltaAngle(), 0, 0, 1);
+#ifndef NDEBUG
+			CheckForGLErrors(std::map<GLenum, std::string>
+			{
+				{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+			});
+#endif
 
 			Color const& color{ wing.getColor() };
 			glColor3f(color.getRed(), color.getGreen(), color.getBlue());
 			glCallList(wing.getGLDisplayList());
+#ifndef NDEBUG
+			CheckForGLErrors(std::map<GLenum, std::string>
+			{
+				{ GL_INVALID_VALUE, "Called list 0." },
+			});
+#endif
 		}
 		glPopMatrix();
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_STACK_OVERFLOW, "Matrix stack is full." },
+			{ GL_STACK_UNDERFLOW, "Matrix stack is empty." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 
 		glFlush();
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 	}
 
 	void Resize(GLsizei width, GLsizei height)
@@ -370,13 +870,46 @@ namespace silnith::wings::gl2
 		}
 
 		glViewport(0, 0, width, height);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_VALUE, "Width or height is negative." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glMatrixMode(GL_PROJECTION);
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid mode." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glLoadIdentity();
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glOrtho(static_cast<GLdouble>(-20) * xmult, static_cast<GLdouble>(20) * xmult,
 			static_cast<GLdouble>(-20) * ymult, static_cast<GLdouble>(20) * ymult,
 			static_cast<GLdouble>(35), static_cast<GLdouble>(105));
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_VALUE, "Left = right, or bottom = top, or near = far." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 		glMatrixMode(GL_MODELVIEW);
-		// check GL errors
+#ifndef NDEBUG
+		CheckForGLErrors(std::map<GLenum, std::string>
+		{
+			{ GL_INVALID_ENUM, "Invalid mode." },
+			{ GL_INVALID_OPERATION, "Called between glBegin and glEnd." },
+		});
+#endif
 	}
 
 }
