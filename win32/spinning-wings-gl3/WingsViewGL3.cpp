@@ -164,18 +164,11 @@ void main() {
     float pitch = rollPitchYaw[1];
     float yaw = rollPitchYaw[2];
 
-    mat4 angle_rot = rotate(angle, vec3(0, 0, 1));
-    mat4 radius_trans = translate(vec3(radius, 0, 0));
-
-    mat4 yaw_rot = rotate(-yaw, vec3(0, 0, 1));
-    mat4 pitch_rot = rotate(-pitch, vec3(0, 1, 0));
-    mat4 roll_rot = rotate(roll, vec3(1, 0, 0));
-
-    mat4 wingTransformation = angle_rot
-                              * radius_trans
-                              * yaw_rot
-                              * pitch_rot
-                              * roll_rot;
+    mat4 wingTransformation = rotate(angle, vec3(0, 0, 1))
+                              * translate(vec3(radius, 0, 0))
+                              * rotate(-yaw, vec3(0, 0, 1))
+                              * rotate(-pitch, vec3(0, 1, 0))
+                              * rotate(roll, vec3(1, 0, 0));
     gl_Position = wingTransformation * gl_Vertex;
 }
 )shaderText",
@@ -198,14 +191,11 @@ void main() {
     float deltaAngle = deltaZ[0];
     float deltaZ = deltaZ[1];
 
-    mat4 deltaZ_trans = translate(vec3(0, 0, deltaZ));
-    mat4 deltaAngle_rot = rotate(deltaAngle, vec3(0, 0, 1));
-
     gl_FrontColor = gl_Color;
     gl_BackColor = gl_Color;
     gl_Position = gl_ModelViewProjectionMatrix
-                  * deltaZ_trans
-                  * deltaAngle_rot
+                  * translate(vec3(0, 0, deltaZ))
+                  * rotate(deltaAngle, vec3(0, 0, 1))
                   * gl_Vertex;
 }
 )shaderText",
