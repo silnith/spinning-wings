@@ -54,8 +54,8 @@ namespace silnith::wings::gl3
 	static_assert(quadVerticesSize == sizeof(quadVertices), "Size of quad vertices array is not as expected.");
 	static_assert(quadIndicesSize == sizeof(quadIndices), "I do not know how sizeof works.");
 
-	GLuint wingVerticesBufferObject{ 0 };
-	GLuint wingIndicesBufferObject{ 0 };
+	GLuint wingVerticesBuffer{ 0 };
+	GLuint wingIndicesBuffer{ 0 };
 
 	GLuint deltaZAttribLocation{ 0 };
 	GLuint radiusAngleAttribLocation{ 0 };
@@ -96,8 +96,8 @@ namespace silnith::wings::gl3
 			0, 0, 13,
 			0, 0, 1);
 
-		glGenBuffers(1, &wingVerticesBufferObject);
-		glBindBuffer(GL_ARRAY_BUFFER, wingVerticesBufferObject);
+		glGenBuffers(1, &wingVerticesBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, wingVerticesBuffer);
 		glBufferData(GL_ARRAY_BUFFER, quadVerticesSize, quadVertices, GL_STATIC_DRAW);
 		glVertexPointer(3, GL_FLOAT, 0, 0);
 
@@ -105,8 +105,8 @@ namespace silnith::wings::gl3
 		// glEdgeFlagPointer();
 		// glVertexAttribPointer();
 
-		glGenBuffers(1, &wingIndicesBufferObject);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBufferObject);
+		glGenBuffers(1, &wingIndicesBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBuffer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesSize, quadIndices, GL_STATIC_DRAW);
 
 		wingTransformProgram = new Program{
@@ -231,8 +231,8 @@ namespace silnith::wings::gl3
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		glDeleteBuffers(1, &wingIndicesBufferObject);
-		glDeleteBuffers(1, &wingVerticesBufferObject);
+		glDeleteBuffers(1, &wingIndicesBuffer);
+		glDeleteBuffers(1, &wingVerticesBuffer);
 
 		delete wingTransformProgram;
 		wingTransformProgram = nullptr;
@@ -270,7 +270,7 @@ namespace silnith::wings::gl3
 		//glEnable(GL_RASTERIZER_DISCARD);
 
 		glBeginTransformFeedback(GL_POINTS);
-		glBindBuffer(GL_ARRAY_BUFFER, wingVerticesBufferObject);
+		glBindBuffer(GL_ARRAY_BUFFER, wingVerticesBuffer);
 		glVertexPointer(3, GL_FLOAT, 0, 0);
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBufferObject);
 		glVertexAttrib2f(radiusAngleAttribLocation, wing.getRadius(), wing.getAngle());
@@ -302,7 +302,7 @@ namespace silnith::wings::gl3
 
 				glBindBuffer(GL_ARRAY_BUFFER, wingVertexBufferObject);
 				glVertexPointer(4, GL_FLOAT, 0, 0);
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBufferObject);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBuffer);
 
 				Color const& edgeColor{ wing.getEdgeColor() };
 				glColor3f(edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
@@ -324,7 +324,7 @@ namespace silnith::wings::gl3
 
 			glBindBuffer(GL_ARRAY_BUFFER, wingVertexBufferObject);
 			glVertexPointer(4, GL_FLOAT, 0, 0);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBufferObject);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBuffer);
 
 			Color const& color{ wing.getColor() };
 			glColor3f(color.getRed(), color.getGreen(), color.getBlue());
