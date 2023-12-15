@@ -47,11 +47,6 @@ namespace silnith::wings::gl3
 	/// </summary>
 	GLuint wingIndexBuffer{ 0 };
 
-	GLuint vertexAttribLocation{ 0 };
-	GLuint deltaZAttribLocation{ 0 };
-	GLuint radiusAngleAttribLocation{ 0 };
-	GLuint rollPitchYawAttribLocation{ 0 };
-
 	void InitializeOpenGLState(void)
 	{
 		GLubyte const* const glVendor{ glGetString(GL_VENDOR) };
@@ -179,9 +174,6 @@ void main() {
 			},
 			std::vector<std::string>{"gl_Position"}
 		};
-		vertexAttribLocation = wingTransformProgram->getAttributeLocation("vertex");
-		radiusAngleAttribLocation = wingTransformProgram->getAttributeLocation("radiusAngle");
-		rollPitchYawAttribLocation = wingTransformProgram->getAttributeLocation("rollPitchYaw");
 
 		renderingProgram = new Program{
 			VertexShader{
@@ -217,7 +209,6 @@ void main() {
 )shaderText",
 			}
 		};
-		deltaZAttribLocation = renderingProgram->getAttributeLocation("deltaZ");
 	}
 
 	void CleanupOpenGLState(void)
@@ -264,6 +255,9 @@ void main() {
 			Color::WHITE) };
 
 		wingTransformProgram->useProgram();
+		GLuint const vertexAttribLocation{ wingTransformProgram->getAttributeLocation("vertex") };
+		GLuint const radiusAngleAttribLocation{ wingTransformProgram->getAttributeLocation("radiusAngle") };
+		GLuint const rollPitchYawAttribLocation{ wingTransformProgram->getAttributeLocation("rollPitchYaw") };
 
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, wingVertexBuffer);
 
@@ -285,6 +279,7 @@ void main() {
 	void DrawFrame(void)
 	{
 		renderingProgram->useProgram();
+		GLuint const deltaZAttribLocation{ renderingProgram->getAttributeLocation("deltaZ") };
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
