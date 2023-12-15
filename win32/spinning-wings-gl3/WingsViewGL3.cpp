@@ -39,7 +39,7 @@ namespace silnith::wings::gl3
 
 	/// <summary>
 	/// The initial untransformed vertices for a single quad.
-	/// After binding, enable using <c>glVertexPointer(2, GL_FLOAT, 0, 0)</c>.
+	/// After binding, enable using <c>glVertexAttribPointer(..., 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0)</c>.
 	/// </summary>
 	GLuint originalVertexBuffer{ 0 };
 	/// <summary>
