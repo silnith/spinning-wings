@@ -110,14 +110,8 @@ namespace silnith::wings::gl3
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesSize, quadIndices, GL_STATIC_DRAW);
 		}
 
-		// TODO: #version 150
-		wingTransformProgram = new Program{
-			VertexShader{
-				R"shaderText(#version 130
-
-in vec2 radiusAngle;
-in vec3 rollPitchYaw;
-
+		std::string const rotateMatrixFunctionDeclaration{
+			R"shaderText(
 mat4 rotate(in float angle, in vec3 axis) {
     float c = cos(radians(angle));
     float s = sin(radians(angle));
@@ -137,13 +131,29 @@ mat4 rotate(in float angle, in vec3 axis) {
 
     return rotation;
 }
-
+)shaderText"
+		};
+		std::string const translateMatrixFunctionDeclaration{
+			R"shaderText(
 mat4 translate(in vec3 move) {
     mat4 trans = mat4(1.0);
     trans[3].xyz = move;
     return trans;
 }
+)shaderText"
+		};
 
+		// TODO: #version 150
+		wingTransformProgram = new Program{
+			VertexShader{
+				R"shaderText(#version 130
+
+in vec2 radiusAngle;
+in vec3 rollPitchYaw;
+)shaderText",
+				rotateMatrixFunctionDeclaration,
+				translateMatrixFunctionDeclaration,
+				R"shaderText(
 void main() {
     float radius = radiusAngle[0];
     float angle = radiusAngle[1];
@@ -172,33 +182,10 @@ void main() {
 				R"shaderText(#version 130
 
 attribute vec2 deltaZ;
-
-mat4 rotate(in float angle, in vec3 axis) {
-    float c = cos(radians(angle));
-    float s = sin(radians(angle));
-
-    mat3 initial = outerProduct(axis, axis) * (1 - c);
-
-    mat3 c_part = mat3(c);
-
-    mat3 s_part = mat3(0, axis.z, -axis.y, -axis.z, 0, axis.x, axis.y, -axis.x, 0) * s;
-
-    mat3 temp = initial + c_part + s_part;
-
-    mat4 rotation = mat4(1.0);
-    rotation[0].xyz = temp[0];
-    rotation[1].xyz = temp[1];
-    rotation[2].xyz = temp[2];
-
-    return rotation;
-}
-
-mat4 translate(in vec3 move) {
-    mat4 trans = mat4(1.0);
-    trans[3].xyz = move;
-    return trans;
-}
-
+)shaderText",
+				rotateMatrixFunctionDeclaration,
+				translateMatrixFunctionDeclaration,
+				R"shaderText(
 void main() {
     float deltaAngle = deltaZ[0];
     float deltaZ = deltaZ[1];
