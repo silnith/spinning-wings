@@ -330,7 +330,7 @@ namespace silnith::wings::gl3
 			glColor3f(color.getRed(), color.getGreen(), color.getBlue());
 			glVertexAttrib2f(deltaZAttribLocation, deltaAngle, deltaZ);
 			glEnableClientState(GL_VERTEX_ARRAY);
-			glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, 0);
 			glDisableClientState(GL_VERTEX_ARRAY);
 		}
 		glDisable(GL_POLYGON_OFFSET_FILL);
