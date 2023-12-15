@@ -291,7 +291,6 @@ namespace silnith::wings::gl3
 	void DrawFrame(void)
 	{
 		renderingProgram->useProgram();
-		deltaZAttribLocation = renderingProgram->getAttributeLocation("deltaZ");
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
