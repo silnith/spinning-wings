@@ -37,25 +37,9 @@ namespace silnith::wings::gl3
 	Program* wingTransformProgram{ nullptr };
 	Program* renderingProgram{ nullptr };
 
-	GLfloat const quadVertices[12]
-	{
-		1, 1, 0,
-		-1, 1, 0,
-		-1, -1, 0,
-		1, -1, 0,
-	};
-	GLsizeiptr const quadVerticesSize{ sizeof(GLfloat) * 12 };
-	GLuint const quadIndices[4]
-	{
-		0, 1, 2, 3,
-	};
-	GLsizeiptr const quadIndicesSize{ sizeof(GLuint) * 4 };
-
-	static_assert(quadVerticesSize == sizeof(quadVertices), "Size of quad vertices array is not as expected.");
-	static_assert(quadIndicesSize == sizeof(quadIndices), "I do not know how sizeof works.");
-
 	/// <summary>
 	/// The initial untransformed vertices for a single quad.
+	/// After binding, enable using <c>glVertexPointer(2, GL_FLOAT, 0, 0)</c>.
 	/// </summary>
 	GLuint originalVertexBuffer{ 0 };
 	/// <summary>
@@ -102,18 +86,38 @@ namespace silnith::wings::gl3
 			0, 0, 13,
 			0, 0, 1);
 
-		glGenBuffers(1, &originalVertexBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
-		glBufferData(GL_ARRAY_BUFFER, quadVerticesSize, quadVertices, GL_STATIC_DRAW);
-		glVertexPointer(3, GL_FLOAT, 0, 0);
+		{
+			GLfloat const quadVertices[8]
+			{
+				1, 1,
+				-1, 1,
+				-1, -1,
+				1, -1,
+			};
+			GLsizeiptr const quadVerticesSize{ sizeof(quadVertices) };
+			static_assert(quadVerticesSize == sizeof(GLfloat) * 8, "Size of quad vertices array is not as expected.");
+
+			glGenBuffers(1, &originalVertexBuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
+			glBufferData(GL_ARRAY_BUFFER, quadVerticesSize, quadVertices, GL_STATIC_DRAW);
+		}
 
 		// glColorPointer();
 		// glEdgeFlagPointer();
 		// glVertexAttribPointer();
 
-		glGenBuffers(1, &wingIndexBuffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesSize, quadIndices, GL_STATIC_DRAW);
+		{
+			GLuint const quadIndices[4]
+			{
+				0, 1, 2, 3,
+			};
+			GLsizeiptr const quadIndicesSize{ sizeof(quadIndices) };
+			static_assert(quadIndicesSize == sizeof(GLuint) * 4, "I do not know how sizeof works.");
+
+			glGenBuffers(1, &wingIndexBuffer);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesSize, quadIndices, GL_STATIC_DRAW);
+		}
 
 		wingTransformProgram = new Program{
 			VertexShader{
@@ -248,21 +252,21 @@ namespace silnith::wings::gl3
 
 	void AdvanceAnimation(void)
 	{
-		GLuint transformFeedbackBuffer{ 0 };
+		GLuint wingVertexBuffer{ 0 };
 		if (wings.empty() || wings.size() < numWings)
 		{
-			glGenBuffers(1, &transformFeedbackBuffer);
-			glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, transformFeedbackBuffer);
+			glGenBuffers(1, &wingVertexBuffer);
+			glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, wingVertexBuffer);
 			glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(GLfloat) * 4 * 4, nullptr, GL_STATIC_DRAW);
 			glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, 0);
 		}
 		else
 		{
 			Wing const& lastWing{ wings.back() };
-			transformFeedbackBuffer = lastWing.getVertexBuffer();
+			wingVertexBuffer = lastWing.getVertexBuffer();
 			wings.pop_back();
 		}
-		Wing const& wing{ wings.emplace_front(transformFeedbackBuffer,
+		Wing const& wing{ wings.emplace_front(wingVertexBuffer,
 			radiusCurve.getNextValue(), angleCurve.getNextValue(),
 			deltaAngleCurve.getNextValue(), deltaZCurve.getNextValue(),
 			rollCurve.getNextValue(), pitchCurve.getNextValue(), yawCurve.getNextValue(),
@@ -271,13 +275,13 @@ namespace silnith::wings::gl3
 
 		wingTransformProgram->useProgram();
 
-		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, transformFeedbackBuffer);
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, wingVertexBuffer);
 
 		//glEnable(GL_RASTERIZER_DISCARD);
 
 		glBeginTransformFeedback(GL_POINTS);
 		glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
-		glVertexPointer(3, GL_FLOAT, 0, 0);
+		glVertexPointer(2, GL_FLOAT, 0, 0);
 		glVertexAttrib2f(radiusAngleAttribLocation, wing.getRadius(), wing.getAngle());
 		glVertexAttrib3f(rollPitchYawAttribLocation, wing.getRoll(), wing.getPitch(), wing.getYaw());
 		glEnableClientState(GL_VERTEX_ARRAY);

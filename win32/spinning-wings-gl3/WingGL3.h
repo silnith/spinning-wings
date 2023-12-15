@@ -57,6 +57,8 @@ namespace silnith::wings::gl3
 
 		/// <summary>
 		/// Returns the OpenGL vertex buffer identifier for this wing.
+		/// The vertex buffer will be populated using transform feedback.
+		/// When bound, enable it using <c>glVertexPointer(4, GL_FLOAT, 0, 0)</c>.
 		/// </summary>
 		/// <returns>the OpenGL vertex buffer identifier</returns>
 		unsigned int getVertexBuffer(void) const noexcept;
