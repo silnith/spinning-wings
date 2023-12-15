@@ -79,7 +79,7 @@ namespace silnith::wings::gl3
 		glMinorVersion = static_cast<GLuint>(minor);
 
 		glEnable(GL_DEPTH_TEST);
-		glPolygonOffset(-0.5, -2);
+		glPolygonOffset(0.5, 2);
 
 		glEnable(GL_LINE_SMOOTH);
 		glLineWidth(1.0);
@@ -292,8 +292,6 @@ namespace silnith::wings::gl3
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		{
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			glEnable(GL_POLYGON_OFFSET_LINE);
 			GLfloat deltaZ{ 0 };
 			GLfloat deltaAngle{ 0 };
 			for (Wing const& wing : wings) {
@@ -310,13 +308,12 @@ namespace silnith::wings::gl3
 				glColor3f(edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
 				glVertexAttrib2f(deltaZAttribLocation, deltaAngle, deltaZ);
 				glEnableClientState(GL_VERTEX_ARRAY);
-				glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, 0);
+				glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, 0);
 				glDisableClientState(GL_VERTEX_ARRAY);
 			}
-			glDisable(GL_POLYGON_OFFSET_LINE);
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
 
+		glEnable(GL_POLYGON_OFFSET_FILL);
 		GLfloat deltaZ{ 0 };
 		GLfloat deltaAngle{ 0 };
 		for (Wing const& wing : wings) {
@@ -336,6 +333,7 @@ namespace silnith::wings::gl3
 			glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, 0);
 			glDisableClientState(GL_VERTEX_ARRAY);
 		}
+		glDisable(GL_POLYGON_OFFSET_FILL);
 
 		glFlush();
 	}
