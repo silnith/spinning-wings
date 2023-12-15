@@ -54,7 +54,13 @@ namespace silnith::wings::gl3
 	static_assert(quadVerticesSize == sizeof(quadVertices), "Size of quad vertices array is not as expected.");
 	static_assert(quadIndicesSize == sizeof(quadIndices), "I do not know how sizeof works.");
 
-	GLuint wingVerticesBuffer{ 0 };
+	/// <summary>
+	/// The initial untransformed vertices for a single quad.
+	/// </summary>
+	GLuint initialVerticesBuffer{ 0 };
+	/// <summary>
+	/// The indices into <c>initialVerticesBuffer</c>.
+	/// </summary>
 	GLuint wingIndicesBuffer{ 0 };
 
 	GLuint deltaZAttribLocation{ 0 };
@@ -96,8 +102,8 @@ namespace silnith::wings::gl3
 			0, 0, 13,
 			0, 0, 1);
 
-		glGenBuffers(1, &wingVerticesBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, wingVerticesBuffer);
+		glGenBuffers(1, &initialVerticesBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, initialVerticesBuffer);
 		glBufferData(GL_ARRAY_BUFFER, quadVerticesSize, quadVertices, GL_STATIC_DRAW);
 		glVertexPointer(3, GL_FLOAT, 0, 0);
 
@@ -232,7 +238,7 @@ namespace silnith::wings::gl3
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glDeleteBuffers(1, &wingIndicesBuffer);
-		glDeleteBuffers(1, &wingVerticesBuffer);
+		glDeleteBuffers(1, &initialVerticesBuffer);
 
 		delete wingTransformProgram;
 		wingTransformProgram = nullptr;
@@ -270,7 +276,7 @@ namespace silnith::wings::gl3
 		//glEnable(GL_RASTERIZER_DISCARD);
 
 		glBeginTransformFeedback(GL_POINTS);
-		glBindBuffer(GL_ARRAY_BUFFER, wingVerticesBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, initialVerticesBuffer);
 		glVertexPointer(3, GL_FLOAT, 0, 0);
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBufferObject);
 		glVertexAttrib2f(radiusAngleAttribLocation, wing.getRadius(), wing.getAngle());
