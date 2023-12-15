@@ -27,8 +27,8 @@ namespace silnith::wings::gl3
         Program& operator=(Program&&) noexcept = delete;
         ~Program(void) noexcept;
     public:
-        Program(Shader const&, std::vector<std::string> const &);
-        Program(Shader const&, Shader const&);
+        Program(Shader const&, std::vector<std::string> const&);
+        Program(Shader const&, Shader const&, std::string const&);
 
         GLuint getProgram(void) const noexcept;
 

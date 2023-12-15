@@ -65,9 +65,11 @@ namespace silnith::wings::gl3
         }
     }
 
-    Program::Program(Shader const& s1, Shader const& s2)
+    Program::Program(Shader const& s1, Shader const& s2, std::string const& fragmentData)
         : id{ glCreateProgram() }, linkLog{}
     {
+        glBindFragDataLocation(id, 0, fragmentData.c_str());
+
         glAttachShader(id, s1.getShader());
         glAttachShader(id, s2.getShader());
 

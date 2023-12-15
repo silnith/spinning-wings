@@ -180,7 +180,10 @@ void main() {
 				R"shaderText(#version 130
 
 in vec4 vertex;
+in vec3 color;
 in vec2 deltaZ;
+
+smooth out vec4 varyingColor;
 
 mat4 rotate(in float angle, in vec3 axis);
 mat4 translate(in vec3 move);
@@ -189,8 +192,7 @@ void main() {
     float deltaAngle = deltaZ[0];
     float deltaZ = deltaZ[1];
 
-    gl_FrontColor = gl_Color;
-    gl_BackColor = gl_Color;
+    varyingColor = vec4(color, 1);
     gl_Position = gl_ModelViewProjectionMatrix
                   * translate(vec3(0, 0, deltaZ))
                   * rotate(deltaAngle, vec3(0, 0, 1))
@@ -203,12 +205,16 @@ void main() {
 			FragmentShader{
 				R"shaderText(#version 130
 
+in vec4 varyingColor;
+
+out vec4 fragmentColor;
+
 void main() {
-    gl_FragColor = gl_Color;
-    gl_FragDepth = gl_FragCoord.z;
+    fragmentColor = varyingColor;
 }
 )shaderText",
-			}
+			},
+			"fragmentColor"
 		};
 	}
 
@@ -281,6 +287,7 @@ void main() {
 	{
 		renderingProgram->useProgram();
 		GLuint const vertexAttribLocation{ renderingProgram->getAttributeLocation("vertex") };
+		GLuint const colorAttribLocation{ renderingProgram->getAttributeLocation("color") };
 		GLuint const deltaZAttribLocation{ renderingProgram->getAttributeLocation("deltaZ") };
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -299,8 +306,7 @@ void main() {
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
 
 				Color const& edgeColor{ wing.getEdgeColor() };
-				// TODO: deprecated
-				glColor3f(edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
+				glVertexAttrib3f(colorAttribLocation, edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
 				glVertexAttrib2f(deltaZAttribLocation, deltaAngle, deltaZ);
 				glEnableVertexAttribArray(vertexAttribLocation);
 				glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, 0);
@@ -322,8 +328,7 @@ void main() {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
 
 			Color const& color{ wing.getColor() };
-			// TODO: deprecated
-			glColor3f(color.getRed(), color.getGreen(), color.getBlue());
+			glVertexAttrib3f(colorAttribLocation, color.getRed(), color.getGreen(), color.getBlue());
 			glVertexAttrib2f(deltaZAttribLocation, deltaAngle, deltaZ);
 			glEnableVertexAttribArray(vertexAttribLocation);
 			glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, 0);
