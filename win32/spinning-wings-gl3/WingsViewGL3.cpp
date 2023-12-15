@@ -110,55 +110,57 @@ namespace silnith::wings::gl3
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesSize, quadIndices, GL_STATIC_DRAW);
 		}
 
+		// TODO: #version 150
 		wingTransformProgram = new Program{
 			VertexShader{
-				"#version 130",
-				"",
-				"in vec2 radiusAngle;",
-				"in vec3 rollPitchYaw;",
-				"",
-				"mat4 rotate(in float angle, in vec3 axis) {",
-				"    float c = cos(radians(angle));",
-				"    float s = sin(radians(angle));",
-				"",
-				"    mat3 initial = outerProduct(axis, axis) * (1 - c);",
-				"",
-				"    mat3 c_part = mat3(c);",
-				"",
-				"    mat3 s_part = mat3(0, axis.z, -axis.y, -axis.z, 0, axis.x, axis.y, -axis.x, 0) * s;",
-				"",
-				"    mat3 temp = initial + c_part + s_part;",
-				"",
-				"    mat4 rotation = mat4(1.0);",
-				"    rotation[0].xyz = temp[0];",
-				"    rotation[1].xyz = temp[1];",
-				"    rotation[2].xyz = temp[2];",
-				"",
-				"    return rotation;",
-				"}",
-				"",
-				"mat4 translate(in vec3 move) {",
-				"    mat4 trans = mat4(1.0);",
-				"    trans[3].xyz = move;",
-				"    return trans;",
-				"}",
-				"",
-				"void main() {",
-				"    float radius = radiusAngle[0];",
-				"    float angle = radiusAngle[1];",
-				"    float roll = rollPitchYaw[0];",
-				"    float pitch = rollPitchYaw[1];",
-				"    float yaw = rollPitchYaw[2];",
-				"    ",
-				"    mat4 angle_rot = rotate(angle, vec3(0, 0, 1));",
-				"    mat4 radius_trans = translate(vec3(radius, 0, 0));",
-				"    ",
-				"    mat4 yaw_rot = rotate(-yaw, vec3(0, 0, 1));",
-				"    mat4 pitch_rot = rotate(-pitch, vec3(0, 1, 0));",
-				"    mat4 roll_rot = rotate(roll, vec3(1, 0, 0));",
-				"    ",
-				"    gl_Position = angle_rot * radius_trans * yaw_rot * pitch_rot * roll_rot * gl_Vertex;",
-				"}",
+				R"shaderText(#version 130
+
+in vec2 radiusAngle;
+in vec3 rollPitchYaw;
+
+mat4 rotate(in float angle, in vec3 axis) {
+    float c = cos(radians(angle));
+    float s = sin(radians(angle));
+
+    mat3 initial = outerProduct(axis, axis) * (1 - c);
+
+    mat3 c_part = mat3(c);
+
+    mat3 s_part = mat3(0, axis.z, -axis.y, -axis.z, 0, axis.x, axis.y, -axis.x, 0) * s;
+
+    mat3 temp = initial + c_part + s_part;
+
+    mat4 rotation = mat4(1.0);
+    rotation[0].xyz = temp[0];
+    rotation[1].xyz = temp[1];
+    rotation[2].xyz = temp[2];
+
+    return rotation;
+}
+
+mat4 translate(in vec3 move) {
+    mat4 trans = mat4(1.0);
+    trans[3].xyz = move;
+    return trans;
+}
+
+void main() {
+    float radius = radiusAngle[0];
+    float angle = radiusAngle[1];
+    float roll = rollPitchYaw[0];
+    float pitch = rollPitchYaw[1];
+    float yaw = rollPitchYaw[2];
+
+    mat4 angle_rot = rotate(angle, vec3(0, 0, 1));
+    mat4 radius_trans = translate(vec3(radius, 0, 0));
+
+    mat4 yaw_rot = rotate(-yaw, vec3(0, 0, 1));
+    mat4 pitch_rot = rotate(-pitch, vec3(0, 1, 0));
+    mat4 roll_rot = rotate(roll, vec3(1, 0, 0));
+
+    gl_Position = angle_rot * radius_trans * yaw_rot * pitch_rot * roll_rot * gl_Vertex;
+}
+)shaderText",
 			},
 			std::vector<std::string>{"gl_Position"}
 		};
@@ -167,55 +169,57 @@ namespace silnith::wings::gl3
 
 		renderingProgram = new Program{
 			VertexShader{
-				"#version 130",
-				"",
-				"attribute vec2 deltaZ;",
-				"",
-				"mat4 rotate(in float angle, in vec3 axis) {",
-				"    float c = cos(radians(angle));",
-				"    float s = sin(radians(angle));",
-				"",
-				"    mat3 initial = outerProduct(axis, axis) * (1 - c);",
-				"",
-				"    mat3 c_part = mat3(c);",
-				"",
-				"    mat3 s_part = mat3(0, axis.z, -axis.y, -axis.z, 0, axis.x, axis.y, -axis.x, 0) * s;",
-				"",
-				"    mat3 temp = initial + c_part + s_part;",
-				"",
-				"    mat4 rotation = mat4(1.0);",
-				"    rotation[0].xyz = temp[0];",
-				"    rotation[1].xyz = temp[1];",
-				"    rotation[2].xyz = temp[2];",
-				"",
-				"    return rotation;",
-				"}",
-				"",
-				"mat4 translate(in vec3 move) {",
-				"    mat4 trans = mat4(1.0);",
-				"    trans[3].xyz = move;",
-				"    return trans;",
-				"}",
-				"",
-				"void main() {",
-				"    float deltaAngle = deltaZ[0];",
-				"    float deltaZ = deltaZ[1];",
-				"    ",
-				"    mat4 deltaZ_trans = translate(vec3(0, 0, deltaZ));",
-				"    mat4 deltaAngle_rot = rotate(deltaAngle, vec3(0, 0, 1));",
-				"    ",
-				"    gl_FrontColor = gl_Color;",
-				"    gl_BackColor = gl_Color;",
-				"    gl_Position = gl_ModelViewProjectionMatrix * deltaZ_trans * deltaAngle_rot * gl_Vertex;",
-				"}",
+				R"shaderText(#version 130
+
+attribute vec2 deltaZ;
+
+mat4 rotate(in float angle, in vec3 axis) {
+    float c = cos(radians(angle));
+    float s = sin(radians(angle));
+
+    mat3 initial = outerProduct(axis, axis) * (1 - c);
+
+    mat3 c_part = mat3(c);
+
+    mat3 s_part = mat3(0, axis.z, -axis.y, -axis.z, 0, axis.x, axis.y, -axis.x, 0) * s;
+
+    mat3 temp = initial + c_part + s_part;
+
+    mat4 rotation = mat4(1.0);
+    rotation[0].xyz = temp[0];
+    rotation[1].xyz = temp[1];
+    rotation[2].xyz = temp[2];
+
+    return rotation;
+}
+
+mat4 translate(in vec3 move) {
+    mat4 trans = mat4(1.0);
+    trans[3].xyz = move;
+    return trans;
+}
+
+void main() {
+    float deltaAngle = deltaZ[0];
+    float deltaZ = deltaZ[1];
+
+    mat4 deltaZ_trans = translate(vec3(0, 0, deltaZ));
+    mat4 deltaAngle_rot = rotate(deltaAngle, vec3(0, 0, 1));
+
+    gl_FrontColor = gl_Color;
+    gl_BackColor = gl_Color;
+    gl_Position = gl_ModelViewProjectionMatrix * deltaZ_trans * deltaAngle_rot * gl_Vertex;
+}
+)shaderText",
 			},
 			FragmentShader{
-				"#version 130",
-				"",
-				"void main() {",
-				"    gl_FragColor = gl_Color;",
-				"    gl_FragDepth = gl_FragCoord.z;",
-				"}",
+				R"shaderText(#version 130
+
+void main() {
+    gl_FragColor = gl_Color;
+    gl_FragDepth = gl_FragCoord.z;
+}
+)shaderText",
 			}
 		};
 		deltaZAttribLocation = renderingProgram->getAttributeLocation("deltaZ");
@@ -274,6 +278,7 @@ namespace silnith::wings::gl3
 		glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
 		// TODO: deprecated
 		glVertexPointer(2, GL_FLOAT, 0, 0);
+		//GLuint const positionAttribLocation{ wingTransformProgram->getAttributeLocation("position") };
 		glVertexAttrib2f(radiusAngleAttribLocation, wing.getRadius(), wing.getAngle());
 		glVertexAttrib3f(rollPitchYawAttribLocation, wing.getRoll(), wing.getPitch(), wing.getYaw());
 		// TODO: deprecated
