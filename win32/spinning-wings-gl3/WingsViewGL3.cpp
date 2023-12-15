@@ -179,7 +179,8 @@ void main() {
 			VertexShader{
 				R"shaderText(#version 130
 
-attribute vec2 deltaZ;
+in vec4 vertex;
+in vec2 deltaZ;
 
 mat4 rotate(in float angle, in vec3 axis);
 mat4 translate(in vec3 move);
@@ -193,7 +194,7 @@ void main() {
     gl_Position = gl_ModelViewProjectionMatrix
                   * translate(vec3(0, 0, deltaZ))
                   * rotate(deltaAngle, vec3(0, 0, 1))
-                  * gl_Vertex;
+                  * vertex;
 }
 )shaderText",
 				rotateMatrixFunctionDeclaration,
@@ -279,6 +280,7 @@ void main() {
 	void DrawFrame(void)
 	{
 		renderingProgram->useProgram();
+		GLuint const vertexAttribLocation{ renderingProgram->getAttributeLocation("vertex") };
 		GLuint const deltaZAttribLocation{ renderingProgram->getAttributeLocation("deltaZ") };
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -293,19 +295,16 @@ void main() {
 				GLuint const wingVertexBuffer{ wing.getVertexBuffer() };
 
 				glBindBuffer(GL_ARRAY_BUFFER, wingVertexBuffer);
-				// TODO: deprecated
-				glVertexPointer(4, GL_FLOAT, 0, 0);
+				glVertexAttribPointer(vertexAttribLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
 
 				Color const& edgeColor{ wing.getEdgeColor() };
 				// TODO: deprecated
 				glColor3f(edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
 				glVertexAttrib2f(deltaZAttribLocation, deltaAngle, deltaZ);
-				// TODO: deprecated
-				glEnableClientState(GL_VERTEX_ARRAY);
+				glEnableVertexAttribArray(vertexAttribLocation);
 				glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, 0);
-				// TODO: deprecated
-				glDisableClientState(GL_VERTEX_ARRAY);
+				glDisableVertexAttribArray(vertexAttribLocation);
 			}
 		}
 
@@ -319,19 +318,16 @@ void main() {
 			GLuint const wingVertexBuffer{ wing.getVertexBuffer() };
 
 			glBindBuffer(GL_ARRAY_BUFFER, wingVertexBuffer);
-			// TODO: deprecated
-			glVertexPointer(4, GL_FLOAT, 0, 0);
+			glVertexAttribPointer(vertexAttribLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
 
 			Color const& color{ wing.getColor() };
 			// TODO: deprecated
 			glColor3f(color.getRed(), color.getGreen(), color.getBlue());
 			glVertexAttrib2f(deltaZAttribLocation, deltaAngle, deltaZ);
-			// TODO: deprecated
-			glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableVertexAttribArray(vertexAttribLocation);
 			glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, 0);
-			// TODO: deprecated
-			glDisableClientState(GL_VERTEX_ARRAY);
+			glDisableVertexAttribArray(vertexAttribLocation);
 		}
 		glDisable(GL_POLYGON_OFFSET_FILL);
 
