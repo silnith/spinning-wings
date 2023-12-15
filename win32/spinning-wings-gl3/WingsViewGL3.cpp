@@ -113,15 +113,18 @@ namespace silnith::wings::gl3
 		std::string const rotateMatrixFunctionDeclaration{
 			R"shaderText(
 mat4 rotate(in float angle, in vec3 axis) {
+    // OpenGL has always specified angles in degrees.
+    // Trigonometric functions operate on radians.
     float c = cos(radians(angle));
     float s = sin(radians(angle));
 
-    mat3 initial = outerProduct(axis, axis) * (1 - c);
-
+    mat3 initial = outerProduct(axis, axis)
+                   * (1 - c);
     mat3 c_part = mat3(c);
-
-    mat3 s_part = mat3(0, axis.z, -axis.y, -axis.z, 0, axis.x, axis.y, -axis.x, 0) * s;
-
+    mat3 s_part = mat3(0, axis.z, -axis.y,
+                       -axis.z, 0, axis.x,
+                       axis.y, -axis.x, 0)
+                  * s;
     mat3 temp = initial + c_part + s_part;
 
     mat4 rotation = mat4(1.0);
@@ -168,7 +171,12 @@ void main() {
     mat4 pitch_rot = rotate(-pitch, vec3(0, 1, 0));
     mat4 roll_rot = rotate(roll, vec3(1, 0, 0));
 
-    gl_Position = angle_rot * radius_trans * yaw_rot * pitch_rot * roll_rot * gl_Vertex;
+    mat4 wingTransformation = angle_rot
+                              * radius_trans
+                              * yaw_rot
+                              * pitch_rot
+                              * roll_rot;
+    gl_Position = wingTransformation * gl_Vertex;
 }
 )shaderText",
 			},
@@ -195,7 +203,10 @@ void main() {
 
     gl_FrontColor = gl_Color;
     gl_BackColor = gl_Color;
-    gl_Position = gl_ModelViewProjectionMatrix * deltaZ_trans * deltaAngle_rot * gl_Vertex;
+    gl_Position = gl_ModelViewProjectionMatrix
+                  * deltaZ_trans
+                  * deltaAngle_rot
+                  * gl_Vertex;
 }
 )shaderText",
 			},
