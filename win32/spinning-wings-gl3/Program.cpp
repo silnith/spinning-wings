@@ -14,7 +14,7 @@ namespace silnith::wings::gl3
     Program::Program(Shader const& s1, std::vector<std::string> const& capturedVaryings)
         : id{ glCreateProgram() }, linkLog{}
     {
-        glProgramParameteri(id, 0, 0);
+        //glProgramParameteri(id, 0, 0);
 
         {
             size_t const size{ capturedVaryings.size() };
