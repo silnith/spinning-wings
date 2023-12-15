@@ -34,62 +34,8 @@ namespace silnith::wings::gl3
 	CurveGenerator greenCurve{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 40) };
 	CurveGenerator blueCurve{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
 
-	Program* glslProgram{ nullptr };
-
-	bool hasOpenGL(GLuint major, GLuint minor)
-	{
-		return (glMajorVersion > major)
-			|| (glMajorVersion == major && glMinorVersion >= minor);
-	}
-
-	void ParseOpenGLVersion(GLubyte const* glVersion)
-	{
-		std::istringstream versionStringInput{ std::string{ reinterpret_cast<char const*>(glVersion) } };
-		//std::basic_istringstream<GLubyte> versionStringInput{ std::basic_string<GLubyte>{glVersion} };
-
-		versionStringInput >> glMajorVersion;
-		GLubyte period;
-		versionStringInput >> period;
-		assert(period == '.');
-		versionStringInput >> glMinorVersion;
-	}
-
-	// The GL display list for rendering a single quad.
-	// This is used for the GL 1.0 rendering path.
-	GLuint quadDisplayList{ 0 };
-
-	void DrawQuadGL1_0(void)
-	{
-		glCallList(quadDisplayList);
-	}
-
-	// The rendering path for rendering a single quad.
-	// This points to the appropriate rendering path for the
-	// active version of the GL.
-	void (*drawQuad)(void) { DrawQuadGL1_0 };
-
-	void CleanupDrawQuadGL1_0(void)
-	{
-		glDeleteLists(quadDisplayList, 1);
-	}
-
-	void (*cleanupDrawQuad)(void) { CleanupDrawQuadGL1_0 };
-
-	void InitializeDrawQuadGL1_0(void)
-	{
-		quadDisplayList = glGenLists(1);
-		glNewList(quadDisplayList, GL_COMPILE);
-		glBegin(GL_QUADS);
-		glVertex2f(1, 1);
-		glVertex2f(-1, 1);
-		glVertex2f(-1, -1);
-		glVertex2f(1, -1);
-		glEnd();
-		glEndList();
-
-		drawQuad = DrawQuadGL1_0;
-		cleanupDrawQuad = CleanupDrawQuadGL1_0;
-	}
+	Program* wingTransformProgram{ nullptr };
+	Program* renderingProgram{ nullptr };
 
 	GLfloat const quadVertices[12]
 	{
@@ -108,98 +54,8 @@ namespace silnith::wings::gl3
 	static_assert(quadVerticesSize == sizeof(quadVertices), "Size of quad vertices array is not as expected.");
 	static_assert(quadIndicesSize == sizeof(quadIndices), "I do not know how sizeof works.");
 
-	void DrawQuadGL1_1(void)
-	{
-		/*
-		 * EnableClientState is executed immediately, it is not compiled into
-		 * a display list.  When creating a display list,
-		 * DrawElements dereferences vertex pointers according to the client
-		 * state, and the dereferenced vertices are compiled into the
-		 * display list.
-		 */
-		glEnableClientState(GL_VERTEX_ARRAY);
-
-		/*
-		 * Elements are interpreted according to the current VertexPointer.
-		 */
-		glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, quadIndices);
-
-		glDisableClientState(GL_VERTEX_ARRAY);
-	}
-
-	void CleanupDrawQuadGL1_1(void)
-	{
-	}
-
-	void InitializeDrawQuadGL1_1(void)
-	{
-		/*
-		 * Specifies vertex data to be used by subsequent calls to
-		 * DrawArrays and DrawElements.
-		 */
-		glVertexPointer(3, GL_FLOAT, 0, quadVertices);
-
-		drawQuad = DrawQuadGL1_1;
-		cleanupDrawQuad = CleanupDrawQuadGL1_1;
-	}
-
-	void DrawQuadGL1_5(void)
-	{
-		/*
-		 * EnableClientState is executed immediately, it is not compiled into
-		 * a display list.  When compiled into a display list,
-		 * DrawElements dereferences vertex pointers according to the client
-		 * state, and the dereferenced vertices are compiled into the
-		 * display list.
-		 */
-		glEnableClientState(GL_VERTEX_ARRAY);
-
-		/*
-		 * If there is an ELEMENT_ARRAY_BUFFER bound, then the last parameter
-		 * to DrawElements is interpreted as an index/offset into the
-		 * ELEMENT_ARRAY_BUFFER.
-		 * 
-		 * Elements of the ELEMENT_ARRAY_BUFFER are interpreted according to
-		 * the current VertexPointer.
-		 */
-		glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, 0);
-
-		glDisableClientState(GL_VERTEX_ARRAY);
-	}
-
-	GLuint wingBufferObject{ 0 };
+	GLuint wingVerticesBufferObject{ 0 };
 	GLuint wingIndicesBufferObject{ 0 };
-
-	void CleanupDrawQuadGL1_5(void)
-	{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		glDeleteBuffers(1, &wingIndicesBufferObject);
-		glDeleteBuffers(1, &wingBufferObject);
-	}
-
-	void InitializeDrawQuadGL1_5(void)
-	{
-		glGenBuffers(1, &wingBufferObject);
-		glBindBuffer(GL_ARRAY_BUFFER, wingBufferObject);
-		glBufferData(GL_ARRAY_BUFFER, quadVerticesSize, quadVertices, GL_STATIC_DRAW);
-		/*
-		 * Specifies vertex data to be used by subsequent calls to
-		 * DrawArrays and DrawElements.
-		 * 
-		 * If there is an ARRAY_BUFFER bound, then the last parameter is interpreted
-		 * as an index/offset into the ARRAY_BUFFER.
-		 */
-		glVertexPointer(3, GL_FLOAT, 0, 0);
-
-		glGenBuffers(1, &wingIndicesBufferObject);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBufferObject);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesSize, quadIndices, GL_STATIC_DRAW);
-
-		drawQuad = DrawQuadGL1_5;
-		cleanupDrawQuad = CleanupDrawQuadGL1_5;
-	}
 
 	GLuint deltaZAttribLocation{ 0 };
 	GLuint radiusAngleAttribLocation{ 0 };
@@ -240,128 +96,201 @@ namespace silnith::wings::gl3
 			0, 0, 13,
 			0, 0, 1);
 
-		InitializeDrawQuadGL1_5();
+		glGenBuffers(1, &wingVerticesBufferObject);
+		glBindBuffer(GL_ARRAY_BUFFER, wingVerticesBufferObject);
+		glBufferData(GL_ARRAY_BUFFER, quadVerticesSize, quadVertices, GL_STATIC_DRAW);
+		glVertexPointer(3, GL_FLOAT, 0, 0);
 
-		std::vector<std::string> vertexSources{
-			"#version 130",
-			"",
-			"attribute vec2 deltaZ;",
-			"attribute vec2 radiusAngle;",
-			"attribute vec3 rollPitchYaw;",
-			"",
-			"mat4 rotate(in float angle, in vec3 axis) {",
-			"    float c = cos(radians(angle));",
-			"    float s = sin(radians(angle));",
-			"",
-			"    mat3 initial = outerProduct(axis, axis) * (1 - c);",
-			"",
-			"    mat3 c_part = mat3(c);",
-			"",
-			"    mat3 s_part = mat3(0, axis.z, -axis.y, -axis.z, 0, axis.x, axis.y, -axis.x, 0) * s;",
-			"",
-			"    mat3 temp = initial + c_part + s_part;",
-			"",
-			"    mat4 rotation = mat4(1.0);",
-			"    rotation[0].xyz = temp[0];",
-			"    rotation[1].xyz = temp[1];",
-			"    rotation[2].xyz = temp[2];",
-			"",
-			"    return rotation;",
-			"}",
-			"",
-			"mat4 translate(in vec3 move) {",
-			"    mat4 trans = mat4(1.0);",
-			"    trans[3].xyz = move;",
-			"    return trans;",
-			"}",
-			"",
-			"void main() {",
-			"    float radius = radiusAngle[0];",
-			"    float angle = radiusAngle[1];",
-			"    float deltaAngle = deltaZ[0];",
-			"    float deltaZ = deltaZ[1];",
-			"    float roll = rollPitchYaw[0];",
-			"    float pitch = rollPitchYaw[1];",
-			"    float yaw = rollPitchYaw[2];",
-			"    ",
-			"    mat4 deltaZ_trans = translate(vec3(0, 0, deltaZ));",
-			"    mat4 deltaAngle_rot = rotate(deltaAngle, vec3(0, 0, 1));",
-			"    ",
-			"    mat4 angle_rot = rotate(angle, vec3(0, 0, 1));",
-			"    mat4 radius_trans = translate(vec3(radius, 0, 0));",
-			"    ",
-			"    mat4 yaw_rot = rotate(-yaw, vec3(0, 0, 1));",
-			"    mat4 pitch_rot = rotate(-pitch, vec3(0, 1, 0));",
-			"    mat4 roll_rot = rotate(roll, vec3(1, 0, 0));",
-			"    ",
-			"    gl_FrontColor = gl_Color;",
-			"    gl_BackColor = gl_Color;",
-			"    gl_Position = gl_ModelViewProjectionMatrix * deltaZ_trans * deltaAngle_rot * angle_rot * radius_trans * yaw_rot * pitch_rot * roll_rot * gl_Vertex;",
-			"}",
+		// glColorPointer();
+		// glEdgeFlagPointer();
+		// glVertexAttribPointer();
+
+		glGenBuffers(1, &wingIndicesBufferObject);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBufferObject);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesSize, quadIndices, GL_STATIC_DRAW);
+
+		wingTransformProgram = new Program{
+			VertexShader{
+				"#version 130",
+				"",
+				"in vec2 radiusAngle;",
+				"in vec3 rollPitchYaw;",
+				"",
+				"mat4 rotate(in float angle, in vec3 axis) {",
+				"    float c = cos(radians(angle));",
+				"    float s = sin(radians(angle));",
+				"",
+				"    mat3 initial = outerProduct(axis, axis) * (1 - c);",
+				"",
+				"    mat3 c_part = mat3(c);",
+				"",
+				"    mat3 s_part = mat3(0, axis.z, -axis.y, -axis.z, 0, axis.x, axis.y, -axis.x, 0) * s;",
+				"",
+				"    mat3 temp = initial + c_part + s_part;",
+				"",
+				"    mat4 rotation = mat4(1.0);",
+				"    rotation[0].xyz = temp[0];",
+				"    rotation[1].xyz = temp[1];",
+				"    rotation[2].xyz = temp[2];",
+				"",
+				"    return rotation;",
+				"}",
+				"",
+				"mat4 translate(in vec3 move) {",
+				"    mat4 trans = mat4(1.0);",
+				"    trans[3].xyz = move;",
+				"    return trans;",
+				"}",
+				"",
+				"void main() {",
+				"    float radius = radiusAngle[0];",
+				"    float angle = radiusAngle[1];",
+				"    float roll = rollPitchYaw[0];",
+				"    float pitch = rollPitchYaw[1];",
+				"    float yaw = rollPitchYaw[2];",
+				"    ",
+				"    mat4 angle_rot = rotate(angle, vec3(0, 0, 1));",
+				"    mat4 radius_trans = translate(vec3(radius, 0, 0));",
+				"    ",
+				"    mat4 yaw_rot = rotate(-yaw, vec3(0, 0, 1));",
+				"    mat4 pitch_rot = rotate(-pitch, vec3(0, 1, 0));",
+				"    mat4 roll_rot = rotate(roll, vec3(1, 0, 0));",
+				"    ",
+				"    gl_Position = angle_rot * radius_trans * yaw_rot * pitch_rot * roll_rot * gl_Vertex;",
+				"}",
+			},
+			std::vector<std::string>{"gl_Position"}
 		};
+		radiusAngleAttribLocation = wingTransformProgram->getAttributeLocation("radiusAngle");
+		rollPitchYawAttribLocation = wingTransformProgram->getAttributeLocation("rollPitchYaw");
 
-		std::vector<std::string> fragmentSources{
-			"#version 130",
-			"",
-			"void main() {",
-			"    gl_FragColor = gl_Color;",
-			"    gl_FragDepth = gl_FragCoord.z;",
-			"}",
+		renderingProgram = new Program{
+			VertexShader{
+				"#version 130",
+				"",
+				"attribute vec2 deltaZ;",
+				"",
+				"mat4 rotate(in float angle, in vec3 axis) {",
+				"    float c = cos(radians(angle));",
+				"    float s = sin(radians(angle));",
+				"",
+				"    mat3 initial = outerProduct(axis, axis) * (1 - c);",
+				"",
+				"    mat3 c_part = mat3(c);",
+				"",
+				"    mat3 s_part = mat3(0, axis.z, -axis.y, -axis.z, 0, axis.x, axis.y, -axis.x, 0) * s;",
+				"",
+				"    mat3 temp = initial + c_part + s_part;",
+				"",
+				"    mat4 rotation = mat4(1.0);",
+				"    rotation[0].xyz = temp[0];",
+				"    rotation[1].xyz = temp[1];",
+				"    rotation[2].xyz = temp[2];",
+				"",
+				"    return rotation;",
+				"}",
+				"",
+				"mat4 translate(in vec3 move) {",
+				"    mat4 trans = mat4(1.0);",
+				"    trans[3].xyz = move;",
+				"    return trans;",
+				"}",
+				"",
+				"void main() {",
+				"    float deltaAngle = deltaZ[0];",
+				"    float deltaZ = deltaZ[1];",
+				"    ",
+				"    mat4 deltaZ_trans = translate(vec3(0, 0, deltaZ));",
+				"    mat4 deltaAngle_rot = rotate(deltaAngle, vec3(0, 0, 1));",
+				"    ",
+				"    gl_FrontColor = gl_Color;",
+				"    gl_BackColor = gl_Color;",
+				"    gl_Position = gl_ModelViewProjectionMatrix * deltaZ_trans * deltaAngle_rot * gl_Vertex;",
+				"}",
+			},
+			FragmentShader{
+				"#version 130",
+				"",
+				"void main() {",
+				"    gl_FragColor = gl_Color;",
+				"    gl_FragDepth = gl_FragCoord.z;",
+				"}",
+			}
 		};
-
-		glslProgram = new Program{ VertexShader{ vertexSources }, FragmentShader{ fragmentSources } };
-
-		deltaZAttribLocation = glslProgram->getAttributeLocation("deltaZ");
-		radiusAngleAttribLocation = glslProgram->getAttributeLocation("radiusAngle");
-		rollPitchYawAttribLocation = glslProgram->getAttributeLocation("rollPitchYaw");
-
-		glslProgram->useProgram();
+		deltaZAttribLocation = renderingProgram->getAttributeLocation("deltaZ");
 	}
 
 	void CleanupOpenGLState(void)
 	{
 		for (Wing const& wing : wings)
 		{
-			glDeleteLists(wing.getGLDisplayList(), 1);
+			GLuint const buffer{ wing.getGLDisplayList() };
+			glDeleteBuffers(1, &buffer);
 		}
 
-		cleanupDrawQuad();
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		delete glslProgram;
-		glslProgram = nullptr;
+		glDeleteBuffers(1, &wingIndicesBufferObject);
+		glDeleteBuffers(1, &wingVerticesBufferObject);
+
+		delete wingTransformProgram;
+		wingTransformProgram = nullptr;
+		delete renderingProgram;
+		renderingProgram = nullptr;
 	}
 
 	void AdvanceAnimation(void)
 	{
-		GLuint displayList{ 0 };
+		GLuint transformFeedbackBuffer{ 0 };
 		if (wings.empty() || wings.size() < numWings)
 		{
-			displayList = glGenLists(1);
+			glGenBuffers(1, &transformFeedbackBuffer);
+			glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, transformFeedbackBuffer);
+			glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(GLfloat) * 4 * 4, nullptr, GL_STATIC_DRAW);
+			glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, 0);
 		}
 		else
 		{
-			displayList = wings.back().getGLDisplayList();
+			Wing const& lastWing{ wings.back() };
+			transformFeedbackBuffer = lastWing.getGLDisplayList();
 			wings.pop_back();
 		}
-		Wing const& wing{ wings.emplace_front(displayList,
+		Wing const& wing{ wings.emplace_front(transformFeedbackBuffer,
 			radiusCurve.getNextValue(), angleCurve.getNextValue(),
 			deltaAngleCurve.getNextValue(), deltaZCurve.getNextValue(),
 			rollCurve.getNextValue(), pitchCurve.getNextValue(), yawCurve.getNextValue(),
 			Color{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
 			Color::WHITE) };
 
-		glNewList(displayList, GL_COMPILE);
+		wingTransformProgram->useProgram();
+
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, transformFeedbackBuffer);
+
+		//glEnable(GL_RASTERIZER_DISCARD);
+
+		glBeginTransformFeedback(GL_POINTS);
+		glBindBuffer(GL_ARRAY_BUFFER, wingVerticesBufferObject);
+		glVertexPointer(3, GL_FLOAT, 0, 0);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBufferObject);
 		glVertexAttrib2f(radiusAngleAttribLocation, wing.getRadius(), wing.getAngle());
 		glVertexAttrib3f(rollPitchYawAttribLocation, wing.getRoll(), wing.getPitch(), wing.getYaw());
-		drawQuad();
-		glEndList();
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glDrawArrays(GL_POINTS, 0, 4);
+		//glDrawElements(GL_POINTS, 4, GL_UNSIGNED_INT, 0);
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glEndTransformFeedback();
+
+		//glDisable(GL_RASTERIZER_DISCARD);
 	}
 
 	void DrawFrame(void)
 	{
+		renderingProgram->useProgram();
+		deltaZAttribLocation = renderingProgram->getAttributeLocation("deltaZ");
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		if (hasOpenGL(1, 1))
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glEnable(GL_POLYGON_OFFSET_LINE);
@@ -371,10 +300,18 @@ namespace silnith::wings::gl3
 				deltaZ += wing.getDeltaZ();
 				deltaAngle += wing.getDeltaAngle();
 
+				GLuint const wingVertexBufferObject{ wing.getGLDisplayList() };
+
+				glBindBuffer(GL_ARRAY_BUFFER, wingVertexBufferObject);
+				glVertexPointer(4, GL_FLOAT, 0, 0);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBufferObject);
+
 				Color const& edgeColor{ wing.getEdgeColor() };
 				glColor3f(edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
 				glVertexAttrib2f(deltaZAttribLocation, deltaAngle, deltaZ);
-				glCallList(wing.getGLDisplayList());
+				glEnableClientState(GL_VERTEX_ARRAY);
+				glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, 0);
+				glDisableClientState(GL_VERTEX_ARRAY);
 			}
 			glDisable(GL_POLYGON_OFFSET_LINE);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -386,10 +323,18 @@ namespace silnith::wings::gl3
 			deltaZ += wing.getDeltaZ();
 			deltaAngle += wing.getDeltaAngle();
 
+			GLuint const wingVertexBufferObject{ wing.getGLDisplayList() };
+
+			glBindBuffer(GL_ARRAY_BUFFER, wingVertexBufferObject);
+			glVertexPointer(4, GL_FLOAT, 0, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBufferObject);
+
 			Color const& color{ wing.getColor() };
 			glColor3f(color.getRed(), color.getGreen(), color.getBlue());
 			glVertexAttrib2f(deltaZAttribLocation, deltaAngle, deltaZ);
-			glCallList(wing.getGLDisplayList());
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, 0);
+			glDisableClientState(GL_VERTEX_ARRAY);
 		}
 
 		glFlush();

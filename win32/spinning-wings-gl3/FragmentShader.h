@@ -2,6 +2,7 @@
 
 #include "Shader.h"
 
+#include <initializer_list>
 #include <string>
 #include <vector>
 
@@ -26,6 +27,7 @@ namespace silnith::wings::gl3
         ~FragmentShader(void) noexcept = default;
     public:
         FragmentShader(std::vector<std::string> const&);
+        FragmentShader(std::initializer_list<std::string> const&);
 
     private:
     };
