@@ -17,13 +17,14 @@ namespace silnith::wings::gl3
         glProgramParameteri(id, 0, 0);
 
         {
-            GLchar const** varyings{ new GLchar const* [capturedVaryings.size()] };
-            for (size_t i{ 0 }; i < capturedVaryings.size(); i++)
+            size_t const size{ capturedVaryings.size() };
+            GLchar const** varyings{ new GLchar const* [size] };
+            for (size_t i{ 0 }; i < size; i++)
             {
                 std::string const& varying{ capturedVaryings.at(i) };
-                varyings[0] = varying.c_str();
+                varyings[i] = varying.c_str();
             }
-            glTransformFeedbackVaryings(id, capturedVaryings.size(), varyings, GL_INTERLEAVED_ATTRIBS);
+            glTransformFeedbackVaryings(id, static_cast<GLsizei>(size), varyings, GL_INTERLEAVED_ATTRIBS);
             //glTransformFeedbackVaryings(id, capturedVaryings.size(), varyings, GL_SEPARATE_ATTRIBS);
             delete[] varyings;
         }
