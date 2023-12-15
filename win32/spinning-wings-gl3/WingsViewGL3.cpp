@@ -230,8 +230,8 @@ namespace silnith::wings::gl3
 	{
 		for (Wing const& wing : wings)
 		{
-			GLuint const buffer{ wing.getVertexBuffer() };
-			glDeleteBuffers(1, &buffer);
+			GLuint const vertexBuffer{ wing.getVertexBuffer() };
+			glDeleteBuffers(1, &vertexBuffer);
 		}
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
