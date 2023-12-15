@@ -47,6 +47,7 @@ namespace silnith::wings::gl3
 	/// </summary>
 	GLuint wingIndexBuffer{ 0 };
 
+	GLuint vertexAttribLocation{ 0 };
 	GLuint deltaZAttribLocation{ 0 };
 	GLuint radiusAngleAttribLocation{ 0 };
 	GLuint rollPitchYawAttribLocation{ 0 };
@@ -151,6 +152,7 @@ mat4 translate(in vec3 move) {
 			VertexShader{
 				R"shaderText(#version 130
 
+in vec2 vertex;
 in vec2 radiusAngle;
 in vec3 rollPitchYaw;
 
@@ -169,7 +171,7 @@ void main() {
                               * rotate(-yaw, vec3(0, 0, 1))
                               * rotate(-pitch, vec3(0, 1, 0))
                               * rotate(roll, vec3(1, 0, 0));
-    gl_Position = wingTransformation * gl_Vertex;
+    gl_Position = wingTransformation * vec4(vertex, 0, 1);
 }
 )shaderText",
 				rotateMatrixFunctionDeclaration,
@@ -177,6 +179,7 @@ void main() {
 			},
 			std::vector<std::string>{"gl_Position"}
 		};
+		vertexAttribLocation = wingTransformProgram->getAttributeLocation("vertex");
 		radiusAngleAttribLocation = wingTransformProgram->getAttributeLocation("radiusAngle");
 		rollPitchYawAttribLocation = wingTransformProgram->getAttributeLocation("rollPitchYaw");
 
@@ -268,16 +271,12 @@ void main() {
 
 		glBeginTransformFeedback(GL_POINTS);
 		glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
-		// TODO: deprecated
-		glVertexPointer(2, GL_FLOAT, 0, 0);
-		//GLuint const positionAttribLocation{ wingTransformProgram->getAttributeLocation("position") };
+		glVertexAttribPointer(vertexAttribLocation, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
 		glVertexAttrib2f(radiusAngleAttribLocation, wing.getRadius(), wing.getAngle());
 		glVertexAttrib3f(rollPitchYawAttribLocation, wing.getRoll(), wing.getPitch(), wing.getYaw());
-		// TODO: deprecated
-		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableVertexAttribArray(vertexAttribLocation);
 		glDrawArrays(GL_POINTS, 0, 4);
-		// TODO: deprecated
-		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableVertexAttribArray(vertexAttribLocation);
 		glEndTransformFeedback();
 
 		//glDisable(GL_RASTERIZER_DISCARD);
