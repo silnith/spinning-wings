@@ -5,7 +5,7 @@
 #include <sstream>
 
 #include "CurveGenerator.h"
-#include "Wing.h"
+#include "WingGL3.h"
 
 #include "FragmentShader.h"
 #include "Program.h"
@@ -224,7 +224,7 @@ namespace silnith::wings::gl3
 	{
 		for (Wing const& wing : wings)
 		{
-			GLuint const buffer{ wing.getGLDisplayList() };
+			GLuint const buffer{ wing.getVertexBuffer() };
 			glDeleteBuffers(1, &buffer);
 		}
 
@@ -253,7 +253,7 @@ namespace silnith::wings::gl3
 		else
 		{
 			Wing const& lastWing{ wings.back() };
-			transformFeedbackBuffer = lastWing.getGLDisplayList();
+			transformFeedbackBuffer = lastWing.getVertexBuffer();
 			wings.pop_back();
 		}
 		Wing const& wing{ wings.emplace_front(transformFeedbackBuffer,
@@ -298,7 +298,7 @@ namespace silnith::wings::gl3
 				deltaZ += wing.getDeltaZ();
 				deltaAngle += wing.getDeltaAngle();
 
-				GLuint const wingVertexBufferObject{ wing.getGLDisplayList() };
+				GLuint const wingVertexBufferObject{ wing.getVertexBuffer() };
 
 				glBindBuffer(GL_ARRAY_BUFFER, wingVertexBufferObject);
 				glVertexPointer(4, GL_FLOAT, 0, 0);
@@ -320,7 +320,7 @@ namespace silnith::wings::gl3
 			deltaZ += wing.getDeltaZ();
 			deltaAngle += wing.getDeltaAngle();
 
-			GLuint const wingVertexBufferObject{ wing.getGLDisplayList() };
+			GLuint const wingVertexBufferObject{ wing.getVertexBuffer() };
 
 			glBindBuffer(GL_ARRAY_BUFFER, wingVertexBufferObject);
 			glVertexPointer(4, GL_FLOAT, 0, 0);

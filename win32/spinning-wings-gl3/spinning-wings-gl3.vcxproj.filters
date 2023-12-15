@@ -33,6 +33,9 @@
     <ClInclude Include="WingsViewGL3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="WingGL3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FragmentShader.cpp">
@@ -51,6 +54,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WingsViewGL3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WingGL3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
