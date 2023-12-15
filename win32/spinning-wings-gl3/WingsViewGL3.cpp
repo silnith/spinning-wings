@@ -55,7 +55,6 @@ namespace silnith::wings::gl3
 	{
 		GLubyte const* const glVendor{ glGetString(GL_VENDOR) };
 		GLubyte const* const glRenderer{ glGetString(GL_RENDERER) };
-		GLubyte const* const glExtensions{ glGetString(GL_EXTENSIONS) };
 		GLint major{ 0 };
 		GLint minor{ 0 };
 		glGetIntegerv(GL_MAJOR_VERSION, &major);
@@ -63,7 +62,6 @@ namespace silnith::wings::gl3
 
 		assert(glVendor != NULL);
 		assert(glRenderer != NULL);
-		assert(glExtensions != NULL);
 
 		glMajorVersion = static_cast<GLuint>(major);
 		glMinorVersion = static_cast<GLuint>(minor);
@@ -72,13 +70,10 @@ namespace silnith::wings::gl3
 		glPolygonOffset(0.5, 2);
 
 		glEnable(GL_LINE_SMOOTH);
-		glLineWidth(1.0);
 
 		glEnable(GL_POLYGON_SMOOTH);
 
 		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-		glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
 		glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
 		glLoadIdentity();
@@ -101,10 +96,6 @@ namespace silnith::wings::gl3
 			glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
 			glBufferData(GL_ARRAY_BUFFER, quadVerticesSize, quadVertices, GL_STATIC_DRAW);
 		}
-
-		// glColorPointer();
-		// glEdgeFlagPointer();
-		// glVertexAttribPointer();
 
 		{
 			GLuint const quadIndices[4]
@@ -281,11 +272,14 @@ namespace silnith::wings::gl3
 
 		glBeginTransformFeedback(GL_POINTS);
 		glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
+		// TODO: deprecated
 		glVertexPointer(2, GL_FLOAT, 0, 0);
 		glVertexAttrib2f(radiusAngleAttribLocation, wing.getRadius(), wing.getAngle());
 		glVertexAttrib3f(rollPitchYawAttribLocation, wing.getRoll(), wing.getPitch(), wing.getYaw());
+		// TODO: deprecated
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glDrawArrays(GL_POINTS, 0, 4);
+		// TODO: deprecated
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glEndTransformFeedback();
 
@@ -308,14 +302,18 @@ namespace silnith::wings::gl3
 				GLuint const wingVertexBuffer{ wing.getVertexBuffer() };
 
 				glBindBuffer(GL_ARRAY_BUFFER, wingVertexBuffer);
+				// TODO: deprecated
 				glVertexPointer(4, GL_FLOAT, 0, 0);
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
 
 				Color const& edgeColor{ wing.getEdgeColor() };
+				// TODO: deprecated
 				glColor3f(edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
 				glVertexAttrib2f(deltaZAttribLocation, deltaAngle, deltaZ);
+				// TODO: deprecated
 				glEnableClientState(GL_VERTEX_ARRAY);
 				glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, 0);
+				// TODO: deprecated
 				glDisableClientState(GL_VERTEX_ARRAY);
 			}
 		}
@@ -330,14 +328,18 @@ namespace silnith::wings::gl3
 			GLuint const wingVertexBuffer{ wing.getVertexBuffer() };
 
 			glBindBuffer(GL_ARRAY_BUFFER, wingVertexBuffer);
+			// TODO: deprecated
 			glVertexPointer(4, GL_FLOAT, 0, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
 
 			Color const& color{ wing.getColor() };
+			// TODO: deprecated
 			glColor3f(color.getRed(), color.getGreen(), color.getBlue());
 			glVertexAttrib2f(deltaZAttribLocation, deltaAngle, deltaZ);
+			// TODO: deprecated
 			glEnableClientState(GL_VERTEX_ARRAY);
 			glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, 0);
+			// TODO: deprecated
 			glDisableClientState(GL_VERTEX_ARRAY);
 		}
 		glDisable(GL_POLYGON_OFFSET_FILL);
@@ -359,11 +361,15 @@ namespace silnith::wings::gl3
 		}
 
 		glViewport(0, 0, width, height);
+		// TODO: deprecated
 		glMatrixMode(GL_PROJECTION);
+		// TODO: deprecated
 		glLoadIdentity();
+		// TODO: deprecated
 		glOrtho(static_cast<GLdouble>(-20) * xmult, static_cast<GLdouble>(20) * xmult,
 			static_cast<GLdouble>(-20) * ymult, static_cast<GLdouble>(20) * ymult,
 			static_cast<GLdouble>(35), static_cast<GLdouble>(105));
+		// TODO: deprecated
 		glMatrixMode(GL_MODELVIEW);
 		// check GL errors
 	}
