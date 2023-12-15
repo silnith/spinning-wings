@@ -153,10 +153,10 @@ mat4 translate(in vec3 move) {
 
 in vec2 radiusAngle;
 in vec3 rollPitchYaw;
-)shaderText",
-				rotateMatrixFunctionDeclaration,
-				translateMatrixFunctionDeclaration,
-				R"shaderText(
+
+mat4 rotate(in float angle, in vec3 axis);
+mat4 translate(in vec3 move);
+
 void main() {
     float radius = radiusAngle[0];
     float angle = radiusAngle[1];
@@ -172,6 +172,8 @@ void main() {
     gl_Position = wingTransformation * gl_Vertex;
 }
 )shaderText",
+				rotateMatrixFunctionDeclaration,
+				translateMatrixFunctionDeclaration,
 			},
 			std::vector<std::string>{"gl_Position"}
 		};
@@ -183,10 +185,10 @@ void main() {
 				R"shaderText(#version 130
 
 attribute vec2 deltaZ;
-)shaderText",
-				rotateMatrixFunctionDeclaration,
-				translateMatrixFunctionDeclaration,
-				R"shaderText(
+
+mat4 rotate(in float angle, in vec3 axis);
+mat4 translate(in vec3 move);
+
 void main() {
     float deltaAngle = deltaZ[0];
     float deltaZ = deltaZ[1];
@@ -199,6 +201,8 @@ void main() {
                   * gl_Vertex;
 }
 )shaderText",
+				rotateMatrixFunctionDeclaration,
+				translateMatrixFunctionDeclaration,
 			},
 			FragmentShader{
 				R"shaderText(#version 130
