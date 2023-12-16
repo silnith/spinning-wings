@@ -90,13 +90,6 @@ namespace silnith::wings::gl3
 		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 		glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
-		glLoadIdentity();
-		//gluLookAt(0, 50, 50,
-		//	0, 0, 13,
-		//	0, 0, 1);
-		//glTranslatef(0, 0, -20);
-		//glRotatef(-45, 1, 0, 0);
-		//glTranslatef(0, 0, -30);
 		glm::mat4 view2{ glm::lookAt(
 			glm::vec3{ 0, 50, 50 },
 			glm::vec3{ 0, 0, 13 },
