@@ -1,5 +1,9 @@
 #include "WingsViewGL3.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <cassert>
 #include <deque>
 #include <sstream>
@@ -18,8 +22,8 @@ namespace silnith::wings::gl3
 
 	size_t const numWings{ 40 };
 
-	GLuint glMajorVersion{ 1 };
-	GLuint glMinorVersion{ 0 };
+	GLint glMajorVersion{ 1 };
+	GLint glMinorVersion{ 0 };
 
 	wing_list wings{};
 
@@ -47,20 +51,34 @@ namespace silnith::wings::gl3
 	/// </summary>
 	GLuint wingIndexBuffer{ 0 };
 
+	GLfloat model[16]{
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1,
+	};
+	GLfloat view[16]{
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1,
+	};
+	GLfloat projection[16]{
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1,
+	};
+
 	void InitializeOpenGLState(void)
 	{
 		GLubyte const* const glVendor{ glGetString(GL_VENDOR) };
 		GLubyte const* const glRenderer{ glGetString(GL_RENDERER) };
-		GLint major{ 0 };
-		GLint minor{ 0 };
-		glGetIntegerv(GL_MAJOR_VERSION, &major);
-		glGetIntegerv(GL_MINOR_VERSION, &minor);
+		glGetIntegerv(GL_MAJOR_VERSION, &glMajorVersion);
+		glGetIntegerv(GL_MINOR_VERSION, &glMinorVersion);
 
 		assert(glVendor != NULL);
 		assert(glRenderer != NULL);
-
-		glMajorVersion = static_cast<GLuint>(major);
-		glMinorVersion = static_cast<GLuint>(minor);
 
 		glEnable(GL_DEPTH_TEST);
 		glPolygonOffset(0.5, 2);
@@ -73,9 +91,32 @@ namespace silnith::wings::gl3
 		glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
 		glLoadIdentity();
-		gluLookAt(0, 50, 50,
-			0, 0, 13,
-			0, 0, 1);
+		//gluLookAt(0, 50, 50,
+		//	0, 0, 13,
+		//	0, 0, 1);
+		//glTranslatef(0, 0, -20);
+		//glRotatef(-45, 1, 0, 0);
+		//glTranslatef(0, 0, -30);
+		glm::mat4 view2{ glm::lookAt(
+			glm::vec3{ 0, 50, 50 },
+			glm::vec3{ 0, 0, 13 },
+			glm::vec3{ 0, 0, 1 }) };
+		view[0] = view2[0][0];
+		view[1] = view2[0][1];
+		view[2] = view2[0][2];
+		view[3] = view2[0][3];
+		view[4] = view2[1][0];
+		view[5] = view2[1][1];
+		view[6] = view2[1][2];
+		view[7] = view2[1][3];
+		view[8] = view2[2][0];
+		view[9] = view2[2][1];
+		view[10] = view2[2][2];
+		view[11] = view2[2][3];
+		view[12] = view2[3][0];
+		view[13] = view2[3][1];
+		view[14] = view2[3][2];
+		view[15] = view2[3][3];
 
 		{
 			GLfloat const quadVertices[8]
@@ -179,6 +220,10 @@ void main() {
 			VertexShader{
 				R"shaderText(#version 130
 
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
 in vec4 vertex;
 in vec3 color;
 in vec2 deltaZ;
@@ -192,8 +237,10 @@ void main() {
     float deltaAngle = deltaZ[0];
     float deltaZ = deltaZ[1];
 
+    mat4 modelViewProjection = projection * view * model;
+
     varyingColor = vec4(color, 1);
-    gl_Position = gl_ModelViewProjectionMatrix
+    gl_Position = modelViewProjection
                   * translate(vec3(0, 0, deltaZ))
                   * rotate(deltaAngle, vec3(0, 0, 1))
                   * vertex;
@@ -290,6 +337,14 @@ void main() {
 		GLuint const colorAttribLocation{ renderingProgram->getAttributeLocation("color") };
 		GLuint const deltaZAttribLocation{ renderingProgram->getAttributeLocation("deltaZ") };
 
+		GLint const modelUniformLocation{ renderingProgram->getUniformLocation("model") };
+		GLint const viewUniformLocation{ renderingProgram->getUniformLocation("view") };
+		GLint const projectionUniformLocation{ renderingProgram->getUniformLocation("projection") };
+
+		glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, model);
+		glUniformMatrix4fv(viewUniformLocation, 1, GL_FALSE, view);
+		glUniformMatrix4fv(projectionUniformLocation, 1, GL_FALSE, projection);
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		{
@@ -339,31 +394,52 @@ void main() {
 		glFlush();
 	}
 
-	void Resize(GLsizei width, GLsizei height)
+	void Ortho(GLfloat const width, GLfloat const height)
 	{
-		GLdouble xmult{ 1.0 };
-		GLdouble ymult{ 1.0 };
+		GLfloat xmult{ 1.0 };
+		GLfloat ymult{ 1.0 };
 		if (width > height)
 		{
-			xmult = static_cast<GLdouble>(width) / static_cast<GLdouble>(height);
+			xmult = width / height;
 		}
 		else
 		{
-			ymult = static_cast<GLdouble>(height) / static_cast<GLdouble>(width);
+			ymult = height / width;
 		}
+		
+		GLfloat const left{ -20 * xmult };
+		GLfloat const right{ 20 * xmult };
+		GLfloat const bottom{ -20 * ymult };
+		GLfloat const top{ 20 * ymult };
+		GLfloat const nearZ{ 15 };
+		GLfloat const farZ{ 105 };
 
+		GLfloat const viewWidth{ right - left };
+		GLfloat const viewHeight{ top - bottom };
+		GLfloat const viewDepth{ farZ - nearZ };
+
+		projection[0] = static_cast<GLfloat>(2) / viewWidth;
+		projection[1] = 0;
+		projection[2] = 0;
+		projection[3] = 0;
+		projection[4] = 0;
+		projection[5] = static_cast<GLfloat>(2) / viewHeight;
+		projection[6] = 0;
+		projection[7] = 0;
+		projection[8] = 0;
+		projection[9] = 0;
+		projection[10] = static_cast<GLfloat>(-2) / viewDepth;
+		projection[11] = 0;
+		projection[12] = -(right + left) / viewWidth;
+		projection[13] = -(top + bottom) / viewHeight;
+		projection[14] = -(farZ + nearZ) / viewDepth;
+		projection[15] = static_cast<GLfloat>(1);
+	}
+
+	void Resize(GLsizei width, GLsizei height)
+	{
 		glViewport(0, 0, width, height);
-		// TODO: deprecated
-		glMatrixMode(GL_PROJECTION);
-		// TODO: deprecated
-		glLoadIdentity();
-		// TODO: deprecated
-		glOrtho(static_cast<GLdouble>(-20) * xmult, static_cast<GLdouble>(20) * xmult,
-			static_cast<GLdouble>(-20) * ymult, static_cast<GLdouble>(20) * ymult,
-			static_cast<GLdouble>(35), static_cast<GLdouble>(105));
-		// TODO: deprecated
-		glMatrixMode(GL_MODELVIEW);
-		// check GL errors
+		Ortho(static_cast<GLfloat>(width), static_cast<GLfloat>(height));
 	}
 
 }
