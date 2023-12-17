@@ -375,7 +375,7 @@ void main() {
 		{
 			glGenBuffers(1, &wingVertexBuffer);
 			glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, wingVertexBuffer);
-			glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(GLfloat) * 4 * 4, nullptr, GL_STATIC_DRAW);
+			glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(GLfloat) * 4 * 4, nullptr, GL_DYNAMIC_DRAW);
 			glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, 0);
 
 			glGenBuffers(1, &wingColorBuffer);
