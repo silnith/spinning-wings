@@ -253,6 +253,10 @@ in vec2 vertex;
 mat4 rotate(in float angle, in vec3 axis);
 mat4 translate(in vec3 move);
 
+const vec3 xAxis = vec3(1, 0, 0);
+const vec3 yAxis = vec3(0, 1, 0);
+const vec3 zAxis = vec3(0, 0, 1);
+
 void main() {
     float radius = radiusAngle[0];
     float angle = radiusAngle[1];
@@ -260,11 +264,11 @@ void main() {
     float pitch = rollPitchYaw[1];
     float yaw = rollPitchYaw[2];
 
-    mat4 wingTransformation = rotate(angle, vec3(0, 0, 1))
+    mat4 wingTransformation = rotate(angle, zAxis)
                               * translate(vec3(radius, 0, 0))
-                              * rotate(-yaw, vec3(0, 0, 1))
-                              * rotate(-pitch, vec3(0, 1, 0))
-                              * rotate(roll, vec3(1, 0, 0));
+                              * rotate(-yaw, zAxis)
+                              * rotate(-pitch, yAxis)
+                              * rotate(roll, xAxis);
     gl_Position = wingTransformation * vec4(vertex, 0, 1);
 }
 )shaderText",
@@ -296,6 +300,10 @@ smooth out vec4 varyingColor;
 mat4 rotate(in float angle, in vec3 axis);
 mat4 translate(in vec3 move);
 
+const vec3 xAxis = vec3(1, 0, 0);
+const vec3 yAxis = vec3(0, 1, 0);
+const vec3 zAxis = vec3(0, 0, 1);
+
 void main() {
     float deltaAngle = deltaZ[0];
     float deltaZ = deltaZ[1];
@@ -305,7 +313,7 @@ void main() {
     varyingColor = vec4(color, 1);
     gl_Position = modelViewProjection
                   * translate(vec3(0, 0, deltaZ))
-                  * rotate(deltaAngle, vec3(0, 0, 1))
+                  * rotate(deltaAngle, zAxis)
                   * vertex;
 }
 )shaderText",
