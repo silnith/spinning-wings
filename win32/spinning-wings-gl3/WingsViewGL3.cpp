@@ -50,7 +50,16 @@ namespace silnith::wings::gl3
 	/// The indices into <c>originalVertexBuffer</c>.
 	/// </summary>
 	GLuint wingIndexBuffer{ 0 };
+	/// <summary>
+	/// The vertex array used for transform feedback.
+	/// This maintains the state of the enabled vertex attributes.
+	/// </summary>
 	GLuint transformVertexArray{ 0 };
+	/// <summary>
+	/// The vertex array used for rendering.
+	/// This maintains the state of the enabled vertex attributes,
+	/// as well as the binding for the ELEMENT_ARRAY_BUFFER.
+	/// </summary>
 	GLuint renderVertexArray{ 0 };
 
 	GLfloat model[16]{
@@ -268,9 +277,9 @@ void main() {
 		};
 		glGenVertexArrays(1, &renderVertexArray);
 		glBindVertexArray(renderVertexArray);
-		glEnableVertexAttribArray(wingTransformProgram->getAttributeLocation("vertex"));
-		glEnableVertexAttribArray(wingTransformProgram->getAttributeLocation("color"));
-		glEnableVertexAttribArray(wingTransformProgram->getAttributeLocation("deltaZ"));
+		glEnableVertexAttribArray(renderingProgram->getAttributeLocation("vertex"));
+		glEnableVertexAttribArray(renderingProgram->getAttributeLocation("color"));
+		glEnableVertexAttribArray(renderingProgram->getAttributeLocation("deltaZ"));
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
 		glBindVertexArray(0);
 	}
@@ -373,11 +382,6 @@ void main() {
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 
-		wingTransformProgram->useProgram();
-		GLuint const vertexAttribLocation{ wingTransformProgram->getAttributeLocation("vertex") };
-		GLuint const radiusAngleAttribLocation{ wingTransformProgram->getAttributeLocation("radiusAngle") };
-		GLuint const rollPitchYawAttribLocation{ wingTransformProgram->getAttributeLocation("rollPitchYaw") };
-
 		GLuint angleRadiusBuffer{ 0 };
 		GLuint rollPitchYawBuffer{ 0 };
 
@@ -411,6 +415,11 @@ void main() {
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 
+		wingTransformProgram->useProgram();
+		GLuint const vertexAttribLocation{ wingTransformProgram->getAttributeLocation("vertex") };
+		GLuint const radiusAngleAttribLocation{ wingTransformProgram->getAttributeLocation("radiusAngle") };
+		GLuint const rollPitchYawAttribLocation{ wingTransformProgram->getAttributeLocation("rollPitchYaw") };
+
 		//glEnable(GL_RASTERIZER_DISCARD);
 
 		glBindVertexArray(transformVertexArray);
@@ -418,8 +427,6 @@ void main() {
 		glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
 		glVertexAttribPointer(vertexAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		//glEnableVertexArrayAttrib(vertexArray, vertexAttribLocation);
 
 		glBindBuffer(GL_ARRAY_BUFFER, angleRadiusBuffer);
 		glVertexAttribPointer(radiusAngleAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
@@ -459,12 +466,9 @@ void main() {
 		glUniformMatrix4fv(projectionUniformLocation, 1, GL_FALSE, projection);
 
 		GLuint deltaAttribBuffer{ 0 };
-
-		GLuint vertexArray{ 0 };
-		glGenVertexArrays(1, &vertexArray);
-		glBindVertexArray(vertexArray);
-
 		glGenBuffers(1, &deltaAttribBuffer);
+
+		glBindVertexArray(renderVertexArray);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
@@ -489,22 +493,18 @@ void main() {
 				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
 
+			glBindBuffer(GL_ARRAY_BUFFER, deltaAttribBuffer);
+			glVertexAttribPointer(deltaZAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 			glBindBuffer(GL_ARRAY_BUFFER, wing.getVertexBuffer());
-			glEnableVertexAttribArray(vertexAttribLocation);
 			glVertexAttribPointer(vertexAttribLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glBindBuffer(GL_ARRAY_BUFFER, wing.getEdgeColorBuffer());
-			glEnableVertexAttribArray(colorAttribLocation);
 			glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glBindBuffer(GL_ARRAY_BUFFER, deltaAttribBuffer);
-			glEnableVertexAttribArray(deltaZAttribLocation);
-			glVertexAttribPointer(deltaZAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
 			glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, 0);
 
 			glBindBuffer(GL_ARRAY_BUFFER, wing.getColorBuffer());
@@ -512,10 +512,6 @@ void main() {
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, 0);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-			glDisableVertexAttribArray(deltaZAttribLocation);
-			glDisableVertexAttribArray(colorAttribLocation);
-			glDisableVertexAttribArray(vertexAttribLocation);
 		}
 		glDisable(GL_POLYGON_OFFSET_FILL);
 
@@ -523,7 +519,7 @@ void main() {
 
 		glDeleteBuffers(1, &deltaAttribBuffer);
 
-		glDeleteVertexArrays(1, &vertexArray);
+		glBindVertexArray(0);
 	}
 
 	void Ortho(GLfloat const width, GLfloat const height)
