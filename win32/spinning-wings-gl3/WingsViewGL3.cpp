@@ -298,26 +298,32 @@ void main() {
 		}
 		else
 		{
-			Wing const& lastWing{ wings.back() };
-			wingVertexBuffer = lastWing.getVertexBuffer();
-			wingColorBuffer = lastWing.getColorBuffer();
-			wingEdgeColorBuffer = lastWing.getEdgeColorBuffer();
+			{
+				Wing const& lastWing{ wings.back() };
+				wingVertexBuffer = lastWing.getVertexBuffer();
+				wingColorBuffer = lastWing.getColorBuffer();
+				wingEdgeColorBuffer = lastWing.getEdgeColorBuffer();
+			}
 			wings.pop_back();
 		}
+
+		GLfloat const radius{ radiusCurve.getNextValue() };
+		GLfloat const angle{ angleCurve.getNextValue() };
+		GLfloat const deltaAngle{ deltaAngleCurve.getNextValue() };
+		GLfloat const deltaZ{ deltaZCurve.getNextValue() };
+		GLfloat const roll{ rollCurve.getNextValue() };
+		GLfloat const pitch{ pitchCurve.getNextValue() };
+		GLfloat const yaw{ yawCurve.getNextValue() };
+		GLfloat const red{ redCurve.getNextValue() };
+		GLfloat const green{ greenCurve.getNextValue() };
+		GLfloat const blue{ blueCurve.getNextValue() };
+
 		Wing const& wing{ wings.emplace_front(wingVertexBuffer,
 			wingColorBuffer,
 			wingEdgeColorBuffer,
-			radiusCurve.getNextValue(), angleCurve.getNextValue(),
-			deltaAngleCurve.getNextValue(), deltaZCurve.getNextValue(),
-			rollCurve.getNextValue(), pitchCurve.getNextValue(), yawCurve.getNextValue(),
-			Color{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
-			Color::WHITE) };
+			deltaAngle, deltaZ) };
 
 		{
-			Color const& color{ wing.getColor() };
-			GLfloat const red{ color.getRed() };
-			GLfloat const green{ color.getGreen() };
-			GLfloat const blue{ color.getBlue() };
 			GLfloat const colorData[12]{
 				red, green, blue,
 				red, green, blue,
@@ -332,10 +338,10 @@ void main() {
 		}
 
 		{
-			Color const& edgeColor{ wing.getEdgeColor() };
-			GLfloat const red{ edgeColor.getRed() };
-			GLfloat const green{ edgeColor.getGreen() };
-			GLfloat const blue{ edgeColor.getBlue() };
+			Color const wingEdgeColor{ Color::WHITE };
+			GLfloat const red{ wingEdgeColor.getRed() };
+			GLfloat const green{ wingEdgeColor.getGreen() };
+			GLfloat const blue{ wingEdgeColor.getBlue() };
 			GLfloat const edgeColorData[12]{
 				red, green, blue,
 				red, green, blue,
@@ -358,8 +364,6 @@ void main() {
 		GLuint rollPitchYawBuffer{ 0 };
 
 		{
-			GLfloat const radius{ wing.getRadius() };
-			GLfloat const angle{ wing.getAngle() };
 			GLfloat const angleRadiusData[8]{
 				radius, angle,
 				radius, angle,
@@ -376,9 +380,6 @@ void main() {
 		}
 
 		{
-			GLfloat const roll{ wing.getRoll() };
-			GLfloat const pitch{ wing.getPitch() };
-			GLfloat const yaw{ wing.getYaw() };
 			GLfloat const rollPitchYawData[12]{
 				roll, pitch, yaw,
 				roll, pitch, yaw,
@@ -438,69 +439,13 @@ void main() {
 		glGenBuffers(1, &deltaAttribBuffer);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		{
-			GLfloat deltaZ{ 0 };
-			GLfloat deltaAngle{ 0 };
-			for (Wing const& wing : wings) {
-				deltaZ += wing.getDeltaZ();
-				deltaAngle += wing.getDeltaAngle();
-
-				GLuint const wingVertexBuffer{ wing.getVertexBuffer() };
-				GLuint const wingColorBuffer{ wing.getEdgeColorBuffer() };
-
-				glBindBuffer(GL_ARRAY_BUFFER, wingVertexBuffer);
-				glVertexAttribPointer(vertexAttribLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-				glBindBuffer(GL_ARRAY_BUFFER, wingColorBuffer);
-				glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-				{
-					GLfloat const deltaData[8]{
-						deltaAngle, deltaZ,
-						deltaAngle, deltaZ,
-						deltaAngle, deltaZ,
-						deltaAngle, deltaZ,
-					};
-					GLsizeiptr const deltaDataSize{ sizeof(deltaData) };
-					static_assert(deltaDataSize == sizeof(GLfloat) * 2 * 4, "");
-					glBindBuffer(GL_ARRAY_BUFFER, deltaAttribBuffer);
-					glBufferData(GL_ARRAY_BUFFER, deltaDataSize, deltaData, GL_STATIC_DRAW);
-					glVertexAttribPointer(deltaZAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
-					glBindBuffer(GL_ARRAY_BUFFER, 0);
-				}
-
-				glEnableVertexAttribArray(vertexAttribLocation);
-				glEnableVertexAttribArray(colorAttribLocation);
-				glEnableVertexAttribArray(deltaZAttribLocation);
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
-				glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, 0);
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-				glDisableVertexAttribArray(deltaZAttribLocation);
-				glDisableVertexAttribArray(colorAttribLocation);
-				glDisableVertexAttribArray(vertexAttribLocation);
-			}
-		}
-
+		
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		GLfloat deltaZ{ 0 };
 		GLfloat deltaAngle{ 0 };
 		for (Wing const& wing : wings) {
 			deltaZ += wing.getDeltaZ();
 			deltaAngle += wing.getDeltaAngle();
-
-			GLuint const wingVertexBuffer{ wing.getVertexBuffer() };
-			GLuint const wingColorBuffer{ wing.getColorBuffer() };
-
-			glBindBuffer(GL_ARRAY_BUFFER, wingVertexBuffer);
-			glVertexAttribPointer(vertexAttribLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-			glBindBuffer(GL_ARRAY_BUFFER, wingColorBuffer);
-			glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			{
 				GLfloat const deltaData[8]{
@@ -517,10 +462,24 @@ void main() {
 				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
 
+			glBindBuffer(GL_ARRAY_BUFFER, wing.getVertexBuffer());
+			glVertexAttribPointer(vertexAttribLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			glBindBuffer(GL_ARRAY_BUFFER, wing.getEdgeColorBuffer());
+			glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 			glEnableVertexAttribArray(vertexAttribLocation);
 			glEnableVertexAttribArray(colorAttribLocation);
 			glEnableVertexAttribArray(deltaZAttribLocation);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
+			glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, 0);
+
+			glBindBuffer(GL_ARRAY_BUFFER, wing.getColorBuffer());
+			glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 			glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			glDisableVertexAttribArray(deltaZAttribLocation);
