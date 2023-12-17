@@ -241,10 +241,9 @@ mat4 scale(in vec3 factor) {
 )shaderText"
 		};
 
-		// TODO: #version 150
 		wingTransformProgram = new Program{
 			VertexShader{
-				R"shaderText(#version 130
+				R"shaderText(#version 150
 
 in vec2 vertex;
 in vec2 radiusAngle;
@@ -282,7 +281,7 @@ void main() {
 
 		renderProgram = new Program{
 			VertexShader{
-				R"shaderText(#version 130
+				R"shaderText(#version 150
 
 uniform mat4 model;
 uniform mat4 view;
@@ -314,7 +313,7 @@ void main() {
 				translateMatrixFunctionDeclaration,
 			},
 			FragmentShader{
-				R"shaderText(#version 130
+				R"shaderText(#version 150
 
 in vec4 varyingColor;
 
