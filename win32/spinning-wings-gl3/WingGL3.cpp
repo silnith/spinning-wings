@@ -4,10 +4,12 @@ namespace silnith::wings::gl3
 {
 
 	Wing::Wing(unsigned int vertexBuffer,
+		unsigned int colorBuffer,
+		unsigned int edgeColorBuffer,
 		float radius, float angle, float deltaAngle, float deltaZ,
 		float roll, float pitch, float yaw,
 		Color const& color, Color const& edgeColor) noexcept
-		: vertexBuffer{ vertexBuffer },
+		: vertexBuffer{ vertexBuffer }, colorBuffer{ colorBuffer }, edgeColorBuffer{ edgeColorBuffer },
 		radius{ radius }, angle{ angle }, deltaAngle{ deltaAngle }, deltaZ{ deltaZ },
 		roll{ roll }, pitch{ pitch }, yaw{ yaw },
 		color{ color }, edgeColor{ edgeColor }
@@ -16,6 +18,16 @@ namespace silnith::wings::gl3
 	unsigned int Wing::getVertexBuffer(void) const noexcept
 	{
 		return vertexBuffer;
+	}
+
+	unsigned int Wing::getColorBuffer(void) const noexcept
+	{
+		return colorBuffer;
+	}
+
+	unsigned int Wing::getEdgeColorBuffer(void) const noexcept
+	{
+		return edgeColorBuffer;
 	}
 
 	float Wing::getRadius(void) const noexcept

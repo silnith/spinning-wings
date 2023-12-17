@@ -120,11 +120,12 @@ namespace silnith::wings::gl3
 				1, -1,
 			};
 			GLsizeiptr const quadVerticesSize{ sizeof(quadVertices) };
-			static_assert(quadVerticesSize == sizeof(GLfloat) * 8, "Size of quad vertices array is not as expected.");
+			static_assert(quadVerticesSize == sizeof(GLfloat) * 2 * 4, "Size of quad vertices array is not as expected.");
 
 			glGenBuffers(1, &originalVertexBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
 			glBufferData(GL_ARRAY_BUFFER, quadVerticesSize, quadVertices, GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 
 		{
@@ -138,6 +139,7 @@ namespace silnith::wings::gl3
 			glGenBuffers(1, &wingIndexBuffer);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesSize, quadIndices, GL_STATIC_DRAW);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
 		std::string const rotateMatrixFunctionDeclaration{
@@ -263,11 +265,12 @@ void main() {
 		for (Wing const& wing : wings)
 		{
 			GLuint const vertexBuffer{ wing.getVertexBuffer() };
+			GLuint const colorBuffer{ wing.getColorBuffer() };
+			GLuint const edgeColorBuffer{ wing.getEdgeColorBuffer() };
 			glDeleteBuffers(1, &vertexBuffer);
+			glDeleteBuffers(1, &colorBuffer);
+			glDeleteBuffers(1, &edgeColorBuffer);
 		}
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glDeleteBuffers(1, &wingIndexBuffer);
 		glDeleteBuffers(1, &originalVertexBuffer);
@@ -281,46 +284,138 @@ void main() {
 	void AdvanceAnimation(void)
 	{
 		GLuint wingVertexBuffer{ 0 };
+		GLuint wingColorBuffer{ 0 };
+		GLuint wingEdgeColorBuffer{ 0 };
 		if (wings.empty() || wings.size() < numWings)
 		{
 			glGenBuffers(1, &wingVertexBuffer);
 			glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, wingVertexBuffer);
 			glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(GLfloat) * 4 * 4, nullptr, GL_STATIC_DRAW);
 			glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, 0);
+
+			glGenBuffers(1, &wingColorBuffer);
+			glGenBuffers(1, &wingEdgeColorBuffer);
 		}
 		else
 		{
 			Wing const& lastWing{ wings.back() };
 			wingVertexBuffer = lastWing.getVertexBuffer();
+			wingColorBuffer = lastWing.getColorBuffer();
+			wingEdgeColorBuffer = lastWing.getEdgeColorBuffer();
 			wings.pop_back();
 		}
 		Wing const& wing{ wings.emplace_front(wingVertexBuffer,
+			wingColorBuffer,
+			wingEdgeColorBuffer,
 			radiusCurve.getNextValue(), angleCurve.getNextValue(),
 			deltaAngleCurve.getNextValue(), deltaZCurve.getNextValue(),
 			rollCurve.getNextValue(), pitchCurve.getNextValue(), yawCurve.getNextValue(),
 			Color{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
 			Color::WHITE) };
 
+		{
+			Color const& color{ wing.getColor() };
+			GLfloat const red{ color.getRed() };
+			GLfloat const green{ color.getGreen() };
+			GLfloat const blue{ color.getBlue() };
+			GLfloat const colorData[12]{
+				red, green, blue,
+				red, green, blue,
+				red, green, blue,
+				red, green, blue,
+			};
+			GLsizeiptr const colorDataSize{ sizeof(colorData) };
+			static_assert(colorDataSize == sizeof(GLfloat) * 3 * 4, "");
+			glBindBuffer(GL_ARRAY_BUFFER, wingColorBuffer);
+			glBufferData(GL_ARRAY_BUFFER, colorDataSize, colorData, GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		}
+
+		{
+			Color const& edgeColor{ wing.getEdgeColor() };
+			GLfloat const red{ edgeColor.getRed() };
+			GLfloat const green{ edgeColor.getGreen() };
+			GLfloat const blue{ edgeColor.getBlue() };
+			GLfloat const edgeColorData[12]{
+				red, green, blue,
+				red, green, blue,
+				red, green, blue,
+				red, green, blue,
+			};
+			GLsizeiptr const edgeColorDataSize{ sizeof(edgeColorData) };
+			static_assert(edgeColorDataSize == sizeof(GLfloat) * 3 * 4, "");
+			glBindBuffer(GL_ARRAY_BUFFER, wingEdgeColorBuffer);
+			glBufferData(GL_ARRAY_BUFFER, edgeColorDataSize, edgeColorData, GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		}
+
 		wingTransformProgram->useProgram();
 		GLuint const vertexAttribLocation{ wingTransformProgram->getAttributeLocation("vertex") };
 		GLuint const radiusAngleAttribLocation{ wingTransformProgram->getAttributeLocation("radiusAngle") };
 		GLuint const rollPitchYawAttribLocation{ wingTransformProgram->getAttributeLocation("rollPitchYaw") };
 
-		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, wingVertexBuffer);
+		GLuint angleRadiusBuffer{ 0 };
+		GLuint rollPitchYawBuffer{ 0 };
+
+		{
+			GLfloat const radius{ wing.getRadius() };
+			GLfloat const angle{ wing.getAngle() };
+			GLfloat const angleRadiusData[8]{
+				radius, angle,
+				radius, angle,
+				radius, angle,
+				radius, angle,
+			};
+			GLsizeiptr const angleRadiusDataSize{ sizeof(angleRadiusData) };
+			static_assert(angleRadiusDataSize == sizeof(GLfloat) * 2 * 4, "");
+			glGenBuffers(1, &angleRadiusBuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, angleRadiusBuffer);
+			glBufferData(GL_ARRAY_BUFFER, angleRadiusDataSize, angleRadiusData, GL_STATIC_DRAW);
+			glVertexAttribPointer(radiusAngleAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		}
+
+		{
+			GLfloat const roll{ wing.getRoll() };
+			GLfloat const pitch{ wing.getPitch() };
+			GLfloat const yaw{ wing.getYaw() };
+			GLfloat const rollPitchYawData[12]{
+				roll, pitch, yaw,
+				roll, pitch, yaw,
+				roll, pitch, yaw,
+				roll, pitch, yaw,
+			};
+			GLsizeiptr const rollPitchYawDataSize{ sizeof(rollPitchYawData) };
+			static_assert(rollPitchYawDataSize == sizeof(GLfloat) * 3 * 4, "");
+			glGenBuffers(1, &rollPitchYawBuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, rollPitchYawBuffer);
+			glBufferData(GL_ARRAY_BUFFER, rollPitchYawDataSize, rollPitchYawData, GL_STATIC_DRAW);
+			glVertexAttribPointer(rollPitchYawAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		}
 
 		//glEnable(GL_RASTERIZER_DISCARD);
 
-		glBeginTransformFeedback(GL_POINTS);
 		glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
-		glVertexAttribPointer(vertexAttribLocation, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
-		glVertexAttrib2f(radiusAngleAttribLocation, wing.getRadius(), wing.getAngle());
-		glVertexAttrib3f(rollPitchYawAttribLocation, wing.getRoll(), wing.getPitch(), wing.getYaw());
+		glVertexAttribPointer(vertexAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, wingVertexBuffer);
+
 		glEnableVertexAttribArray(vertexAttribLocation);
+		glEnableVertexAttribArray(radiusAngleAttribLocation);
+		glEnableVertexAttribArray(rollPitchYawAttribLocation);
+		glBeginTransformFeedback(GL_POINTS);
 		glDrawArrays(GL_POINTS, 0, 4);
-		glDisableVertexAttribArray(vertexAttribLocation);
 		glEndTransformFeedback();
+		glDisableVertexAttribArray(rollPitchYawAttribLocation);
+		glDisableVertexAttribArray(radiusAngleAttribLocation);
+		glDisableVertexAttribArray(vertexAttribLocation);
 
 		//glDisable(GL_RASTERIZER_DISCARD);
+
+		glDeleteBuffers(1, &rollPitchYawBuffer);
+		glDeleteBuffers(1, &angleRadiusBuffer);
 	}
 
 	void DrawFrame(void)
@@ -338,6 +433,10 @@ void main() {
 		glUniformMatrix4fv(viewUniformLocation, 1, GL_FALSE, view);
 		glUniformMatrix4fv(projectionUniformLocation, 1, GL_FALSE, projection);
 
+		GLuint deltaAttribBuffer{ 0 };
+
+		glGenBuffers(1, &deltaAttribBuffer);
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		{
@@ -348,16 +447,39 @@ void main() {
 				deltaAngle += wing.getDeltaAngle();
 
 				GLuint const wingVertexBuffer{ wing.getVertexBuffer() };
+				GLuint const wingColorBuffer{ wing.getEdgeColorBuffer() };
 
 				glBindBuffer(GL_ARRAY_BUFFER, wingVertexBuffer);
 				glVertexAttribPointer(vertexAttribLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
+				glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-				Color const& edgeColor{ wing.getEdgeColor() };
-				glVertexAttrib3f(colorAttribLocation, edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
-				glVertexAttrib2f(deltaZAttribLocation, deltaAngle, deltaZ);
+				glBindBuffer(GL_ARRAY_BUFFER, wingColorBuffer);
+				glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+				glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+				{
+					GLfloat const deltaData[8]{
+						deltaAngle, deltaZ,
+						deltaAngle, deltaZ,
+						deltaAngle, deltaZ,
+						deltaAngle, deltaZ,
+					};
+					GLsizeiptr const deltaDataSize{ sizeof(deltaData) };
+					static_assert(deltaDataSize == sizeof(GLfloat) * 2 * 4, "");
+					glBindBuffer(GL_ARRAY_BUFFER, deltaAttribBuffer);
+					glBufferData(GL_ARRAY_BUFFER, deltaDataSize, deltaData, GL_STATIC_DRAW);
+					glVertexAttribPointer(deltaZAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
+				}
+
 				glEnableVertexAttribArray(vertexAttribLocation);
+				glEnableVertexAttribArray(colorAttribLocation);
+				glEnableVertexAttribArray(deltaZAttribLocation);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
 				glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, 0);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+				glDisableVertexAttribArray(deltaZAttribLocation);
+				glDisableVertexAttribArray(colorAttribLocation);
 				glDisableVertexAttribArray(vertexAttribLocation);
 			}
 		}
@@ -370,21 +492,46 @@ void main() {
 			deltaAngle += wing.getDeltaAngle();
 
 			GLuint const wingVertexBuffer{ wing.getVertexBuffer() };
+			GLuint const wingColorBuffer{ wing.getColorBuffer() };
 
 			glBindBuffer(GL_ARRAY_BUFFER, wingVertexBuffer);
 			glVertexAttribPointer(vertexAttribLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			Color const& color{ wing.getColor() };
-			glVertexAttrib3f(colorAttribLocation, color.getRed(), color.getGreen(), color.getBlue());
-			glVertexAttrib2f(deltaZAttribLocation, deltaAngle, deltaZ);
+			glBindBuffer(GL_ARRAY_BUFFER, wingColorBuffer);
+			glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			{
+				GLfloat const deltaData[8]{
+					deltaAngle, deltaZ,
+					deltaAngle, deltaZ,
+					deltaAngle, deltaZ,
+					deltaAngle, deltaZ,
+				};
+				GLsizeiptr const deltaDataSize{ sizeof(deltaData) };
+				static_assert(deltaDataSize == sizeof(GLfloat) * 2 * 4, "");
+				glBindBuffer(GL_ARRAY_BUFFER, deltaAttribBuffer);
+				glBufferData(GL_ARRAY_BUFFER, deltaDataSize, deltaData, GL_STATIC_DRAW);
+				glVertexAttribPointer(deltaZAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
+				glBindBuffer(GL_ARRAY_BUFFER, 0);
+			}
+
 			glEnableVertexAttribArray(vertexAttribLocation);
+			glEnableVertexAttribArray(colorAttribLocation);
+			glEnableVertexAttribArray(deltaZAttribLocation);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
 			glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			glDisableVertexAttribArray(deltaZAttribLocation);
+			glDisableVertexAttribArray(colorAttribLocation);
 			glDisableVertexAttribArray(vertexAttribLocation);
 		}
 		glDisable(GL_POLYGON_OFFSET_FILL);
 
 		glFlush();
+
+		glDeleteBuffers(1, &deltaAttribBuffer);
 	}
 
 	void Ortho(GLfloat const width, GLfloat const height)

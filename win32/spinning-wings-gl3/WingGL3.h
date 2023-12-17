@@ -39,6 +39,8 @@ namespace silnith::wings::gl3
 		/// Creates a new wing with the provided parameters.
 		/// </summary>
 		/// <param name="vertexBuffer">the OpenGL vertex buffer for this wing</param>
+		/// <param name="colorBuffer">the OpenGL color buffer identifier</param>
+		/// <param name="edgeColorBuffer">the OpenGL edge color buffer identifier</param>
 		/// <param name="radius">the radius from the central axis</param>
 		/// <param name="angle">the angle around the central axis</param>
 		/// <param name="deltaAngle">the additional angle around the central axis as the wing receds into history</param>
@@ -49,6 +51,8 @@ namespace silnith::wings::gl3
 		/// <param name="color">the color of the wing</param>
 		/// <param name="edgeColor">the color of the edge of the wing</param>
 		Wing(unsigned int vertexBuffer,
+			unsigned int colorBuffer,
+			unsigned int edgeColorBuffer,
 			float radius, float angle,
 			float deltaAngle, float deltaZ,
 			float roll, float pitch, float yaw,
@@ -58,10 +62,21 @@ namespace silnith::wings::gl3
 		/// <summary>
 		/// Returns the OpenGL vertex buffer identifier for this wing.
 		/// The vertex buffer will be populated using transform feedback.
-		/// When bound, enable it using <c>glVertexPointer(4, GL_FLOAT, 0, 0)</c>.
 		/// </summary>
 		/// <returns>the OpenGL vertex buffer identifier</returns>
 		unsigned int getVertexBuffer(void) const noexcept;
+
+		/// <summary>
+		/// Returns the OpenGL color buffer identifier for this wing.
+		/// </summary>
+		/// <returns>the OpenGL color buffer identifier</returns>
+		unsigned int getColorBuffer(void) const noexcept;
+
+		/// <summary>
+		/// Returns the OpenGL edge color buffer identifier for this wing.
+		/// </summary>
+		/// <returns>the OpenGL edge color buffer identifier</returns>
+		unsigned int getEdgeColorBuffer(void) const noexcept;
 
 		/// <summary>
 		/// Returns the distance of the wing from the central axis around which they all rotate.
@@ -124,6 +139,8 @@ namespace silnith::wings::gl3
 
 	private:
 		unsigned int const vertexBuffer{ 0 };
+		unsigned int const colorBuffer{ 0 };
+		unsigned int const edgeColorBuffer{ 0 };
 		float const radius{ 10 };
 		float const angle{ 0 };
 		float const deltaAngle{ 15 };
