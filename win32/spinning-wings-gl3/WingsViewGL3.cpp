@@ -39,7 +39,7 @@ namespace silnith::wings::gl3
 	CurveGenerator blueCurve{ CurveGenerator::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
 
 	Program* wingTransformProgram{ nullptr };
-	Program* renderingProgram{ nullptr };
+	Program* renderProgram{ nullptr };
 
 	/// <summary>
 	/// The initial untransformed vertices for a single quad.
@@ -54,7 +54,7 @@ namespace silnith::wings::gl3
 	/// The vertex array used for transform feedback.
 	/// This maintains the state of the enabled vertex attributes.
 	/// </summary>
-	GLuint transformVertexArray{ 0 };
+	GLuint wingTransformVertexArray{ 0 };
 	/// <summary>
 	/// The vertex array used for rendering.
 	/// This maintains the state of the enabled vertex attributes,
@@ -62,18 +62,54 @@ namespace silnith::wings::gl3
 	/// </summary>
 	GLuint renderVertexArray{ 0 };
 
+	/// <summary>
+	/// The model matrix to be passed to the vertex shaders.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// Remember that this is used in column-major order,
+	/// but in the source code it looks like it is in row-major order.
+	/// Therefore you need to transpose it in your mind.
+	/// Fortunately all the hard-coded source code appearances
+	/// are purely the identity matrix, where transposition does nothing.
+	/// </para>
+	/// </remarks>
 	GLfloat model[16]{
 		1, 0, 0, 0,
 		0, 1, 0, 0,
 		0, 0, 1, 0,
 		0, 0, 0, 1,
 	};
+	/// <summary>
+	/// The view matrix to be passed to the vertex shaders.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// Remember that this is used in column-major order,
+	/// but in the source code it looks like it is in row-major order.
+	/// Therefore you need to transpose it in your mind.
+	/// Fortunately all the hard-coded source code appearances
+	/// are purely the identity matrix, where transposition does nothing.
+	/// </para>
+	/// </remarks>
 	GLfloat view[16]{
 		1, 0, 0, 0,
 		0, 1, 0, 0,
 		0, 0, 1, 0,
 		0, 0, 0, 1,
 	};
+	/// <summary>
+	/// The projection matrix to be passed to the vertex shaders.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// Remember that this is used in column-major order,
+	/// but in the source code it looks like it is in row-major order.
+	/// Therefore you need to transpose it in your mind.
+	/// Fortunately all the hard-coded source code appearances
+	/// are purely the identity matrix, where transposition does nothing.
+	/// </para>
+	/// </remarks>
 	GLfloat projection[16]{
 		1, 0, 0, 0,
 		0, 1, 0, 0,
@@ -93,6 +129,7 @@ namespace silnith::wings::gl3
 
 		glEnable(GL_DEPTH_TEST);
 		glPolygonOffset(0.5, 2);
+		glEnable(GL_POLYGON_OFFSET_FILL);
 
 		glEnable(GL_LINE_SMOOTH);
 
@@ -105,25 +142,33 @@ namespace silnith::wings::gl3
 			glm::vec3{ 0, 50, 50 },
 			glm::vec3{ 0, 0, 13 },
 			glm::vec3{ 0, 0, 1 }) };
+		/*
+		 * I deliberately assign individual elements and avoid the array
+		 * block initialization syntax so that the column-major order
+		 * behavior is not confused with the row-major syntax of C++.
+		 */
 		view[0] = view2[0][0];
 		view[1] = view2[0][1];
 		view[2] = view2[0][2];
 		view[3] = view2[0][3];
+
 		view[4] = view2[1][0];
 		view[5] = view2[1][1];
 		view[6] = view2[1][2];
 		view[7] = view2[1][3];
+
 		view[8] = view2[2][0];
 		view[9] = view2[2][1];
 		view[10] = view2[2][2];
 		view[11] = view2[2][3];
+
 		view[12] = view2[3][0];
 		view[13] = view2[3][1];
 		view[14] = view2[3][2];
 		view[15] = view2[3][3];
 
 		{
-			GLfloat const quadVertices[8]
+			GLfloat const quadVertices[2 * 4]
 			{
 				1, 1,
 				-1, 1,
@@ -188,6 +233,13 @@ mat4 translate(in vec3 move) {
 }
 )shaderText"
 		};
+		std::string const scaleMatrixFunctionDeclaration{
+			R"shaderText(
+mat4 scale(in vec3 factor) {
+    return mat4(vec4(factor, 1));
+}
+)shaderText"
+		};
 
 		// TODO: #version 150
 		wingTransformProgram = new Program{
@@ -221,14 +273,14 @@ void main() {
 			},
 			std::vector<std::string>{"gl_Position"}
 		};
-		glGenVertexArrays(1, &transformVertexArray);
-		glBindVertexArray(transformVertexArray);
+		glGenVertexArrays(1, &wingTransformVertexArray);
+		glBindVertexArray(wingTransformVertexArray);
 		glEnableVertexAttribArray(wingTransformProgram->getAttributeLocation("vertex"));
 		glEnableVertexAttribArray(wingTransformProgram->getAttributeLocation("radiusAngle"));
 		glEnableVertexAttribArray(wingTransformProgram->getAttributeLocation("rollPitchYaw"));
 		glBindVertexArray(0);
 
-		renderingProgram = new Program{
+		renderProgram = new Program{
 			VertexShader{
 				R"shaderText(#version 130
 
@@ -277,9 +329,9 @@ void main() {
 		};
 		glGenVertexArrays(1, &renderVertexArray);
 		glBindVertexArray(renderVertexArray);
-		glEnableVertexAttribArray(renderingProgram->getAttributeLocation("vertex"));
-		glEnableVertexAttribArray(renderingProgram->getAttributeLocation("color"));
-		glEnableVertexAttribArray(renderingProgram->getAttributeLocation("deltaZ"));
+		glEnableVertexAttribArray(renderProgram->getAttributeLocation("vertex"));
+		glEnableVertexAttribArray(renderProgram->getAttributeLocation("color"));
+		glEnableVertexAttribArray(renderProgram->getAttributeLocation("deltaZ"));
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
 		glBindVertexArray(0);
 	}
@@ -297,15 +349,15 @@ void main() {
 		}
 
 		glDeleteVertexArrays(1, &renderVertexArray);
-		glDeleteVertexArrays(1, &transformVertexArray);
+		glDeleteVertexArrays(1, &wingTransformVertexArray);
 
 		glDeleteBuffers(1, &wingIndexBuffer);
 		glDeleteBuffers(1, &originalVertexBuffer);
 
 		delete wingTransformProgram;
 		wingTransformProgram = nullptr;
-		delete renderingProgram;
-		renderingProgram = nullptr;
+		delete renderProgram;
+		renderProgram = nullptr;
 	}
 
 	void AdvanceAnimation(void)
@@ -351,7 +403,7 @@ void main() {
 			deltaAngle, deltaZ) };
 
 		{
-			GLfloat const colorData[12]{
+			GLfloat const colorData[3 * 4]{
 				red, green, blue,
 				red, green, blue,
 				red, green, blue,
@@ -369,7 +421,7 @@ void main() {
 			GLfloat const red{ wingEdgeColor.getRed() };
 			GLfloat const green{ wingEdgeColor.getGreen() };
 			GLfloat const blue{ wingEdgeColor.getBlue() };
-			GLfloat const edgeColorData[12]{
+			GLfloat const edgeColorData[3 * 4]{
 				red, green, blue,
 				red, green, blue,
 				red, green, blue,
@@ -386,7 +438,7 @@ void main() {
 		GLuint rollPitchYawBuffer{ 0 };
 
 		{
-			GLfloat const angleRadiusData[8]{
+			GLfloat const angleRadiusData[2 * 4]{
 				radius, angle,
 				radius, angle,
 				radius, angle,
@@ -401,7 +453,7 @@ void main() {
 		}
 
 		{
-			GLfloat const rollPitchYawData[12]{
+			GLfloat const rollPitchYawData[3 * 4]{
 				roll, pitch, yaw,
 				roll, pitch, yaw,
 				roll, pitch, yaw,
@@ -420,9 +472,7 @@ void main() {
 		GLuint const radiusAngleAttribLocation{ wingTransformProgram->getAttributeLocation("radiusAngle") };
 		GLuint const rollPitchYawAttribLocation{ wingTransformProgram->getAttributeLocation("rollPitchYaw") };
 
-		//glEnable(GL_RASTERIZER_DISCARD);
-
-		glBindVertexArray(transformVertexArray);
+		glBindVertexArray(wingTransformVertexArray);
 
 		glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
 		glVertexAttribPointer(vertexAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
@@ -442,8 +492,6 @@ void main() {
 		glDrawArrays(GL_POINTS, 0, 4);
 		glEndTransformFeedback();
 
-		//glDisable(GL_RASTERIZER_DISCARD);
-
 		glBindVertexArray(0);
 
 		glDeleteBuffers(1, &rollPitchYawBuffer);
@@ -452,14 +500,14 @@ void main() {
 
 	void DrawFrame(void)
 	{
-		renderingProgram->useProgram();
-		GLuint const vertexAttribLocation{ renderingProgram->getAttributeLocation("vertex") };
-		GLuint const colorAttribLocation{ renderingProgram->getAttributeLocation("color") };
-		GLuint const deltaZAttribLocation{ renderingProgram->getAttributeLocation("deltaZ") };
+		renderProgram->useProgram();
+		GLuint const vertexAttribLocation{ renderProgram->getAttributeLocation("vertex") };
+		GLuint const colorAttribLocation{ renderProgram->getAttributeLocation("color") };
+		GLuint const deltaZAttribLocation{ renderProgram->getAttributeLocation("deltaZ") };
 
-		GLint const modelUniformLocation{ renderingProgram->getUniformLocation("model") };
-		GLint const viewUniformLocation{ renderingProgram->getUniformLocation("view") };
-		GLint const projectionUniformLocation{ renderingProgram->getUniformLocation("projection") };
+		GLint const modelUniformLocation{ renderProgram->getUniformLocation("model") };
+		GLint const viewUniformLocation{ renderProgram->getUniformLocation("view") };
+		GLint const projectionUniformLocation{ renderProgram->getUniformLocation("projection") };
 
 		glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, model);
 		glUniformMatrix4fv(viewUniformLocation, 1, GL_FALSE, view);
@@ -472,7 +520,6 @@ void main() {
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		glEnable(GL_POLYGON_OFFSET_FILL);
 		GLfloat deltaZ{ 0 };
 		GLfloat deltaAngle{ 0 };
 		for (Wing const& wing : wings) {
@@ -480,7 +527,7 @@ void main() {
 			deltaAngle += wing.getDeltaAngle();
 
 			{
-				GLfloat const deltaData[8]{
+				GLfloat const deltaData[2 * 4]{
 					deltaAngle, deltaZ,
 					deltaAngle, deltaZ,
 					deltaAngle, deltaZ,
@@ -513,7 +560,6 @@ void main() {
 
 			glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, 0);
 		}
-		glDisable(GL_POLYGON_OFFSET_FILL);
 
 		glFlush();
 
@@ -546,18 +592,26 @@ void main() {
 		GLfloat const viewHeight{ top - bottom };
 		GLfloat const viewDepth{ farZ - nearZ };
 
+		/*
+		 * I deliberately assign individual elements and avoid the array
+		 * block initialization syntax so that the column-major order
+		 * behavior is not confused with the row-major syntax of C++.
+		 */
 		projection[0] = static_cast<GLfloat>(2) / viewWidth;
 		projection[1] = 0;
 		projection[2] = 0;
 		projection[3] = 0;
+
 		projection[4] = 0;
 		projection[5] = static_cast<GLfloat>(2) / viewHeight;
 		projection[6] = 0;
 		projection[7] = 0;
+
 		projection[8] = 0;
 		projection[9] = 0;
 		projection[10] = static_cast<GLfloat>(-2) / viewDepth;
 		projection[11] = 0;
+
 		projection[12] = -(right + left) / viewWidth;
 		projection[13] = -(top + bottom) / viewHeight;
 		projection[14] = -(farZ + nearZ) / viewDepth;
