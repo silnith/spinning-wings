@@ -375,7 +375,6 @@ void main() {
 			glGenBuffers(1, &angleRadiusBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, angleRadiusBuffer);
 			glBufferData(GL_ARRAY_BUFFER, angleRadiusDataSize, angleRadiusData, GL_STATIC_DRAW);
-			glVertexAttribPointer(radiusAngleAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 
@@ -391,21 +390,32 @@ void main() {
 			glGenBuffers(1, &rollPitchYawBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, rollPitchYawBuffer);
 			glBufferData(GL_ARRAY_BUFFER, rollPitchYawDataSize, rollPitchYawData, GL_STATIC_DRAW);
-			glVertexAttribPointer(rollPitchYawAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 
 		//glEnable(GL_RASTERIZER_DISCARD);
 
+		GLuint vertexArray{ 0 };
+		glGenVertexArrays(1, &vertexArray);
+		glBindVertexArray(vertexArray);
+
 		glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
+		glEnableVertexAttribArray(vertexAttribLocation);
 		glVertexAttribPointer(vertexAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, angleRadiusBuffer);
+		glEnableVertexAttribArray(radiusAngleAttribLocation);
+		glVertexAttribPointer(radiusAngleAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, rollPitchYawBuffer);
+		glEnableVertexAttribArray(rollPitchYawAttribLocation);
+		glVertexAttribPointer(rollPitchYawAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, wingVertexBuffer);
 
-		glEnableVertexAttribArray(vertexAttribLocation);
-		glEnableVertexAttribArray(radiusAngleAttribLocation);
-		glEnableVertexAttribArray(rollPitchYawAttribLocation);
 		glBeginTransformFeedback(GL_POINTS);
 		glDrawArrays(GL_POINTS, 0, 4);
 		glEndTransformFeedback();
@@ -417,6 +427,8 @@ void main() {
 
 		glDeleteBuffers(1, &rollPitchYawBuffer);
 		glDeleteBuffers(1, &angleRadiusBuffer);
+
+		glDeleteVertexArrays(1, &vertexArray);
 	}
 
 	void DrawFrame(void)
@@ -435,6 +447,10 @@ void main() {
 		glUniformMatrix4fv(projectionUniformLocation, 1, GL_FALSE, projection);
 
 		GLuint deltaAttribBuffer{ 0 };
+
+		GLuint vertexArray{ 0 };
+		glGenVertexArrays(1, &vertexArray);
+		glBindVertexArray(vertexArray);
 
 		glGenBuffers(1, &deltaAttribBuffer);
 
@@ -458,21 +474,24 @@ void main() {
 				static_assert(deltaDataSize == sizeof(GLfloat) * 2 * 4, "");
 				glBindBuffer(GL_ARRAY_BUFFER, deltaAttribBuffer);
 				glBufferData(GL_ARRAY_BUFFER, deltaDataSize, deltaData, GL_STATIC_DRAW);
-				glVertexAttribPointer(deltaZAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
 				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
 
 			glBindBuffer(GL_ARRAY_BUFFER, wing.getVertexBuffer());
+			glEnableVertexAttribArray(vertexAttribLocation);
 			glVertexAttribPointer(vertexAttribLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glBindBuffer(GL_ARRAY_BUFFER, wing.getEdgeColorBuffer());
+			glEnableVertexAttribArray(colorAttribLocation);
 			glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(vertexAttribLocation);
-			glEnableVertexAttribArray(colorAttribLocation);
+			glBindBuffer(GL_ARRAY_BUFFER, deltaAttribBuffer);
 			glEnableVertexAttribArray(deltaZAttribLocation);
+			glVertexAttribPointer(deltaZAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
 			glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, 0);
 
@@ -491,6 +510,8 @@ void main() {
 		glFlush();
 
 		glDeleteBuffers(1, &deltaAttribBuffer);
+
+		glDeleteVertexArrays(1, &vertexArray);
 	}
 
 	void Ortho(GLfloat const width, GLfloat const height)
