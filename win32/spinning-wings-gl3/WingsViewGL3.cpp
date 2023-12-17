@@ -245,9 +245,10 @@ mat4 scale(in vec3 factor) {
 			VertexShader{
 				R"shaderText(#version 150
 
+uniform vec2 radiusAngle;
+uniform vec3 rollPitchYaw;
+
 in vec2 vertex;
-in vec2 radiusAngle;
-in vec3 rollPitchYaw;
 
 mat4 rotate(in float angle, in vec3 axis);
 mat4 translate(in vec3 move);
@@ -275,8 +276,6 @@ void main() {
 		glGenVertexArrays(1, &wingTransformVertexArray);
 		glBindVertexArray(wingTransformVertexArray);
 		glEnableVertexAttribArray(wingTransformProgram->getAttributeLocation("vertex"));
-		glEnableVertexAttribArray(wingTransformProgram->getAttributeLocation("radiusAngle"));
-		glEnableVertexAttribArray(wingTransformProgram->getAttributeLocation("rollPitchYaw"));
 		glBindVertexArray(0);
 
 		renderProgram = new Program{
@@ -287,9 +286,10 @@ uniform mat4 model = mat4(1);
 uniform mat4 view = mat4(1);
 uniform mat4 projection = mat4(1);
 
+uniform vec2 deltaZ;
+
 in vec4 vertex;
 in vec3 color;
-in vec2 deltaZ;
 
 smooth out vec4 varyingColor;
 
@@ -330,7 +330,6 @@ void main() {
 		glBindVertexArray(renderVertexArray);
 		glEnableVertexAttribArray(renderProgram->getAttributeLocation("vertex"));
 		glEnableVertexAttribArray(renderProgram->getAttributeLocation("color"));
-		glEnableVertexAttribArray(renderProgram->getAttributeLocation("deltaZ"));
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
 		glBindVertexArray(0);
 	}
@@ -433,57 +432,17 @@ void main() {
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 
-		GLuint angleRadiusBuffer{ 0 };
-		GLuint rollPitchYawBuffer{ 0 };
-
-		{
-			GLfloat const angleRadiusData[2 * 4]{
-				radius, angle,
-				radius, angle,
-				radius, angle,
-				radius, angle,
-			};
-			GLsizeiptr const angleRadiusDataSize{ sizeof(angleRadiusData) };
-			static_assert(angleRadiusDataSize == sizeof(GLfloat) * 2 * 4, "I do not know how sizeof works.");
-			glGenBuffers(1, &angleRadiusBuffer);
-			glBindBuffer(GL_ARRAY_BUFFER, angleRadiusBuffer);
-			glBufferData(GL_ARRAY_BUFFER, angleRadiusDataSize, angleRadiusData, GL_STATIC_DRAW);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-		}
-
-		{
-			GLfloat const rollPitchYawData[3 * 4]{
-				roll, pitch, yaw,
-				roll, pitch, yaw,
-				roll, pitch, yaw,
-				roll, pitch, yaw,
-			};
-			GLsizeiptr const rollPitchYawDataSize{ sizeof(rollPitchYawData) };
-			static_assert(rollPitchYawDataSize == sizeof(GLfloat) * 3 * 4, "I do not know how sizeof works.");
-			glGenBuffers(1, &rollPitchYawBuffer);
-			glBindBuffer(GL_ARRAY_BUFFER, rollPitchYawBuffer);
-			glBufferData(GL_ARRAY_BUFFER, rollPitchYawDataSize, rollPitchYawData, GL_STATIC_DRAW);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-		}
-
 		wingTransformProgram->useProgram();
-		GLuint const vertexAttribLocation{ wingTransformProgram->getAttributeLocation("vertex") };
-		GLuint const radiusAngleAttribLocation{ wingTransformProgram->getAttributeLocation("radiusAngle") };
-		GLuint const rollPitchYawAttribLocation{ wingTransformProgram->getAttributeLocation("rollPitchYaw") };
 
 		glBindVertexArray(wingTransformVertexArray);
 
 		glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
-		glVertexAttribPointer(vertexAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(wingTransformProgram->getAttributeLocation("vertex"), 2, GL_FLOAT, GL_FALSE, 0, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, angleRadiusBuffer);
-		glVertexAttribPointer(radiusAngleAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glUniform2f(wingTransformProgram->getUniformLocation("radiusAngle"), radius, angle);
 
-		glBindBuffer(GL_ARRAY_BUFFER, rollPitchYawBuffer);
-		glVertexAttribPointer(rollPitchYawAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glUniform3f(wingTransformProgram->getUniformLocation("rollPitchYaw"), roll, pitch, yaw);
 
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, wingVertexBuffer);
 
@@ -492,9 +451,6 @@ void main() {
 		glEndTransformFeedback();
 
 		glBindVertexArray(0);
-
-		glDeleteBuffers(1, &rollPitchYawBuffer);
-		glDeleteBuffers(1, &angleRadiusBuffer);
 	}
 
 	void DrawFrame(void)
@@ -502,7 +458,6 @@ void main() {
 		renderProgram->useProgram();
 		GLuint const vertexAttribLocation{ renderProgram->getAttributeLocation("vertex") };
 		GLuint const colorAttribLocation{ renderProgram->getAttributeLocation("color") };
-		GLuint const deltaZAttribLocation{ renderProgram->getAttributeLocation("deltaZ") };
 
 		GLint const modelUniformLocation{ renderProgram->getUniformLocation("model") };
 		GLint const viewUniformLocation{ renderProgram->getUniformLocation("view") };
@@ -525,23 +480,7 @@ void main() {
 			deltaZ += wing.getDeltaZ();
 			deltaAngle += wing.getDeltaAngle();
 
-			{
-				GLfloat const deltaData[2 * 4]{
-					deltaAngle, deltaZ,
-					deltaAngle, deltaZ,
-					deltaAngle, deltaZ,
-					deltaAngle, deltaZ,
-				};
-				GLsizeiptr const deltaDataSize{ sizeof(deltaData) };
-				static_assert(deltaDataSize == sizeof(GLfloat) * 2 * 4, "I do not know how sizeof works.");
-				glBindBuffer(GL_ARRAY_BUFFER, deltaAttribBuffer);
-				glBufferData(GL_ARRAY_BUFFER, deltaDataSize, deltaData, GL_STATIC_DRAW);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
-			}
-
-			glBindBuffer(GL_ARRAY_BUFFER, deltaAttribBuffer);
-			glVertexAttribPointer(deltaZAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glUniform2f(renderProgram->getUniformLocation("deltaZ"), deltaAngle, deltaZ);
 
 			glBindBuffer(GL_ARRAY_BUFFER, wing.getVertexBuffer());
 			glVertexAttribPointer(vertexAttribLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
