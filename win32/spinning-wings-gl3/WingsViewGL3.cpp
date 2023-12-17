@@ -433,16 +433,14 @@ void main() {
 		}
 
 		wingTransformProgram->useProgram();
+		glUniform2f(wingTransformProgram->getUniformLocation("radiusAngle"), radius, angle);
+		glUniform3f(wingTransformProgram->getUniformLocation("rollPitchYaw"), roll, pitch, yaw);
 
 		glBindVertexArray(wingTransformVertexArray);
 
 		glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
 		glVertexAttribPointer(wingTransformProgram->getAttributeLocation("vertex"), 2, GL_FLOAT, GL_FALSE, 0, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		glUniform2f(wingTransformProgram->getUniformLocation("radiusAngle"), radius, angle);
-
-		glUniform3f(wingTransformProgram->getUniformLocation("rollPitchYaw"), roll, pitch, yaw);
 
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, wingVertexBuffer);
 
@@ -459,13 +457,9 @@ void main() {
 		GLuint const vertexAttribLocation{ renderProgram->getAttributeLocation("vertex") };
 		GLuint const colorAttribLocation{ renderProgram->getAttributeLocation("color") };
 
-		GLint const modelUniformLocation{ renderProgram->getUniformLocation("model") };
-		GLint const viewUniformLocation{ renderProgram->getUniformLocation("view") };
-		GLint const projectionUniformLocation{ renderProgram->getUniformLocation("projection") };
-
-		glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, model);
-		glUniformMatrix4fv(viewUniformLocation, 1, GL_FALSE, view);
-		glUniformMatrix4fv(projectionUniformLocation, 1, GL_FALSE, projection);
+		glUniformMatrix4fv(renderProgram->getUniformLocation("model"), 1, GL_FALSE, model);
+		glUniformMatrix4fv(renderProgram->getUniformLocation("view"), 1, GL_FALSE, view);
+		glUniformMatrix4fv(renderProgram->getUniformLocation("projection"), 1, GL_FALSE, projection);
 
 		GLuint deltaAttribBuffer{ 0 };
 		glGenBuffers(1, &deltaAttribBuffer);
