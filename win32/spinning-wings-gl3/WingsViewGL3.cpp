@@ -50,6 +50,8 @@ namespace silnith::wings::gl3
 	/// The indices into <c>originalVertexBuffer</c>.
 	/// </summary>
 	GLuint wingIndexBuffer{ 0 };
+	GLuint transformVertexArray{ 0 };
+	GLuint renderVertexArray{ 0 };
 
 	GLfloat model[16]{
 		1, 0, 0, 0,
@@ -210,6 +212,12 @@ void main() {
 			},
 			std::vector<std::string>{"gl_Position"}
 		};
+		glGenVertexArrays(1, &transformVertexArray);
+		glBindVertexArray(transformVertexArray);
+		glEnableVertexAttribArray(wingTransformProgram->getAttributeLocation("vertex"));
+		glEnableVertexAttribArray(wingTransformProgram->getAttributeLocation("radiusAngle"));
+		glEnableVertexAttribArray(wingTransformProgram->getAttributeLocation("rollPitchYaw"));
+		glBindVertexArray(0);
 
 		renderingProgram = new Program{
 			VertexShader{
@@ -258,6 +266,13 @@ void main() {
 			},
 			"fragmentColor"
 		};
+		glGenVertexArrays(1, &renderVertexArray);
+		glBindVertexArray(renderVertexArray);
+		glEnableVertexAttribArray(wingTransformProgram->getAttributeLocation("vertex"));
+		glEnableVertexAttribArray(wingTransformProgram->getAttributeLocation("color"));
+		glEnableVertexAttribArray(wingTransformProgram->getAttributeLocation("deltaZ"));
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
+		glBindVertexArray(0);
 	}
 
 	void CleanupOpenGLState(void)
@@ -271,6 +286,9 @@ void main() {
 			glDeleteBuffers(1, &colorBuffer);
 			glDeleteBuffers(1, &edgeColorBuffer);
 		}
+
+		glDeleteVertexArrays(1, &renderVertexArray);
+		glDeleteVertexArrays(1, &transformVertexArray);
 
 		glDeleteBuffers(1, &wingIndexBuffer);
 		glDeleteBuffers(1, &originalVertexBuffer);
@@ -395,22 +413,19 @@ void main() {
 
 		//glEnable(GL_RASTERIZER_DISCARD);
 
-		GLuint vertexArray{ 0 };
-		glGenVertexArrays(1, &vertexArray);
-		glBindVertexArray(vertexArray);
+		glBindVertexArray(transformVertexArray);
 
 		glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
-		glEnableVertexAttribArray(vertexAttribLocation);
 		glVertexAttribPointer(vertexAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+		//glEnableVertexArrayAttrib(vertexArray, vertexAttribLocation);
+
 		glBindBuffer(GL_ARRAY_BUFFER, angleRadiusBuffer);
-		glEnableVertexAttribArray(radiusAngleAttribLocation);
 		glVertexAttribPointer(radiusAngleAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, rollPitchYawBuffer);
-		glEnableVertexAttribArray(rollPitchYawAttribLocation);
 		glVertexAttribPointer(rollPitchYawAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -419,16 +434,13 @@ void main() {
 		glBeginTransformFeedback(GL_POINTS);
 		glDrawArrays(GL_POINTS, 0, 4);
 		glEndTransformFeedback();
-		glDisableVertexAttribArray(rollPitchYawAttribLocation);
-		glDisableVertexAttribArray(radiusAngleAttribLocation);
-		glDisableVertexAttribArray(vertexAttribLocation);
 
 		//glDisable(GL_RASTERIZER_DISCARD);
 
+		glBindVertexArray(0);
+
 		glDeleteBuffers(1, &rollPitchYawBuffer);
 		glDeleteBuffers(1, &angleRadiusBuffer);
-
-		glDeleteVertexArrays(1, &vertexArray);
 	}
 
 	void DrawFrame(void)
