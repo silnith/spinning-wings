@@ -131,7 +131,7 @@ namespace silnith::wings::gl3
 				1, -1,
 			};
 			GLsizeiptr const quadVerticesSize{ sizeof(quadVertices) };
-			static_assert(quadVerticesSize == sizeof(GLfloat) * 2 * 4, "Size of quad vertices array is not as expected.");
+			static_assert(quadVerticesSize == sizeof(GLfloat) * 2 * 4, "I do not know how sizeof works.");
 
 			glGenBuffers(1, &originalVertexBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
@@ -358,7 +358,7 @@ void main() {
 				red, green, blue,
 			};
 			GLsizeiptr const colorDataSize{ sizeof(colorData) };
-			static_assert(colorDataSize == sizeof(GLfloat) * 3 * 4, "");
+			static_assert(colorDataSize == sizeof(GLfloat) * 3 * 4, "I do not know how sizeof works.");
 			glBindBuffer(GL_ARRAY_BUFFER, wingColorBuffer);
 			glBufferData(GL_ARRAY_BUFFER, colorDataSize, colorData, GL_STATIC_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -376,7 +376,7 @@ void main() {
 				red, green, blue,
 			};
 			GLsizeiptr const edgeColorDataSize{ sizeof(edgeColorData) };
-			static_assert(edgeColorDataSize == sizeof(GLfloat) * 3 * 4, "");
+			static_assert(edgeColorDataSize == sizeof(GLfloat) * 3 * 4, "I do not know how sizeof works.");
 			glBindBuffer(GL_ARRAY_BUFFER, wingEdgeColorBuffer);
 			glBufferData(GL_ARRAY_BUFFER, edgeColorDataSize, edgeColorData, GL_STATIC_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -393,7 +393,7 @@ void main() {
 				radius, angle,
 			};
 			GLsizeiptr const angleRadiusDataSize{ sizeof(angleRadiusData) };
-			static_assert(angleRadiusDataSize == sizeof(GLfloat) * 2 * 4, "");
+			static_assert(angleRadiusDataSize == sizeof(GLfloat) * 2 * 4, "I do not know how sizeof works.");
 			glGenBuffers(1, &angleRadiusBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, angleRadiusBuffer);
 			glBufferData(GL_ARRAY_BUFFER, angleRadiusDataSize, angleRadiusData, GL_STATIC_DRAW);
@@ -408,7 +408,7 @@ void main() {
 				roll, pitch, yaw,
 			};
 			GLsizeiptr const rollPitchYawDataSize{ sizeof(rollPitchYawData) };
-			static_assert(rollPitchYawDataSize == sizeof(GLfloat) * 3 * 4, "");
+			static_assert(rollPitchYawDataSize == sizeof(GLfloat) * 3 * 4, "I do not know how sizeof works.");
 			glGenBuffers(1, &rollPitchYawBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, rollPitchYawBuffer);
 			glBufferData(GL_ARRAY_BUFFER, rollPitchYawDataSize, rollPitchYawData, GL_STATIC_DRAW);
@@ -487,7 +487,7 @@ void main() {
 					deltaAngle, deltaZ,
 				};
 				GLsizeiptr const deltaDataSize{ sizeof(deltaData) };
-				static_assert(deltaDataSize == sizeof(GLfloat) * 2 * 4, "");
+				static_assert(deltaDataSize == sizeof(GLfloat) * 2 * 4, "I do not know how sizeof works.");
 				glBindBuffer(GL_ARRAY_BUFFER, deltaAttribBuffer);
 				glBufferData(GL_ARRAY_BUFFER, deltaDataSize, deltaData, GL_STATIC_DRAW);
 				glBindBuffer(GL_ARRAY_BUFFER, 0);
