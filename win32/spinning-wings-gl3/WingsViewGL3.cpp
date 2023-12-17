@@ -248,7 +248,7 @@ mat4 scale(in vec3 factor) {
 uniform vec2 radiusAngle;
 uniform vec3 rollPitchYaw;
 
-in vec2 vertex;
+in vec4 vertex;
 
 mat4 rotate(in float angle, in vec3 axis);
 mat4 translate(in vec3 move);
@@ -269,7 +269,7 @@ void main() {
                               * rotate(-yaw, zAxis)
                               * rotate(-pitch, yAxis)
                               * rotate(roll, xAxis);
-    gl_Position = wingTransformation * vec4(vertex, 0, 1);
+    gl_Position = wingTransformation * vertex;
 }
 )shaderText",
 				rotateMatrixFunctionDeclaration,
@@ -293,7 +293,7 @@ uniform mat4 projection = mat4(1);
 uniform vec2 deltaZ;
 
 in vec4 vertex;
-in vec3 color;
+in vec4 color;
 
 smooth out vec4 varyingColor;
 
@@ -310,7 +310,7 @@ void main() {
 
     mat4 modelViewProjection = projection * view * model;
 
-    varyingColor = vec4(color, 1);
+    varyingColor = color;
     gl_Position = modelViewProjection
                   * translate(vec3(0, 0, deltaZ))
                   * rotate(deltaAngle, zAxis)
