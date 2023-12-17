@@ -283,9 +283,9 @@ void main() {
 			VertexShader{
 				R"shaderText(#version 150
 
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+uniform mat4 model = mat4(1);
+uniform mat4 view = mat4(1);
+uniform mat4 projection = mat4(1);
 
 in vec4 vertex;
 in vec3 color;
