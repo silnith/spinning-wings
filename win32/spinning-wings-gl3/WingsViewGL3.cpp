@@ -290,7 +290,7 @@ uniform mat4 model = mat4(1);
 uniform mat4 view = mat4(1);
 uniform mat4 projection = mat4(1);
 
-uniform vec2 deltaZ;
+uniform vec2 deltaZ = vec2(15, 0.5);
 
 in vec4 vertex;
 in vec4 color;
