@@ -368,6 +368,17 @@ void main() {
 
 	void AdvanceAnimation(void)
 	{
+		GLfloat const radius{ radiusCurve.getNextValue() };
+		GLfloat const angle{ angleCurve.getNextValue() };
+		GLfloat const deltaAngle{ deltaAngleCurve.getNextValue() };
+		GLfloat const deltaZ{ deltaZCurve.getNextValue() };
+		GLfloat const roll{ rollCurve.getNextValue() };
+		GLfloat const pitch{ pitchCurve.getNextValue() };
+		GLfloat const yaw{ yawCurve.getNextValue() };
+		GLfloat const red{ redCurve.getNextValue() };
+		GLfloat const green{ greenCurve.getNextValue() };
+		GLfloat const blue{ blueCurve.getNextValue() };
+
 		GLuint wingVertexBuffer{ 0 };
 		GLuint wingColorBuffer{ 0 };
 		GLuint wingEdgeColorBuffer{ 0 };
@@ -391,17 +402,6 @@ void main() {
 			}
 			wings.pop_back();
 		}
-
-		GLfloat const radius{ radiusCurve.getNextValue() };
-		GLfloat const angle{ angleCurve.getNextValue() };
-		GLfloat const deltaAngle{ deltaAngleCurve.getNextValue() };
-		GLfloat const deltaZ{ deltaZCurve.getNextValue() };
-		GLfloat const roll{ rollCurve.getNextValue() };
-		GLfloat const pitch{ pitchCurve.getNextValue() };
-		GLfloat const yaw{ yawCurve.getNextValue() };
-		GLfloat const red{ redCurve.getNextValue() };
-		GLfloat const green{ greenCurve.getNextValue() };
-		GLfloat const blue{ blueCurve.getNextValue() };
 
 		Wing const& wing{ wings.emplace_front(wingVertexBuffer,
 			wingColorBuffer,
