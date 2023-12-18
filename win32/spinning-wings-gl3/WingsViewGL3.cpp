@@ -375,7 +375,7 @@ void main() {
 		{
 			glGenBuffers(1, &wingVertexBuffer);
 			glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, wingVertexBuffer);
-			glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(GLfloat) * 4 * 4, nullptr, GL_DYNAMIC_DRAW);
+			glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(GLfloat) * 4 * 4, nullptr, GL_STREAM_DRAW);
 			glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, 0);
 
 			glGenBuffers(1, &wingColorBuffer);
@@ -418,7 +418,7 @@ void main() {
 			GLsizeiptr const colorDataSize{ sizeof(colorData) };
 			static_assert(colorDataSize == sizeof(GLfloat) * 3 * 4, "I do not know how sizeof works.");
 			glBindBuffer(GL_ARRAY_BUFFER, wingColorBuffer);
-			glBufferData(GL_ARRAY_BUFFER, colorDataSize, colorData, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, colorDataSize, colorData, GL_STREAM_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 
@@ -436,7 +436,7 @@ void main() {
 			GLsizeiptr const edgeColorDataSize{ sizeof(edgeColorData) };
 			static_assert(edgeColorDataSize == sizeof(GLfloat) * 3 * 4, "I do not know how sizeof works.");
 			glBindBuffer(GL_ARRAY_BUFFER, wingEdgeColorBuffer);
-			glBufferData(GL_ARRAY_BUFFER, edgeColorDataSize, edgeColorData, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, edgeColorDataSize, edgeColorData, GL_STREAM_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 
