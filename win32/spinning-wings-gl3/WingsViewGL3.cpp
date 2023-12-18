@@ -385,15 +385,16 @@ void main() {
 		if (wings.empty() || wings.size() < numWings)
 		{
 			glGenBuffers(1, &wingVertexBuffer);
-			glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, wingVertexBuffer);
-			glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(GLfloat) * 4 * 4, nullptr, GL_STREAM_DRAW);
-			glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, 0);
+			glBindBuffer(GL_ARRAY_BUFFER, wingVertexBuffer);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * 4, nullptr, GL_STREAM_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glGenBuffers(1, &wingColorBuffer);
 			glGenBuffers(1, &wingEdgeColorBuffer);
 		}
 		else
 		{
+			// This block is simply so lastWing goes out of scope before the pop_back.
 			{
 				Wing const& lastWing{ wings.back() };
 				wingVertexBuffer = lastWing.getVertexBuffer();
