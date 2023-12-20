@@ -298,8 +298,9 @@ mat4 scale(in vec3 factor) {
 )shaderText"
 			};
 
-			std::vector<std::string> vertexSources{
-				R"shaderText(#version 120
+			glslProgram = new Program{
+				VertexShader{
+					R"shaderText(#version 120
 
 attribute vec2 deltaZ;
 attribute vec2 radiusAngle;
@@ -307,6 +308,10 @@ attribute vec3 rollPitchYaw;
 
 mat4 rotate(in float angle, in vec3 axis);
 mat4 translate(in vec3 move);
+
+const vec3 xAxis = vec3(1, 0, 0);
+const vec3 yAxis = vec3(0, 1, 0);
+const vec3 zAxis = vec3(0, 0, 1);
 
 void main() {
     float radius = radiusAngle[0];
@@ -317,36 +322,32 @@ void main() {
     float pitch = rollPitchYaw[1];
     float yaw = rollPitchYaw[2];
 
-    mat4 deltaZ_trans = translate(vec3(0, 0, deltaZ));
-    mat4 deltaAngle_rot = rotate(deltaAngle, vec3(0, 0, 1));
-
-    mat4 angle_rot = rotate(angle, vec3(0, 0, 1));
-    mat4 radius_trans = translate(vec3(radius, 0, 0));
-
-    mat4 yaw_rot = rotate(-yaw, vec3(0, 0, 1));
-    mat4 pitch_rot = rotate(-pitch, vec3(0, 1, 0));
-    mat4 roll_rot = rotate(roll, vec3(1, 0, 0));
+    mat4 deltaTransformation = translate(vec3(0, 0, deltaZ))
+                               * rotate(deltaAngle, zAxis);
+    mat4 wingTransformation = rotate(angle, zAxis)
+                              * translate(vec3(radius, 0, 0))
+                              * rotate(-yaw, zAxis)
+                              * rotate(-pitch, yAxis)
+                              * rotate(roll, xAxis);
 
     gl_FrontColor = gl_Color;
     gl_BackColor = gl_Color;
-    gl_Position = gl_ModelViewProjectionMatrix * deltaZ_trans * deltaAngle_rot * angle_rot * radius_trans * yaw_rot * pitch_rot * roll_rot * gl_Vertex;
+    gl_Position = gl_ModelViewProjectionMatrix * deltaTransformation * wingTransformation * gl_Vertex;
 }
 )shaderText",
-				rotateMatrixFunctionDeclaration,
-				translateMatrixFunctionDeclaration,
-			};
-
-			std::vector<std::string> fragmentSources{
-				R"shaderText(#version 120
+					rotateMatrixFunctionDeclaration,
+					translateMatrixFunctionDeclaration,
+				},
+				FragmentShader{
+					R"shaderText(#version 120
 
 void main() {
     gl_FragColor = gl_Color;
     gl_FragDepth = gl_FragCoord.z;
 }
 )shaderText",
+				}
 			};
-
-			glslProgram = new Program{ VertexShader{ vertexSources }, FragmentShader{ fragmentSources } };
 
 			deltaZAttribLocation = glslProgram->getAttributeLocation("deltaZ");
 			radiusAngleAttribLocation = glslProgram->getAttributeLocation("radiusAngle");

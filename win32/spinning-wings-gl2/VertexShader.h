@@ -2,6 +2,7 @@
 
 #include "Shader.h"
 
+#include <initializer_list>
 #include <string>
 #include <vector>
 
@@ -26,6 +27,7 @@ namespace silnith::wings::gl2
         ~VertexShader(void) noexcept = default;
     public:
         VertexShader(std::vector<std::string> const&);
+        VertexShader(std::initializer_list<std::string> const&);
 
     private:
     };
