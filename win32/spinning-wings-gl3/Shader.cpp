@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <stdexcept>
+#include <vector>
 
 namespace silnith::wings::gl3
 {
@@ -11,9 +12,10 @@ namespace silnith::wings::gl3
         glDeleteShader(id);
     }
 
-    Shader::Shader(GLenum type, std::vector<std::string> const& sources_)
+    Shader::Shader(GLenum type, std::initializer_list<std::string> const& sources_)
         : id{ glCreateShader(type) }, compilationLog{}
     {
+        // Limit scope of copies of string sources.
         {
             std::vector<std::string> sources{ sources_ };
             for (std::string& source : sources)

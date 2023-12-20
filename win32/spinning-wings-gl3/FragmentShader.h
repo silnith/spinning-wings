@@ -4,7 +4,6 @@
 
 #include <initializer_list>
 #include <string>
-#include <vector>
 
 namespace silnith::wings::gl3
 {
@@ -13,7 +12,7 @@ namespace silnith::wings::gl3
     /// </summary>
     /// <remarks>
     /// <para>
-    /// This requires OpenGL 2.0 or greater.
+    /// This is designed for OpenGL 3.2 or greater.
     /// </para>
     /// </remarks>
     class FragmentShader : public Shader
@@ -24,10 +23,9 @@ namespace silnith::wings::gl3
         FragmentShader& operator=(FragmentShader const&) noexcept = delete;
         FragmentShader(FragmentShader&&) noexcept = delete;
         FragmentShader& operator=(FragmentShader&&) noexcept = delete;
-        ~FragmentShader(void) noexcept = default;
+        virtual ~FragmentShader(void) noexcept = default;
     public:
-        FragmentShader(std::vector<std::string> const&);
-        FragmentShader(std::initializer_list<std::string> const&);
+        explicit FragmentShader(std::initializer_list<std::string> const&);
 
     private:
     };

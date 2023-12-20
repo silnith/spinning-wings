@@ -3,8 +3,10 @@
 #include <Windows.h>
 #include <GL/glew.h>
 
-#include "Shader.h"
+#include "FragmentShader.h"
+#include "VertexShader.h"
 
+#include <initializer_list>
 #include <string>
 
 namespace silnith::wings::gl3
@@ -14,7 +16,7 @@ namespace silnith::wings::gl3
     /// </summary>
     /// <remarks>
     /// <para>
-    /// This requires OpenGL 2.0 or greater.
+    /// This is designed for OpenGL 3.2 or greater.
     /// </para>
     /// </remarks>
     class Program
@@ -25,10 +27,22 @@ namespace silnith::wings::gl3
         Program& operator=(Program const&) noexcept = delete;
         Program(Program&&) noexcept = delete;
         Program& operator=(Program&&) noexcept = delete;
-        ~Program(void) noexcept;
+        virtual ~Program(void) noexcept;
     public:
-        Program(Shader const&, std::vector<std::string> const&);
-        Program(Shader const&, Shader const&, std::string const&);
+        /// <summary>
+        /// Creates a GLSL program for transformation feedback.
+        /// </summary>
+        /// <param name="vertexShader">The vertex shader.</param>
+        /// <param name="capturedVaryings">The varying variables to capture.</param>
+        explicit Program(VertexShader const& vertexShader, std::initializer_list<std::string> const& capturedVaryings);
+
+        /// <summary>
+        /// Creates a GLSL program for rendering.
+        /// </summary>
+        /// <param name="vertexShader">The vertex shader.</param>
+        /// <param name="fragmentShader">The fragment shader.</param>
+        /// <param name="fragmentData">The fragment shader output variable to be written into the output buffer.</param>
+        explicit Program(VertexShader const& vertexShader, FragmentShader const& fragmentShader, std::string const& fragmentData);
 
         GLuint getProgram(void) const noexcept;
 

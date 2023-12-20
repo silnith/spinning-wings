@@ -275,7 +275,7 @@ void main() {
 				rotateMatrixFunctionDeclaration,
 				translateMatrixFunctionDeclaration,
 			},
-			std::vector<std::string>{"gl_Position"}
+			{"gl_Position"}
 		};
 		glGenVertexArrays(1, &wingTransformVertexArray);
 		glBindVertexArray(wingTransformVertexArray);

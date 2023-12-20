@@ -3,8 +3,8 @@
 #include <Windows.h>
 #include <GL/glew.h>
 
+#include <initializer_list>
 #include <string>
-#include <vector>
 
 namespace silnith::wings::gl3
 {
@@ -14,7 +14,7 @@ namespace silnith::wings::gl3
     /// </summary>
     /// <remarks>
     /// <para>
-    /// This requires OpenGL 2.0 or greater.
+    /// This is designed for OpenGL 3.2 or greater.
     /// </para>
     /// </remarks>
     class Shader
@@ -25,10 +25,9 @@ namespace silnith::wings::gl3
         Shader& operator=(Shader const&) noexcept = delete;
         Shader(Shader&&) noexcept = delete;
         Shader& operator=(Shader&&) noexcept = delete;
-        ~Shader(void) noexcept;
-
+        virtual ~Shader(void) noexcept;
     protected:
-        Shader(GLenum type, std::vector<std::string> const &);
+        explicit Shader(GLenum type, std::initializer_list<std::string> const&);
 
     public:
         GLuint getShader(void) const noexcept;

@@ -4,7 +4,6 @@
 
 #include <initializer_list>
 #include <string>
-#include <vector>
 
 namespace silnith::wings::gl3
 {
@@ -13,7 +12,7 @@ namespace silnith::wings::gl3
     /// </summary>
     /// <remarks>
     /// <para>
-    /// This requires OpenGL 2.0 or greater.
+    /// This is designed for OpenGL 3.2 or greater.
     /// </para>
     /// </remarks>
     class VertexShader : public Shader
@@ -24,10 +23,9 @@ namespace silnith::wings::gl3
         VertexShader& operator=(VertexShader const&) noexcept = delete;
         VertexShader(VertexShader&&) noexcept = delete;
         VertexShader& operator=(VertexShader&&) noexcept = delete;
-        ~VertexShader(void) noexcept = default;
+        virtual ~VertexShader(void) noexcept = default;
     public:
-        VertexShader(std::vector<std::string> const&);
-        VertexShader(std::initializer_list<std::string> const&);
+        explicit VertexShader(std::initializer_list<std::string> const&);
 
     private:
     };

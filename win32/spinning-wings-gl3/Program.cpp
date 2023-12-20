@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <stdexcept>
+#include <vector>
 
 namespace silnith::wings::gl3
 {
@@ -11,27 +12,24 @@ namespace silnith::wings::gl3
         glDeleteProgram(id);
     }
 
-    Program::Program(Shader const& s1, std::vector<std::string> const& capturedVaryings)
+    Program::Program(VertexShader const& vertexShader, std::initializer_list<std::string> const& capturedVaryings)
         : id{ glCreateProgram() }, linkLog{}
     {
+        // Limit scope of pointers to string sources.
         {
-            size_t const size{ capturedVaryings.size() };
-            GLchar const** varyings{ new GLchar const* [size] };
-            for (size_t i{ 0 }; i < size; i++)
+            std::vector<GLchar const*> cPtrs{};
+            for (std::string const& capturedVarying : capturedVaryings)
             {
-                std::string const& varying{ capturedVaryings.at(i) };
-                varyings[i] = varying.c_str();
+                cPtrs.emplace_back(capturedVarying.c_str());
             }
-            glTransformFeedbackVaryings(id, static_cast<GLsizei>(size), varyings, GL_INTERLEAVED_ATTRIBS);
-            //glTransformFeedbackVaryings(id, static_cast<GLsizei>(size), varyings, GL_SEPARATE_ATTRIBS);
-            delete[] varyings;
+            glTransformFeedbackVaryings(id, static_cast<GLsizei>(cPtrs.size()), cPtrs.data(), GL_SEPARATE_ATTRIBS);
         }
 
-        glAttachShader(id, s1.getShader());
+        glAttachShader(id, vertexShader.getShader());
 
         glLinkProgram(id);
 
-        glDetachShader(id, s1.getShader());
+        glDetachShader(id, vertexShader.getShader());
 
         {
             GLint logSize{ 0 };
@@ -63,18 +61,18 @@ namespace silnith::wings::gl3
         }
     }
 
-    Program::Program(Shader const& s1, Shader const& s2, std::string const& fragmentData)
+    Program::Program(VertexShader const& vertexShader, FragmentShader const& fragmentShader, std::string const& fragmentData)
         : id{ glCreateProgram() }, linkLog{}
     {
         glBindFragDataLocation(id, 0, fragmentData.c_str());
 
-        glAttachShader(id, s1.getShader());
-        glAttachShader(id, s2.getShader());
+        glAttachShader(id, vertexShader.getShader());
+        glAttachShader(id, fragmentShader.getShader());
 
         glLinkProgram(id);
 
-        glDetachShader(id, s2.getShader());
-        glDetachShader(id, s1.getShader());
+        glDetachShader(id, fragmentShader.getShader());
+        glDetachShader(id, vertexShader.getShader());
 
         {
             GLint logSize{ 0 };
