@@ -25,7 +25,12 @@ namespace silnith::wings::gl2
         VertexShader& operator=(VertexShader&&) noexcept = delete;
         virtual ~VertexShader(void) noexcept = default;
     public:
-        explicit VertexShader(std::initializer_list<std::string> const&);
+        /// <summary>
+        /// Creates and compiles a vertex shader from the given GLSL sources.
+        /// The source strings are concatenated with newlines appended to each.
+        /// </summary>
+        /// <param name="sources">The source strings to concatenate.</param>
+        explicit VertexShader(std::initializer_list<std::string> const& sources);
 
     private:
     };

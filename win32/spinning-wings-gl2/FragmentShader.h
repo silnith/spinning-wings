@@ -25,7 +25,12 @@ namespace silnith::wings::gl2
         FragmentShader& operator=(FragmentShader&&) noexcept = delete;
         virtual ~FragmentShader(void) noexcept = default;
     public:
-        explicit FragmentShader(std::initializer_list<std::string> const&);
+        /// <summary>
+        /// Creates and compiles a fragment shader from the given GLSL sources.
+        /// The source strings are concatenated with newlines appended to each.
+        /// </summary>
+        /// <param name="sources">The source strings to concatenate.</param>
+        explicit FragmentShader(std::initializer_list<std::string> const& sources);
 
     private:
     };
