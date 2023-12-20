@@ -25,9 +25,9 @@ namespace silnith::wings::gl2
         Program& operator=(Program const&) noexcept = delete;
         Program(Program&&) noexcept = delete;
         Program& operator=(Program&&) noexcept = delete;
-        ~Program(void) noexcept;
+        virtual ~Program(void) noexcept;
     public:
-        Program(Shader const&, Shader const&);
+        explicit Program(Shader const&, Shader const&);
 
         GLuint getProgram(void) const noexcept;
 

@@ -23,9 +23,9 @@ namespace silnith::wings::gl2
         VertexShader& operator=(VertexShader const&) noexcept = delete;
         VertexShader(VertexShader&&) noexcept = delete;
         VertexShader& operator=(VertexShader&&) noexcept = delete;
-        ~VertexShader(void) noexcept = default;
+        virtual ~VertexShader(void) noexcept = default;
     public:
-        VertexShader(std::initializer_list<std::string> const&);
+        explicit VertexShader(std::initializer_list<std::string> const&);
 
     private:
     };
