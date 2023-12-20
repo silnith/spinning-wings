@@ -36,7 +36,11 @@ namespace silnith::wings::gl2
         explicit Shader(GLenum type, std::initializer_list<std::string> const& sources);
 
     public:
-        GLuint getShader(void) const noexcept;
+        /// <summary>
+        /// Returns the OpenGL name for the shader.
+        /// </summary>
+        /// <returns>The OpenGL identifier of the shader.</returns>
+        [[nodiscard]] GLuint getShader(void) const noexcept;
 
     private:
         GLuint id{ 0 };
