@@ -12,7 +12,7 @@ namespace silnith::wings::gl2
         glDeleteShader(id);
     }
 
-    Shader::Shader(GLenum type, std::initializer_list<std::string> const& sources_)
+    Shader::Shader(GLenum type, std::initializer_list<std::string> const& sources)
         : id{ glCreateShader(type) }, compilationLog{}
     {
         if (id == 0)
@@ -22,14 +22,16 @@ namespace silnith::wings::gl2
 
         // Limit scope of copies of string sources.
         {
-            std::vector<std::string> sources{};
-            for (std::string const& source : sources_)
+            std::vector<std::string> sourcesCopy{};
+            sourcesCopy.reserve(sources.size());
+            for (std::string const& source : sources)
             {
-                sources.emplace_back(source + '\n');
+                sourcesCopy.emplace_back(source + '\n');
             }
 
             std::vector<GLchar const*> cSources{};
-            for (std::string const& source : sources)
+            cSources.reserve(sourcesCopy.size());
+            for (std::string const& source : sourcesCopy)
             {
                 cSources.emplace_back(source.c_str());
             }
