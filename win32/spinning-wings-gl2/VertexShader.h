@@ -31,8 +31,6 @@ namespace silnith::wings::gl2
         /// </summary>
         /// <param name="sources">The source strings to concatenate.</param>
         explicit VertexShader(std::initializer_list<std::string> const& sources);
-
-    private:
     };
 
 }
