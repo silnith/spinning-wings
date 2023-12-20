@@ -223,6 +223,7 @@ namespace silnith::wings::gl2
 		if (hasOpenGL(1, 1))
 		{
 			glPolygonOffset(-0.5, -2);
+			glEnable(GL_POLYGON_OFFSET_LINE);
 		}
 
 		glEnable(GL_LINE_SMOOTH);
@@ -403,7 +404,6 @@ void main() {
 		if (hasOpenGL(1, 1))
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			glEnable(GL_POLYGON_OFFSET_LINE);
 			GLfloat deltaZ{ 0 };
 			GLfloat deltaAngle{ 0 };
 			for (Wing const& wing : wings) {
@@ -415,7 +415,6 @@ void main() {
 				glVertexAttrib2f(deltaZAttribLocation, deltaAngle, deltaZ);
 				glCallList(wing.getGLDisplayList());
 			}
-			glDisable(GL_POLYGON_OFFSET_LINE);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
 
