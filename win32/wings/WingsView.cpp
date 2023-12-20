@@ -108,7 +108,7 @@ namespace silnith::wings::gl
 
 	void CleanupOpenGLState(void)
 	{
-		for (Wing const& wing : wings)
+		for (wing_list::const_reference wing : wings)
 		{
 			glDeleteLists(wing.getGLDisplayList(), 1);
 		}
@@ -120,7 +120,7 @@ namespace silnith::wings::gl
 	{
 		GLuint const displayList{ wings.back().getGLDisplayList() };
 		wings.pop_back();
-		Wing const& wing{ wings.emplace_front(displayList,
+		wing_list::const_reference wing{ wings.emplace_front(displayList,
 			radiusCurve.getNextValue(), angleCurve.getNextValue(),
 			deltaAngleCurve.getNextValue(), deltaZCurve.getNextValue(),
 			rollCurve.getNextValue(), pitchCurve.getNextValue(), yawCurve.getNextValue(),
@@ -148,7 +148,7 @@ namespace silnith::wings::gl
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glEnable(GL_POLYGON_OFFSET_LINE);
 			glPushMatrix();
-			for (Wing const& wing : wings) {
+			for (wing_list::const_reference wing : wings) {
 				glTranslatef(0, 0, wing.getDeltaZ());
 				glRotatef(wing.getDeltaAngle(), 0, 0, 1);
 
@@ -162,7 +162,7 @@ namespace silnith::wings::gl
 		}
 
 		glPushMatrix();
-		for (Wing const& wing : wings) {
+		for (wing_list::const_reference wing : wings) {
 			glTranslatef(0, 0, wing.getDeltaZ());
 			glRotatef(wing.getDeltaAngle(), 0, 0, 1);
 
