@@ -14,7 +14,6 @@
 #include <stdexcept>
 
 #include "WingsPixelFormat.h"
-
 #include "WingsViewGL2.h"
 
 UINT const updateDelayMilliseconds{ 33 };
@@ -49,6 +48,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		int const pixelformat{ ChoosePixelFormat(hdc, &silnith::gl::desiredPixelFormat) };
 		if (pixelformat == 0) {
 			DWORD error{ GetLastError() };
+			ReleaseDC(hWnd, hdc);
 			PostQuitMessage(-1);
 			return -1;
 		}
@@ -60,6 +60,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		else
 		{
 			DWORD error{ GetLastError() };
+			ReleaseDC(hWnd, hdc);
 			PostQuitMessage(-1);
 			return -1;
 		}
@@ -67,6 +68,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		hglrc = wglCreateContext(hdc);
 		if (hglrc == NULL) {
 			DWORD error{ GetLastError() };
+			ReleaseDC(hWnd, hdc);
 			PostQuitMessage(-1);
 			return -1;
 		}
@@ -74,11 +76,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		BOOL const didMakeCurrent{ wglMakeCurrent(hdc, hglrc) };
 		if (didMakeCurrent)
 		{
-			glewInit();
+			GLenum const glewInitError{ glewInit() };
+			assert(glewInitError == GLEW_OK);
 		}
 		else
 		{
 			DWORD error{ GetLastError() };
+			ReleaseDC(hWnd, hdc);
+			wglDeleteContext(hglrc);
 			PostQuitMessage(-1);
 			return -1;
 		}
@@ -89,6 +94,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		catch ([[maybe_unused]] std::exception const& e)
 		{
+			ReleaseDC(hWnd, hdc);
+			wglDeleteContext(hglrc);
 			PostQuitMessage(-1);
 			return -1;
 		}
@@ -123,18 +130,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return DefWindowProcW(hWnd, message, wParam, lParam);
 		}
 
-		HDC const hdc{ GetDC(hWnd) };
+		assert(hglrc == wglGetCurrentContext());
 
 		GLsizei const width{ LOWORD(lParam) };
 		GLsizei const height{ HIWORD(lParam) };
 		silnith::wings::gl2::Resize(width, height);
 
-		ReleaseDC(hWnd, hdc);
-
 		return 0;
 	}
 	case WM_TIMER:
 	{
+		assert(hglrc == wglGetCurrentContext());
+
 		silnith::wings::gl2::AdvanceAnimation();
 
 		InvalidateRgn(hWnd, NULL, FALSE);
@@ -146,6 +153,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_PAINT:
 	{
+		/*
+		 * If I understand the Win32 documentation correctly, I do not need to
+		 * own the DC in order to issue OpenGL commands to the GL rendering
+		 * context for the current thread.  But I should own it in order to
+		 * issue the SwapBuffers call, because that affects the DC.
+		 *
+		 * TODO: Is this only for double-buffered windows?
+		 */
+		assert(hglrc == wglGetCurrentContext());
+
+		silnith::wings::gl2::DrawFrame();
+
 		PAINTSTRUCT paintstruct;
 		HDC const hdc{ BeginPaint(hWnd, &paintstruct) };
 		if (hdc == NULL) {
@@ -153,7 +172,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		//EnumDisplayMonitors(hdc, NULL, MonitorEnumProc, 0);
 
-		silnith::wings::gl2::DrawFrame();
+		//wglMakeCurrent(hdc, hglrc);
+
+		//silnith::wings::gl2::DrawFrame();
 
 		SwapBuffers(hdc);
 

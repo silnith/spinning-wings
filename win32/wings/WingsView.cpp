@@ -106,6 +106,16 @@ namespace silnith::wings::gl
 		}
 	}
 
+	void CleanupOpenGLState(void)
+	{
+		for (Wing const& wing : wings)
+		{
+			glDeleteLists(wing.getGLDisplayList(), 1);
+		}
+
+		glDeleteLists(wingDisplayList, 1);
+	}
+
 	void AdvanceAnimation(void)
 	{
 		GLuint const displayList{ wings.back().getGLDisplayList() };
@@ -117,7 +127,6 @@ namespace silnith::wings::gl
 			Color{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
 			Color::WHITE) };
 
-		// TODO: Do I need an HDC in order to execute these OpenGL commands?
 		glNewList(displayList, GL_COMPILE);
 		glPushMatrix();
 		glRotatef(wing.getAngle(), 0, 0, 1);
@@ -186,7 +195,6 @@ namespace silnith::wings::gl
 			static_cast<GLdouble>(-20) * ymult, static_cast<GLdouble>(20) * ymult,
 			static_cast<GLdouble>(35), static_cast<GLdouble>(105));
 		glMatrixMode(GL_MODELVIEW);
-		// check GL errors
 	}
 
 }

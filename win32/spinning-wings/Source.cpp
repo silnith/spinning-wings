@@ -10,10 +10,10 @@
 #pragma comment (lib, "opengl32.lib")
 #pragma comment (lib, "glu32.lib")
 
+#include <cassert>
+
 #include "WingsPixelFormat.h"
 #include "WingsView.h"
-
-#include <cassert>
 
 UINT const updateDelayMilliseconds{ 33 };
 
@@ -47,6 +47,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		int const pixelformat{ ChoosePixelFormat(hdc, &silnith::gl::desiredPixelFormat) };
 		if (pixelformat == 0) {
 			DWORD error{ GetLastError() };
+			ReleaseDC(hWnd, hdc);
 			PostQuitMessage(-1);
 			return -1;
 		}
@@ -58,6 +59,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		else
 		{
 			DWORD error{ GetLastError() };
+			ReleaseDC(hWnd, hdc);
 			PostQuitMessage(-1);
 			return -1;
 		}
@@ -65,6 +67,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		hglrc = wglCreateContext(hdc);
 		if (hglrc == NULL) {
 			DWORD error{ GetLastError() };
+			ReleaseDC(hWnd, hdc);
 			PostQuitMessage(-1);
 			return -1;
 		}
@@ -74,6 +77,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		else
 		{
 			DWORD error{ GetLastError() };
+			ReleaseDC(hWnd, hdc);
+			wglDeleteContext(hglrc);
 			PostQuitMessage(-1);
 			return -1;
 		}
@@ -168,6 +173,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_DESTROY:
 	{
+		silnith::wings::gl::CleanupOpenGLState();
+
 		// window about to be destroyed
 		HDC const hdc{ GetDC(hWnd) };
 		wglMakeCurrent(hdc, NULL);

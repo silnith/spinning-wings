@@ -33,6 +33,16 @@ UINT_PTR timer;
 
 HGLRC hglrc{};
 
+BOOL MonitorEnumProc(HMONITOR hMonitor, HDC hdc, LPRECT lpRect, LPARAM d)
+{
+	return TRUE;
+}
+
+void TimerProc(HWND hWnd, UINT message, UINT_PTR bar, DWORD baz)
+{
+	silnith::wings::gl::AdvanceAnimation();
+}
+
 // add to EXPORTS statement in module-definition (.def) file
 LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -45,6 +55,7 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		int const pixelformat{ ChoosePixelFormat(hdc, &silnith::gl::desiredPixelFormat) };
 		if (pixelformat == 0) {
 			DWORD error{ GetLastError() };
+			ReleaseDC(hWnd, hdc);
 			PostQuitMessage(-1);
 			return -1;
 		}
@@ -56,6 +67,7 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		else
 		{
 			DWORD error{ GetLastError() };
+			ReleaseDC(hWnd, hdc);
 			PostQuitMessage(-1);
 			return -1;
 		}
@@ -63,6 +75,7 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		hglrc = wglCreateContext(hdc);
 		if (hglrc == NULL) {
 			DWORD error{ GetLastError() };
+			ReleaseDC(hWnd, hdc);
 			PostQuitMessage(-1);
 			return -1;
 		}
@@ -72,6 +85,8 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		else
 		{
 			DWORD error{ GetLastError() };
+			ReleaseDC(hWnd, hdc);
+			wglDeleteContext(hglrc);
 			PostQuitMessage(-1);
 			return -1;
 		}
@@ -169,6 +184,8 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 	case WM_DESTROY:
 	{
 		KillTimer(hWnd, timer);
+
+		silnith::wings::gl::CleanupOpenGLState();
 
 		// window about to be destroyed
 		HDC const hdc{ GetDC(hWnd) };

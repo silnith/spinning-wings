@@ -12,6 +12,11 @@ namespace silnith::wings::gl
     void InitializeOpenGLState(void);
 
     /// <summary>
+    /// Cleans up any resources allocated by <c>InitializeOpenGLState</c>.
+    /// </summary>
+    void CleanupOpenGLState(void);
+
+    /// <summary>
     /// Advances the spinning wings animation by one frame.
     /// </summary>
     /// <remarks>
