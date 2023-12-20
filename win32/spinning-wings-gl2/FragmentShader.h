@@ -4,7 +4,6 @@
 
 #include <initializer_list>
 #include <string>
-#include <vector>
 
 namespace silnith::wings::gl2
 {
@@ -26,7 +25,6 @@ namespace silnith::wings::gl2
         FragmentShader& operator=(FragmentShader&&) noexcept = delete;
         ~FragmentShader(void) noexcept = default;
     public:
-        FragmentShader(std::vector<std::string> const&);
         FragmentShader(std::initializer_list<std::string> const&);
 
     private:
