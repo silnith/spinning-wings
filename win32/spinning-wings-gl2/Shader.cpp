@@ -15,23 +15,27 @@ namespace silnith::wings::gl2
     Shader::Shader(GLenum type, std::initializer_list<std::string> const& sources_)
         : id{ glCreateShader(type) }, compilationLog{}
     {
+        if (id == 0)
+        {
+            throw new std::runtime_error{ "Failed to allocate shader." };
+        }
+
         // Limit scope of copies of string sources.
         {
-            std::vector<std::string> sources{ sources_ };
-            for (std::string& source : sources)
+            std::vector<std::string> sources{};
+            for (std::string const& source : sources_)
             {
-                source += '\n';
+                sources.emplace_back(source + '\n');
             }
 
-            size_t const size{ sources.size() };
-            GLchar const** cSources{ new GLchar const* [size] };
-            for (size_t index{ 0 }; index < size; index++)
+            std::vector<GLchar const*> cSources{};
+            for (std::string const& source : sources)
             {
-                cSources[index] = sources.at(index).c_str();
+                cSources.emplace_back(source.c_str());
             }
-            glShaderSource(id, static_cast<GLsizei>(size), cSources, nullptr);
-            delete[] cSources;
+            glShaderSource(id, static_cast<GLsizei>(cSources.size()), cSources.data(), nullptr);
         }
+
         glCompileShader(id);
 
         {
