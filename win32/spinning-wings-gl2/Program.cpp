@@ -11,16 +11,16 @@ namespace silnith::wings::gl2
         glDeleteProgram(id);
     }
 
-    Program::Program(Shader const& s1, Shader const& s2)
+    Program::Program(VertexShader const& vertexShader, FragmentShader const& fragmentShader)
         : id{ glCreateProgram() }, linkLog{}
     {
-        glAttachShader(id, s1.getShader());
-        glAttachShader(id, s2.getShader());
+        glAttachShader(id, vertexShader.getShader());
+        glAttachShader(id, fragmentShader.getShader());
 
         glLinkProgram(id);
 
-        glDetachShader(id, s2.getShader());
-        glDetachShader(id, s1.getShader());
+        glDetachShader(id, fragmentShader.getShader());
+        glDetachShader(id, vertexShader.getShader());
 
         {
             GLint logSize{ 0 };
