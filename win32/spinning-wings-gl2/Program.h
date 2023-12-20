@@ -35,7 +35,11 @@ namespace silnith::wings::gl2
         /// <param name="fragmentShader">The fragment shader.</param>
         explicit Program(VertexShader const& vertexShader, FragmentShader const& fragmentShader);
 
-        GLuint getProgram(void) const noexcept;
+        /// <summary>
+        /// Returns the OpenGL name for the program.
+        /// </summary>
+        /// <returns>The OpenGL identifier for the program.</returns>
+        [[nodiscard]] GLuint getProgram(void) const noexcept;
 
         GLuint getAttributeLocation(std::string const&) const;
 
