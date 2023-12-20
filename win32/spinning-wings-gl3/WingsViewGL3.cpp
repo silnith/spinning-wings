@@ -344,7 +344,7 @@ void main() {
 
 	void CleanupOpenGLState(void)
 	{
-		for (Wing const& wing : wings)
+		for (wing_list::const_reference wing : wings)
 		{
 			GLuint const vertexBuffer{ wing.getVertexBuffer() };
 			GLuint const colorBuffer{ wing.getColorBuffer() };
@@ -396,7 +396,7 @@ void main() {
 		{
 			// This block is simply so lastWing goes out of scope before the pop_back.
 			{
-				Wing const& lastWing{ wings.back() };
+				wing_list::const_reference lastWing{ wings.back() };
 				wingVertexBuffer = lastWing.getVertexBuffer();
 				wingColorBuffer = lastWing.getColorBuffer();
 				wingEdgeColorBuffer = lastWing.getEdgeColorBuffer();
@@ -404,7 +404,7 @@ void main() {
 			wings.pop_back();
 		}
 
-		Wing const& wing{ wings.emplace_front(wingVertexBuffer,
+		wing_list::const_reference wing{ wings.emplace_front(wingVertexBuffer,
 			wingColorBuffer,
 			wingEdgeColorBuffer,
 			deltaAngle, deltaZ) };
@@ -479,7 +479,7 @@ void main() {
 		
 		GLfloat deltaZ{ 0 };
 		GLfloat deltaAngle{ 0 };
-		for (Wing const& wing : wings) {
+		for (wing_list::const_reference wing : wings) {
 			deltaZ += wing.getDeltaZ();
 			deltaAngle += wing.getDeltaAngle();
 

@@ -360,7 +360,7 @@ void main() {
 
 	void CleanupOpenGLState(void)
 	{
-		for (Wing const& wing : wings)
+		for (wing_list::const_reference wing : wings)
 		{
 			glDeleteLists(wing.getGLDisplayList(), 1);
 		}
@@ -383,7 +383,7 @@ void main() {
 			displayList = wings.back().getGLDisplayList();
 			wings.pop_back();
 		}
-		Wing const& wing{ wings.emplace_front(displayList,
+		wing_list::const_reference wing{ wings.emplace_front(displayList,
 			radiusCurve.getNextValue(), angleCurve.getNextValue(),
 			deltaAngleCurve.getNextValue(), deltaZCurve.getNextValue(),
 			rollCurve.getNextValue(), pitchCurve.getNextValue(), yawCurve.getNextValue(),
@@ -406,7 +406,7 @@ void main() {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			GLfloat deltaZ{ 0 };
 			GLfloat deltaAngle{ 0 };
-			for (Wing const& wing : wings) {
+			for (wing_list::const_reference wing : wings) {
 				deltaZ += wing.getDeltaZ();
 				deltaAngle += wing.getDeltaAngle();
 
@@ -420,7 +420,7 @@ void main() {
 
 		GLfloat deltaZ{ 0 };
 		GLfloat deltaAngle{ 0 };
-		for (Wing const& wing : wings) {
+		for (wing_list::const_reference wing : wings) {
 			deltaZ += wing.getDeltaZ();
 			deltaAngle += wing.getDeltaAngle();
 
@@ -453,7 +453,6 @@ void main() {
 			static_cast<GLdouble>(-20) * ymult, static_cast<GLdouble>(20) * ymult,
 			static_cast<GLdouble>(35), static_cast<GLdouble>(105));
 		glMatrixMode(GL_MODELVIEW);
-		// check GL errors
 	}
 
 }
