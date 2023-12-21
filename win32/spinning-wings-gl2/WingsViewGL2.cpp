@@ -373,6 +373,17 @@ void main() {
 
 	void AdvanceAnimation(void)
 	{
+		GLfloat const radius{ radiusCurve.getNextValue() };
+		GLfloat const angle{ angleCurve.getNextValue() };
+		GLfloat const deltaAngle{ deltaAngleCurve.getNextValue() };
+		GLfloat const deltaZ{ deltaZCurve.getNextValue() };
+		GLfloat const roll{ rollCurve.getNextValue() };
+		GLfloat const pitch{ pitchCurve.getNextValue() };
+		GLfloat const yaw{ yawCurve.getNextValue() };
+		GLfloat const red{ redCurve.getNextValue() };
+		GLfloat const green{ greenCurve.getNextValue() };
+		GLfloat const blue{ blueCurve.getNextValue() };
+
 		GLuint displayList{ 0 };
 		if (wings.empty() || wings.size() < numWings)
 		{
@@ -384,15 +395,15 @@ void main() {
 			wings.pop_back();
 		}
 		wing_list::const_reference wing{ wings.emplace_front(displayList,
-			radiusCurve.getNextValue(), angleCurve.getNextValue(),
-			deltaAngleCurve.getNextValue(), deltaZCurve.getNextValue(),
-			rollCurve.getNextValue(), pitchCurve.getNextValue(), yawCurve.getNextValue(),
-			Color<GLfloat>{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
+			radius, angle,
+			deltaAngle, deltaZ,
+			roll, pitch, yaw,
+			Color<GLfloat>{ red, green, blue },
 			Color<GLfloat>::WHITE) };
 
 		glNewList(displayList, GL_COMPILE);
-		glVertexAttrib2f(radiusAngleAttribLocation, wing.getRadius(), wing.getAngle());
-		glVertexAttrib3f(rollPitchYawAttribLocation, wing.getRoll(), wing.getPitch(), wing.getYaw());
+		glVertexAttrib2f(radiusAngleAttribLocation, radius, angle);
+		glVertexAttrib3f(rollPitchYawAttribLocation, roll, pitch, yaw);
 		drawQuad();
 		glEndList();
 	}
