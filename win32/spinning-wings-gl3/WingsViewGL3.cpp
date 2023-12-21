@@ -425,14 +425,14 @@ void main() {
 
 		{
 			Color<GLfloat> const wingEdgeColor{ Color<GLfloat>::WHITE };
-			GLfloat const red{ wingEdgeColor.getRed() };
-			GLfloat const green{ wingEdgeColor.getGreen() };
-			GLfloat const blue{ wingEdgeColor.getBlue() };
+			GLfloat const edgeRed{ wingEdgeColor.getRed() };
+			GLfloat const edgeGreen{ wingEdgeColor.getGreen() };
+			GLfloat const edgeBlue{ wingEdgeColor.getBlue() };
 			GLfloat const edgeColorData[3 * 4]{
-				red, green, blue,
-				red, green, blue,
-				red, green, blue,
-				red, green, blue,
+				edgeRed, edgeGreen, edgeBlue,
+				edgeRed, edgeGreen, edgeBlue,
+				edgeRed, edgeGreen, edgeBlue,
+				edgeRed, edgeGreen, edgeBlue,
 			};
 			GLsizeiptr const edgeColorDataSize{ sizeof(edgeColorData) };
 			static_assert(edgeColorDataSize == sizeof(GLfloat) * 3 * 4, "I do not know how sizeof works.");
