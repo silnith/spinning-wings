@@ -14,7 +14,7 @@
 namespace silnith::wings::gl2
 {
 
-	typedef std::deque<Wing> wing_list;
+	typedef std::deque<Wing<GLuint, GLfloat> > wing_list;
 
 	size_t const numWings{ 40 };
 
@@ -387,8 +387,8 @@ void main() {
 			radiusCurve.getNextValue(), angleCurve.getNextValue(),
 			deltaAngleCurve.getNextValue(), deltaZCurve.getNextValue(),
 			rollCurve.getNextValue(), pitchCurve.getNextValue(), yawCurve.getNextValue(),
-			Color{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
-			Color::WHITE) };
+			Color<GLfloat>{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
+			Color<GLfloat>::WHITE) };
 
 		glNewList(displayList, GL_COMPILE);
 		glVertexAttrib2f(radiusAngleAttribLocation, wing.getRadius(), wing.getAngle());
@@ -410,7 +410,7 @@ void main() {
 				deltaZ += wing.getDeltaZ();
 				deltaAngle += wing.getDeltaAngle();
 
-				Color const& edgeColor{ wing.getEdgeColor() };
+				Color<GLfloat> const& edgeColor{ wing.getEdgeColor() };
 				glColor3f(edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
 				glVertexAttrib2f(deltaZAttribLocation, deltaAngle, deltaZ);
 				glCallList(wing.getGLDisplayList());
@@ -424,7 +424,7 @@ void main() {
 			deltaZ += wing.getDeltaZ();
 			deltaAngle += wing.getDeltaAngle();
 
-			Color const& color{ wing.getColor() };
+			Color<GLfloat> const& color{ wing.getColor() };
 			glColor3f(color.getRed(), color.getGreen(), color.getBlue());
 			glVertexAttrib2f(deltaZAttribLocation, deltaAngle, deltaZ);
 			glCallList(wing.getGLDisplayList());

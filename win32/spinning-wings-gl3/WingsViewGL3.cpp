@@ -18,7 +18,7 @@
 namespace silnith::wings::gl3
 {
 
-	typedef std::deque<Wing> wing_list;
+	typedef std::deque<Wing<GLuint, GLfloat> > wing_list;
 
 	size_t const numWings{ 40 };
 
@@ -424,7 +424,7 @@ void main() {
 		}
 
 		{
-			Color const wingEdgeColor{ Color::WHITE };
+			Color<GLfloat> const wingEdgeColor{ Color<GLfloat>::WHITE };
 			GLfloat const red{ wingEdgeColor.getRed() };
 			GLfloat const green{ wingEdgeColor.getGreen() };
 			GLfloat const blue{ wingEdgeColor.getBlue() };

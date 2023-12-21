@@ -6,6 +6,7 @@ namespace silnith::wings
 	/// <summary>
 	/// A simple RGB color value.
 	/// </summary>
+	template<typename T>
 	class Color
 	{
 	public:
@@ -14,7 +15,7 @@ namespace silnith::wings
 		Color& operator=(Color const&) noexcept = default;
 		Color(Color&&) noexcept = default;
 		Color& operator=(Color&&) noexcept = default;
-		~Color(void) noexcept = default;
+		virtual ~Color(void) noexcept = default;
 	public:
 		/// <summary>
 		/// Initializes a new color structure.
@@ -27,39 +28,62 @@ namespace silnith::wings
 		/// <param name="r">the red component, in the range <c>[0, 1]</c></param>
 		/// <param name="g">the green component, in the range <c>[0, 1]</c></param>
 		/// <param name="b">the blue component, in the range <c>[0, 1]</c></param>
-		Color(float r, float g, float b) noexcept;
+		Color(T r, T g, T b) noexcept
+			: red{ r }, green{ g }, blue{ b }
+		{}
 
 		/// <summary>
 		/// Returns the red component.
 		/// </summary>
 		/// <returns>the red component</returns>
-		float getRed(void) const noexcept;
+		[[nodiscard]]
+		inline T getRed(void) const noexcept
+		{
+			return red;
+		}
+
 		/// <summary>
 		/// Returns the green component.
 		/// </summary>
 		/// <returns>the green component</returns>
-		float getGreen(void) const noexcept;
+		[[nodiscard]]
+		inline T getGreen(void) const noexcept
+		{
+			return green;
+		}
+
 		/// <summary>
 		/// Returns the blue component.
 		/// </summary>
 		/// <returns>the blue component</returns>
-		float getBlue(void) const noexcept;
+		[[nodiscard]]
+		inline T getBlue(void) const noexcept
+		{
+			return blue;
+		}
 
 		/// <summary>
 		/// A constant for the color black.
 		/// The color components are all <c>0</c>.
 		/// </summary>
-		static Color const BLACK;
+		static Color<T> const BLACK;
+
 		/// <summary>
 		/// A constant for the color white.
 		/// The color components are all <c>1</c>.
 		/// </summary>
-		static Color const WHITE;
+		static Color<T> const WHITE;
 
 	private:
-		float const red{ 0 };
-		float const green{ 0 };
-		float const blue{ 0 };
+		T const red{ 0 };
+		T const green{ 0 };
+		T const blue{ 0 };
 	};
+
+	template<typename T>
+	Color<T> const Color<T>::BLACK{ 0, 0, 0 };
+
+	template<typename T>
+	Color<T> const Color<T>::WHITE{ 1, 1, 1 };
 
 }

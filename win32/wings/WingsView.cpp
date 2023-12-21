@@ -12,7 +12,7 @@
 namespace silnith::wings::gl
 {
 
-	typedef std::deque<Wing> wing_list;
+	typedef std::deque<Wing<GLuint, GLfloat> > wing_list;
 
 	size_t const numWings{ 40 };
 
@@ -124,8 +124,8 @@ namespace silnith::wings::gl
 			radiusCurve.getNextValue(), angleCurve.getNextValue(),
 			deltaAngleCurve.getNextValue(), deltaZCurve.getNextValue(),
 			rollCurve.getNextValue(), pitchCurve.getNextValue(), yawCurve.getNextValue(),
-			Color{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
-			Color::WHITE) };
+			Color<GLfloat>{ redCurve.getNextValue(), greenCurve.getNextValue(), blueCurve.getNextValue() },
+			Color<GLfloat>::WHITE) };
 
 		glNewList(displayList, GL_COMPILE);
 		glPushMatrix();
@@ -152,7 +152,7 @@ namespace silnith::wings::gl
 				glTranslatef(0, 0, wing.getDeltaZ());
 				glRotatef(wing.getDeltaAngle(), 0, 0, 1);
 
-				Color const& edgeColor{ wing.getEdgeColor() };
+				Color<GLfloat> const& edgeColor{ wing.getEdgeColor() };
 				glColor3f(edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
 				glCallList(wing.getGLDisplayList());
 			}
@@ -166,7 +166,7 @@ namespace silnith::wings::gl
 			glTranslatef(0, 0, wing.getDeltaZ());
 			glRotatef(wing.getDeltaAngle(), 0, 0, 1);
 
-			Color const& color{ wing.getColor() };
+			Color<GLfloat> const& color{ wing.getColor() };
 			glColor3f(color.getRed(), color.getGreen(), color.getBlue());
 			glCallList(wing.getGLDisplayList());
 		}
