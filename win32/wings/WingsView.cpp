@@ -69,6 +69,7 @@ namespace silnith::wings::gl
 		if (hasOpenGL(1, 1))
 		{
 			glPolygonOffset(-0.5, -2);
+			glEnable(GL_POLYGON_OFFSET_LINE);
 		}
 
 		glEnable(GL_LINE_SMOOTH);
@@ -157,7 +158,6 @@ namespace silnith::wings::gl
 		if (hasOpenGL(1, 1))
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			glEnable(GL_POLYGON_OFFSET_LINE);
 			glPushMatrix();
 			for (wing_list::const_reference wing : wings) {
 				glTranslatef(0, 0, wing.getDeltaZ());
@@ -168,7 +168,6 @@ namespace silnith::wings::gl
 				glCallList(wing.getGLDisplayList());
 			}
 			glPopMatrix();
-			glDisable(GL_POLYGON_OFFSET_LINE);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
 
