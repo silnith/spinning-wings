@@ -11,6 +11,154 @@
 #include "Program.h"
 #include "VertexShader.h"
 
+namespace silnith::wings::gl1_0
+{
+
+	// The GL display list for rendering a single quad.
+	// This is used for the GL 1.0 rendering path.
+	GLuint quadDisplayList{ 0 };
+
+	void InitializeDrawQuad(void)
+	{
+		quadDisplayList = glGenLists(1);
+		glNewList(quadDisplayList, GL_COMPILE);
+		glBegin(GL_QUADS);
+		glVertex2f(1, 1);
+		glVertex2f(-1, 1);
+		glVertex2f(-1, -1);
+		glVertex2f(1, -1);
+		glEnd();
+		glEndList();
+	}
+
+	void DrawQuad(void)
+	{
+		glCallList(quadDisplayList);
+	}
+
+	void CleanupDrawQuad(void)
+	{
+		glDeleteLists(quadDisplayList, 1);
+	}
+
+}
+
+namespace silnith::wings
+{
+
+	GLfloat const quadVertices[2 * 4]
+	{
+		1, 1,
+		-1, 1,
+		-1, -1,
+		1, -1,
+	};
+	GLsizeiptr const quadVerticesSize{ sizeof(quadVertices) };
+	GLuint const quadIndices[4]
+	{
+		0, 1, 2, 3,
+	};
+	GLsizeiptr const quadIndicesSize{ sizeof(quadIndices) };
+
+	static_assert(quadVerticesSize == sizeof(GLfloat) * 2 * 4, "I do not know how sizeof works.");
+	static_assert(quadIndicesSize == sizeof(GLuint) * 4, "I do not know how sizeof works.");
+
+}
+
+namespace silnith::wings::gl1_1
+{
+
+	void InitializeDrawQuad(void)
+	{
+		/*
+		 * Specifies vertex data to be used by subsequent calls to
+		 * DrawArrays and DrawElements.
+		 */
+		glVertexPointer(2, GL_FLOAT, 0, quadVertices);
+
+		/*
+		 * EnableClientState is executed immediately, it is not compiled into
+		 * a display list.
+		 */
+		glEnableClientState(GL_VERTEX_ARRAY);
+	}
+
+	void DrawQuad(void)
+	{
+		/*
+		 * When creating a display list,
+		 * DrawElements dereferences vertex pointers according to the client
+		 * state, and the dereferenced vertices are compiled into the
+		 * display list.
+		 */
+		glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, quadIndices);
+	}
+
+	void CleanupDrawQuad(void)
+	{
+		glDisableClientState(GL_VERTEX_ARRAY);
+	}
+
+}
+
+namespace silnith::wings::gl1_5
+{
+
+	GLuint wingBufferObject{ 0 };
+	GLuint wingIndicesBufferObject{ 0 };
+
+	void InitializeDrawQuad(void)
+	{
+		glGenBuffers(1, &wingBufferObject);
+		glBindBuffer(GL_ARRAY_BUFFER, wingBufferObject);
+		glBufferData(GL_ARRAY_BUFFER, quadVerticesSize, quadVertices, GL_STATIC_DRAW);
+		/*
+		 * Specifies vertex data to be used by subsequent calls to
+		 * DrawArrays and DrawElements.
+		 *
+		 * If there is an ARRAY_BUFFER bound, then the last parameter is interpreted
+		 * as an index/offset into the ARRAY_BUFFER.
+		 */
+		glVertexPointer(2, GL_FLOAT, 0, 0);
+
+		glGenBuffers(1, &wingIndicesBufferObject);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBufferObject);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesSize, quadIndices, GL_STATIC_DRAW);
+
+		glEnableClientState(GL_VERTEX_ARRAY);
+	}
+
+	void DrawQuad(void)
+	{
+		/*
+		 * When compiled into a display list,
+		 * DrawElements dereferences vertex pointers according to the client
+		 * state, and the dereferenced vertices are compiled into the
+		 * display list.
+		 * 
+		 * If there is an ELEMENT_ARRAY_BUFFER bound, then the last parameter
+		 * to DrawElements is interpreted as an index/offset into the
+		 * ELEMENT_ARRAY_BUFFER.
+		 *
+		 * Vertices indexed by the ELEMENT_ARRAY_BUFFER are interpreted according to
+		 * the current VertexPointer.
+		 */
+		glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, 0);
+	}
+
+	void CleanupDrawQuad(void)
+	{
+		glDisableClientState(GL_VERTEX_ARRAY);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glDeleteBuffers(1, &wingIndicesBufferObject);
+		glDeleteBuffers(1, &wingBufferObject);
+	}
+
+}
+
 namespace silnith::wings::gl2
 {
 
@@ -54,152 +202,14 @@ namespace silnith::wings::gl2
 		versionStringInput >> glMinorVersion;
 	}
 
-	// The GL display list for rendering a single quad.
-	// This is used for the GL 1.0 rendering path.
-	GLuint quadDisplayList{ 0 };
-
-	void DrawQuadGL1_0(void)
-	{
-		glCallList(quadDisplayList);
-	}
+	void (*initializeDrawQuad)(void) { silnith::wings::gl1_0::InitializeDrawQuad };
 
 	// The rendering path for rendering a single quad.
 	// This points to the appropriate rendering path for the
 	// active version of the GL.
-	void (*drawQuad)(void) { DrawQuadGL1_0 };
+	void (*drawQuad)(void) { silnith::wings::gl1_0::DrawQuad };
 
-	void CleanupDrawQuadGL1_0(void)
-	{
-		glDeleteLists(quadDisplayList, 1);
-	}
-
-	void (*cleanupDrawQuad)(void) { CleanupDrawQuadGL1_0 };
-
-	void InitializeDrawQuadGL1_0(void)
-	{
-		quadDisplayList = glGenLists(1);
-		glNewList(quadDisplayList, GL_COMPILE);
-		glBegin(GL_QUADS);
-		glVertex2f(1, 1);
-		glVertex2f(-1, 1);
-		glVertex2f(-1, -1);
-		glVertex2f(1, -1);
-		glEnd();
-		glEndList();
-
-		drawQuad = DrawQuadGL1_0;
-		cleanupDrawQuad = CleanupDrawQuadGL1_0;
-	}
-
-	GLfloat const quadVertices[12]
-	{
-		1, 1, 0,
-		-1, 1, 0,
-		-1, -1, 0,
-		1, -1, 0,
-	};
-	GLsizeiptr const quadVerticesSize{ sizeof(GLfloat) * 12 };
-	GLuint const quadIndices[4]
-	{
-		0, 1, 2, 3,
-	};
-	GLsizeiptr const quadIndicesSize{ sizeof(GLuint) * 4 };
-
-	static_assert(quadVerticesSize == sizeof(quadVertices), "Size of quad vertices array is not as expected.");
-	static_assert(quadIndicesSize == sizeof(quadIndices), "I do not know how sizeof works.");
-
-	void DrawQuadGL1_1(void)
-	{
-		/*
-		 * EnableClientState is executed immediately, it is not compiled into
-		 * a display list.  When creating a display list,
-		 * DrawElements dereferences vertex pointers according to the client
-		 * state, and the dereferenced vertices are compiled into the
-		 * display list.
-		 */
-		glEnableClientState(GL_VERTEX_ARRAY);
-
-		/*
-		 * Elements are interpreted according to the current VertexPointer.
-		 */
-		glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, quadIndices);
-
-		glDisableClientState(GL_VERTEX_ARRAY);
-	}
-
-	void CleanupDrawQuadGL1_1(void)
-	{
-	}
-
-	void InitializeDrawQuadGL1_1(void)
-	{
-		/*
-		 * Specifies vertex data to be used by subsequent calls to
-		 * DrawArrays and DrawElements.
-		 */
-		glVertexPointer(3, GL_FLOAT, 0, quadVertices);
-
-		drawQuad = DrawQuadGL1_1;
-		cleanupDrawQuad = CleanupDrawQuadGL1_1;
-	}
-
-	void DrawQuadGL1_5(void)
-	{
-		/*
-		 * EnableClientState is executed immediately, it is not compiled into
-		 * a display list.  When compiled into a display list,
-		 * DrawElements dereferences vertex pointers according to the client
-		 * state, and the dereferenced vertices are compiled into the
-		 * display list.
-		 */
-		glEnableClientState(GL_VERTEX_ARRAY);
-
-		/*
-		 * If there is an ELEMENT_ARRAY_BUFFER bound, then the last parameter
-		 * to DrawElements is interpreted as an index/offset into the
-		 * ELEMENT_ARRAY_BUFFER.
-		 * 
-		 * Elements of the ELEMENT_ARRAY_BUFFER are interpreted according to
-		 * the current VertexPointer.
-		 */
-		glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, 0);
-
-		glDisableClientState(GL_VERTEX_ARRAY);
-	}
-
-	GLuint wingBufferObject{ 0 };
-	GLuint wingIndicesBufferObject{ 0 };
-
-	void CleanupDrawQuadGL1_5(void)
-	{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		glDeleteBuffers(1, &wingIndicesBufferObject);
-		glDeleteBuffers(1, &wingBufferObject);
-	}
-
-	void InitializeDrawQuadGL1_5(void)
-	{
-		glGenBuffers(1, &wingBufferObject);
-		glBindBuffer(GL_ARRAY_BUFFER, wingBufferObject);
-		glBufferData(GL_ARRAY_BUFFER, quadVerticesSize, quadVertices, GL_STATIC_DRAW);
-		/*
-		 * Specifies vertex data to be used by subsequent calls to
-		 * DrawArrays and DrawElements.
-		 * 
-		 * If there is an ARRAY_BUFFER bound, then the last parameter is interpreted
-		 * as an index/offset into the ARRAY_BUFFER.
-		 */
-		glVertexPointer(3, GL_FLOAT, 0, 0);
-
-		glGenBuffers(1, &wingIndicesBufferObject);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBufferObject);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesSize, quadIndices, GL_STATIC_DRAW);
-
-		drawQuad = DrawQuadGL1_5;
-		cleanupDrawQuad = CleanupDrawQuadGL1_5;
-	}
+	void (*cleanupDrawQuad)(void) { silnith::wings::gl1_0::CleanupDrawQuad };
 
 	GLuint deltaZAttribLocation{ 0 };
 	GLuint radiusAngleAttribLocation{ 0 };
@@ -243,16 +253,23 @@ namespace silnith::wings::gl2
 
 		if (hasOpenGL(1, 5))
 		{
-			InitializeDrawQuadGL1_5();
+			initializeDrawQuad = silnith::wings::gl1_5::InitializeDrawQuad;
+			drawQuad = silnith::wings::gl1_5::DrawQuad;
+			cleanupDrawQuad = silnith::wings::gl1_5::CleanupDrawQuad;
 		}
 		else if (hasOpenGL(1, 1))
 		{
-			InitializeDrawQuadGL1_1();
+			initializeDrawQuad = silnith::wings::gl1_1::InitializeDrawQuad;
+			drawQuad = silnith::wings::gl1_1::DrawQuad;
+			cleanupDrawQuad = silnith::wings::gl1_1::CleanupDrawQuad;
 		}
 		else
 		{
-			InitializeDrawQuadGL1_0();
+			initializeDrawQuad = silnith::wings::gl1_0::InitializeDrawQuad;
+			drawQuad = silnith::wings::gl1_0::DrawQuad;
+			cleanupDrawQuad = silnith::wings::gl1_0::CleanupDrawQuad;
 		}
+		initializeDrawQuad();
 
 		if (hasOpenGL(2, 1))
 		{
@@ -391,9 +408,14 @@ void main() {
 		}
 		else
 		{
-			displayList = wings.back().getGLDisplayList();
+			// This block is simply so lastWing goes out of scope before the pop_back.
+			{
+				wing_list::const_reference lastWing{ wings.back() };
+				displayList = lastWing.getGLDisplayList();
+			}
 			wings.pop_back();
 		}
+
 		wing_list::const_reference wing{ wings.emplace_front(displayList,
 			radius, angle,
 			deltaAngle, deltaZ,
