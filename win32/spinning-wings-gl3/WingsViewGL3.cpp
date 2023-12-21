@@ -63,6 +63,27 @@ namespace silnith::wings::gl3
 	GLuint renderVertexArray{ 0 };
 
 	/// <summary>
+	/// The uniform buffer for the ModelViewProjection matrices.
+	/// </summary>
+	GLuint modelViewProjectionUniformBuffer{ 0 };
+	/// <summary>
+	/// The uniform buffer binding index for the ModelViewProjection matrices.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// Uniform buffers use an indirection mechanism.  Rather than binding them directly,
+	/// a shader program specifies an index into a set of binding points.
+	/// The application can then update the uniform buffer bound to that index
+	/// independently of whichever shader program is active.
+	/// </para>
+	/// <para>
+	/// In this case, there is only one shader program and one uniform buffer.
+	/// So this simply uses the first index in the array of binding points.
+	/// </para>
+	/// </remarks>
+	GLuint const modelViewProjectionBindingIndex{ 0 };
+
+	/// <summary>
 	/// The model matrix to be passed to the vertex shaders.
 	/// </summary>
 	/// <remarks>
@@ -80,6 +101,13 @@ namespace silnith::wings::gl3
 		0, 0, 1, 0,
 		0, 0, 0, 1,
 	};
+	/// <summary>
+	/// The offset into the uniform buffer where the model matrix is.
+	/// </summary>
+	/// <seealso cref="modelViewProjectionUniformBuffer"/>
+	GLintptr modelOffset{ 0 };
+	GLsizeiptr const modelSize{ sizeof(model) };
+	static_assert(modelSize == sizeof(GLfloat) * 4 * 4, "Check whether the uniform buffer allocation is correct.");
 	/// <summary>
 	/// The view matrix to be passed to the vertex shaders.
 	/// </summary>
@@ -99,6 +127,13 @@ namespace silnith::wings::gl3
 		0, 0, 0, 1,
 	};
 	/// <summary>
+	/// The offset into the uniform buffer where the view matrix is.
+	/// </summary>
+	/// <seealso cref="modelViewProjectionUniformBuffer"/>
+	GLintptr viewOffset{ 0 };
+	GLsizeiptr const viewSize{ sizeof(view) };
+	static_assert(viewSize == sizeof(GLfloat) * 4 * 4, "Check whether the uniform buffer allocation is correct.");
+	/// <summary>
 	/// The projection matrix to be passed to the vertex shaders.
 	/// </summary>
 	/// <remarks>
@@ -116,6 +151,13 @@ namespace silnith::wings::gl3
 		0, 0, 1, 0,
 		0, 0, 0, 1,
 	};
+	/// <summary>
+	/// The offset into the uniform buffer where the projection matrix is.
+	/// </summary>
+	/// <seealso cref="modelViewProjectionUniformBuffer"/>
+	GLintptr projectionOffset{ 0 };
+	GLsizeiptr const projectionSize{ sizeof(projection) };
+	static_assert(projectionSize == sizeof(GLfloat) * 4 * 4, "Check whether the uniform buffer allocation is correct.");
 
 	void InitializeOpenGLState(void)
 	{
@@ -286,9 +328,11 @@ void main() {
 			VertexShader{
 				R"shaderText(#version 150
 
-uniform mat4 model = mat4(1);
-uniform mat4 view = mat4(1);
-uniform mat4 projection = mat4(1);
+uniform ModelViewProjection {
+    mat4 model;
+    mat4 view;
+    mat4 projection;
+};
 
 uniform vec2 deltaZ = vec2(15, 0.5);
 
@@ -340,6 +384,41 @@ void main() {
 		glEnableVertexAttribArray(renderProgram->getAttributeLocation("color"));
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
 		glBindVertexArray(0);
+
+		GLsizei dataSize{ 0 };
+		{
+			GLuint const programId{ renderProgram->getProgram() };
+			GLuint const blockIndex{ glGetUniformBlockIndex(programId, "ModelViewProjection")};
+			glUniformBlockBinding(programId, blockIndex, modelViewProjectionBindingIndex);
+
+			{
+				GLuint uniformIndices[3]{ 0, 0, 0, };
+				GLchar const* const names[3]{ "model", "view", "projection" };
+				glGetUniformIndices(programId, 3, names, uniformIndices);
+
+				GLint uniformOffsets[3]{ 0, 0, 0, };
+				glGetActiveUniformsiv(programId, 3, uniformIndices, GL_UNIFORM_OFFSET, uniformOffsets);
+				modelOffset = uniformOffsets[0];
+				viewOffset = uniformOffsets[1];
+				projectionOffset = uniformOffsets[2];
+			}
+
+			{
+				GLint modelViewProjectionUniformDataSize{ 0 };
+				glGetActiveUniformBlockiv(programId, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &modelViewProjectionUniformDataSize);
+				dataSize = modelViewProjectionUniformDataSize;
+			}
+		}
+
+		glGenBuffers(1, &modelViewProjectionUniformBuffer);
+		glBindBufferBase(GL_UNIFORM_BUFFER, modelViewProjectionBindingIndex, modelViewProjectionUniformBuffer);
+
+		glBindBuffer(GL_UNIFORM_BUFFER, modelViewProjectionUniformBuffer);
+		glBufferData(GL_UNIFORM_BUFFER, dataSize, nullptr, GL_STATIC_DRAW);
+		glBufferSubData(GL_UNIFORM_BUFFER, modelOffset, modelSize, model);
+		glBufferSubData(GL_UNIFORM_BUFFER, viewOffset, viewSize, view);
+		glBufferSubData(GL_UNIFORM_BUFFER, projectionOffset, projectionSize, projection);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
 	void CleanupOpenGLState(void)
@@ -353,6 +432,8 @@ void main() {
 			glDeleteBuffers(1, &colorBuffer);
 			glDeleteBuffers(1, &edgeColorBuffer);
 		}
+
+		glDeleteBuffers(1, &modelViewProjectionUniformBuffer);
 
 		glDeleteVertexArrays(1, &renderVertexArray);
 		glDeleteVertexArrays(1, &wingTransformVertexArray);
@@ -466,10 +547,6 @@ void main() {
 		GLuint const vertexAttribLocation{ renderProgram->getAttributeLocation("vertex") };
 		GLuint const colorAttribLocation{ renderProgram->getAttributeLocation("color") };
 
-		glUniformMatrix4fv(renderProgram->getUniformLocation("model"), 1, GL_FALSE, model);
-		glUniformMatrix4fv(renderProgram->getUniformLocation("view"), 1, GL_FALSE, view);
-		glUniformMatrix4fv(renderProgram->getUniformLocation("projection"), 1, GL_FALSE, projection);
-
 		GLuint deltaAttribBuffer{ 0 };
 		glGenBuffers(1, &deltaAttribBuffer);
 
@@ -557,6 +634,10 @@ void main() {
 		projection[13] = -(top + bottom) / viewHeight;
 		projection[14] = -(farZ + nearZ) / viewDepth;
 		projection[15] = static_cast<GLfloat>(1);
+
+		glBindBuffer(GL_UNIFORM_BUFFER, modelViewProjectionUniformBuffer);
+		glBufferSubData(GL_UNIFORM_BUFFER, projectionOffset, projectionSize, projection);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
 	void Resize(GLsizei width, GLsizei height)
