@@ -15,6 +15,8 @@
 #include "WingsPixelFormat.h"
 #include "WingsView.h"
 
+#include "resource.h"
+
 UINT const updateDelayMilliseconds{ 33 };
 
 /*
@@ -204,6 +206,18 @@ int APIENTRY WinMain(
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
 	// register the window class for the main window
+	HCURSOR hCursor{ LoadCursorW(NULL, IDC_ARROW) };
+	//HCURSOR hCursor{ (HCURSOR) LoadImageW(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED) };
+	
+	int const iconWidth{ GetSystemMetrics(SM_CXICON) };
+	int const iconHeight{ GetSystemMetrics(SM_CYICON) };
+	int const iconSmWidth{ GetSystemMetrics(SM_CXSMICON) };
+	int const iconSmHeight{ GetSystemMetrics(SM_CYSMICON) };
+
+	//HICON hIcon{ LoadIconW(hInstance, MAKEINTRESOURCEW(IDI_WING)) };
+	HICON hIcon{ (HICON)LoadImageW(hInstance, MAKEINTRESOURCEW(IDI_WING), IMAGE_ICON, iconWidth, iconHeight, LR_DEFAULTCOLOR | LR_SHARED) };
+	HICON hIconSm{ (HICON)LoadImageW(hInstance, MAKEINTRESOURCEW(IDI_WING), IMAGE_ICON, iconSmWidth, iconSmHeight, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_SHARED) };
+	HBRUSH hBrush{ GetSysColorBrush(COLOR_WINDOW) };
 
 	WNDCLASSEXW const wndClassEx{
 		.cbSize = sizeof(WNDCLASSEXW),
@@ -212,13 +226,13 @@ int APIENTRY WinMain(
 		.cbClsExtra = 0,
 		.cbWndExtra = 0,
 		.hInstance = hInstance,
-		.hIcon = NULL,  // LoadIcon
-		.hCursor = NULL,  // LoadCursor
-		// GetStockObject(BLACK_BRUSH);
-		.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1),
+		.hIcon = hIcon,
+		.hCursor = hCursor,
+		//.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1),
+		.hbrBackground = hBrush,
 		.lpszMenuName = NULL,
 		.lpszClassName = L"Project1Class",
-		.hIconSm = NULL,
+		.hIconSm = hIconSm,
 	};
 	ATOM const wndClassIdentifier{ RegisterClassExW(&wndClassEx) };
 	if (wndClassIdentifier == 0)
