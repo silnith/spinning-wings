@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by spinning-wings.rc
+// Used by wings-saver.rc
 //
 #define IDI_WINGS                       101
 

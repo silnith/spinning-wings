@@ -30,7 +30,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="wing.ico">
+    <Image Include="wings.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

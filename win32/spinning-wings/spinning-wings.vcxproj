@@ -177,7 +177,7 @@
     <ResourceCompile Include="spinning-wings.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="wing.ico" />
+    <Image Include="wings.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
