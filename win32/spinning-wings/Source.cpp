@@ -206,14 +206,14 @@ int APIENTRY WinMain(
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
 	// register the window class for the main window
-	//HCURSOR const hCursor{ LoadCursorW(nullptr, IDC_ARROW) };
+
+	HICON const hIcon{ static_cast<HICON>(LoadImageW(hInstance, MAKEINTRESOURCEW(IDI_WINGS), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_SHARED)) };
 	HCURSOR const hCursor{ static_cast<HCURSOR>(LoadImageW(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED)) };
-	
+	HBRUSH const hBrush{ GetSysColorBrush(COLOR_WINDOW) };
+	LPCWSTR const menuName{ nullptr };
+	LPCWSTR const className{ L"SpinningWings" };
 	int const iconSmWidth{ GetSystemMetrics(SM_CXSMICON) };
 	int const iconSmHeight{ GetSystemMetrics(SM_CYSMICON) };
-
-	//HICON const hIcon{ LoadIconW(hInstance, MAKEINTRESOURCEW(IDI_WING)) };
-	HICON const hIcon{ static_cast<HICON>(LoadImageW(hInstance, MAKEINTRESOURCEW(IDI_WINGS), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_SHARED)) };
 	HICON const hIconSm{ static_cast<HICON>(LoadImageW(hInstance, MAKEINTRESOURCEW(IDI_WINGS), IMAGE_ICON, iconSmWidth, iconSmHeight, LR_DEFAULTCOLOR | LR_SHARED)) };
 
 	WNDCLASSEXW const wndClassEx{
@@ -225,9 +225,9 @@ int APIENTRY WinMain(
 		.hInstance = hInstance,
 		.hIcon = hIcon,
 		.hCursor = hCursor,
-		.hbrBackground = GetSysColorBrush(COLOR_WINDOW),
-		.lpszMenuName = nullptr,
-		.lpszClassName = L"Project1Class",
+		.hbrBackground = hBrush,
+		.lpszMenuName = menuName,
+		.lpszClassName = className,
 		.hIconSm = hIconSm,
 	};
 	ATOM const wndClassIdentifier{ RegisterClassExW(&wndClassEx) };
@@ -239,8 +239,8 @@ int APIENTRY WinMain(
 	// create the main window
 
 	DWORD const extendedWindowStyle{ WS_EX_APPWINDOW | WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_WINDOWEDGE };
-	LPCWSTR const className{ reinterpret_cast<LPCWSTR>(wndClassIdentifier) };
-	LPCWSTR const windowName{ L"Project1Window" };
+	LPCWSTR const classType{ reinterpret_cast<LPCWSTR>(wndClassIdentifier) };
+	LPCWSTR const windowName{ L"Spinning Wings" };
 	DWORD const windowStyle{ WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS };
 	int const x{ CW_USEDEFAULT };
 	int const y{ CW_USEDEFAULT };
@@ -248,7 +248,7 @@ int APIENTRY WinMain(
 	int const height{ 600 };
 	HWND const windowParent{ nullptr };
 	HMENU const menu{ nullptr };
-	HWND const window{ CreateWindowExW(extendedWindowStyle, className, windowName, windowStyle, x, y, width, height, windowParent, menu, hInstance, nullptr) };
+	HWND const window{ CreateWindowExW(extendedWindowStyle, classType, windowName, windowStyle, x, y, width, height, windowParent, menu, hInstance, nullptr) };
 	if (window == nullptr) {
 		// call GetLastError
 		return FALSE;
