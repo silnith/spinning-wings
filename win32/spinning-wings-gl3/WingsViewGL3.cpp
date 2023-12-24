@@ -367,7 +367,7 @@ void main() {
 			FragmentShader{
 				R"shaderText(#version 150
 
-in vec4 varyingColor;
+smooth in vec4 varyingColor;
 
 out vec4 fragmentColor;
 
