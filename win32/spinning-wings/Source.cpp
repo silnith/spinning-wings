@@ -48,7 +48,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		int const pixelformat{ ChoosePixelFormat(hdc, &silnith::gl::desiredPixelFormat) };
 		if (pixelformat == 0) {
-			DWORD error{ GetLastError() };
+			DWORD const error{ GetLastError() };
 			ReleaseDC(hWnd, hdc);
 			PostQuitMessage(-1);
 			return -1;
@@ -60,15 +60,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (didSetPixelFormat) {}
 		else
 		{
-			DWORD error{ GetLastError() };
+			DWORD const error{ GetLastError() };
 			ReleaseDC(hWnd, hdc);
 			PostQuitMessage(-1);
 			return -1;
 		}
 
 		hglrc = wglCreateContext(hdc);
-		if (hglrc == NULL) {
-			DWORD error{ GetLastError() };
+		if (hglrc == nullptr) {
+			DWORD const error{ GetLastError() };
 			ReleaseDC(hWnd, hdc);
 			PostQuitMessage(-1);
 			return -1;
@@ -78,7 +78,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (didMakeCurrent) {}
 		else
 		{
-			DWORD error{ GetLastError() };
+			DWORD const error{ GetLastError() };
 			ReleaseDC(hWnd, hdc);
 			wglDeleteContext(hglrc);
 			PostQuitMessage(-1);
@@ -96,11 +96,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// GetSystemMetricsForDpi, AdjustWindowRectExForDpi, SystemParametersInfoForDpi, GetDpiForWindow
 		WORD const yAxisDPI{ HIWORD(wParam) };
 		WORD const xAxisDPI{ LOWORD(wParam) };
-		LPRECT const suggestedSizeAndPosition{ (RECT*)lParam };
+		LPRECT const suggestedSizeAndPosition{ reinterpret_cast<LPRECT>(lParam) };
 		/*
 		* TODO: Guard this call to Windows 8.1 and later.
 		*/
-		BOOL const success{ SetWindowPos(hWnd, NULL, suggestedSizeAndPosition->left, suggestedSizeAndPosition->top, suggestedSizeAndPosition->right - suggestedSizeAndPosition->left, suggestedSizeAndPosition->bottom - suggestedSizeAndPosition->top, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS) };
+		BOOL const success{ SetWindowPos(hWnd, nullptr, suggestedSizeAndPosition->left, suggestedSizeAndPosition->top, suggestedSizeAndPosition->right - suggestedSizeAndPosition->left, suggestedSizeAndPosition->bottom - suggestedSizeAndPosition->top, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS) };
 		return 0;
 	}
 	case WM_SIZE:
@@ -116,12 +116,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		default:
 			return DefWindowProcW(hWnd, message, wParam, lParam);
 		}
+		WORD const width{ LOWORD(lParam) };
+		WORD const height{ HIWORD(lParam) };
 
 		assert(hglrc == wglGetCurrentContext());
 
-		GLsizei const width{ LOWORD(lParam) };
-		GLsizei const height{ HIWORD(lParam) };
-		silnith::wings::gl::Resize(width, height);
+		silnith::wings::gl::Resize(static_cast<GLsizei>(width), static_cast<GLsizei>(height));
 
 		return 0;
 	}
@@ -131,7 +131,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		silnith::wings::gl::AdvanceAnimation();
 
-		InvalidateRgn(hWnd, NULL, FALSE);
+		InvalidateRgn(hWnd, nullptr, FALSE);
 		return 0;
 	}
 	case WM_ERASEBKGND:
@@ -154,10 +154,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		PAINTSTRUCT paintstruct;
 		HDC const hdc{ BeginPaint(hWnd, &paintstruct) };
-		if (hdc == NULL) {
+		if (hdc == nullptr) {
 			return -1;
 		}
-		//EnumDisplayMonitors(hdc, NULL, MonitorEnumProc, 0);
+		//EnumDisplayMonitors(hdc, nullptr, MonitorEnumProc, 0);
 
 		//wglMakeCurrent(hdc, hglrc);
 
@@ -179,7 +179,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		// window about to be destroyed
 		HDC const hdc{ GetDC(hWnd) };
-		wglMakeCurrent(hdc, NULL);
+		wglMakeCurrent(hdc, nullptr);
 		ReleaseDC(hWnd, hdc);
 
 		wglDeleteContext(hglrc);
@@ -206,18 +206,15 @@ int APIENTRY WinMain(
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
 	// register the window class for the main window
-	HCURSOR hCursor{ LoadCursorW(NULL, IDC_ARROW) };
-	//HCURSOR hCursor{ (HCURSOR) LoadImageW(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED) };
+	//HCURSOR const hCursor{ LoadCursorW(nullptr, IDC_ARROW) };
+	HCURSOR const hCursor{ static_cast<HCURSOR>(LoadImageW(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED)) };
 	
-	int const iconWidth{ GetSystemMetrics(SM_CXICON) };
-	int const iconHeight{ GetSystemMetrics(SM_CYICON) };
 	int const iconSmWidth{ GetSystemMetrics(SM_CXSMICON) };
 	int const iconSmHeight{ GetSystemMetrics(SM_CYSMICON) };
 
-	//HICON hIcon{ LoadIconW(hInstance, MAKEINTRESOURCEW(IDI_WING)) };
-	HICON hIcon{ (HICON)LoadImageW(hInstance, MAKEINTRESOURCEW(IDI_WING), IMAGE_ICON, iconWidth, iconHeight, LR_DEFAULTCOLOR | LR_SHARED) };
-	HICON hIconSm{ (HICON)LoadImageW(hInstance, MAKEINTRESOURCEW(IDI_WING), IMAGE_ICON, iconSmWidth, iconSmHeight, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_SHARED) };
-	HBRUSH hBrush{ GetSysColorBrush(COLOR_WINDOW) };
+	//HICON const hIcon{ LoadIconW(hInstance, MAKEINTRESOURCEW(IDI_WING)) };
+	HICON const hIcon{ static_cast<HICON>(LoadImageW(hInstance, MAKEINTRESOURCEW(IDI_WING), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_SHARED)) };
+	HICON const hIconSm{ static_cast<HICON>(LoadImageW(hInstance, MAKEINTRESOURCEW(IDI_WING), IMAGE_ICON, iconSmWidth, iconSmHeight, LR_DEFAULTCOLOR | LR_SHARED)) };
 
 	WNDCLASSEXW const wndClassEx{
 		.cbSize = sizeof(WNDCLASSEXW),
@@ -228,9 +225,8 @@ int APIENTRY WinMain(
 		.hInstance = hInstance,
 		.hIcon = hIcon,
 		.hCursor = hCursor,
-		//.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1),
-		.hbrBackground = hBrush,
-		.lpszMenuName = NULL,
+		.hbrBackground = GetSysColorBrush(COLOR_WINDOW),
+		.lpszMenuName = nullptr,
 		.lpszClassName = L"Project1Class",
 		.hIconSm = hIconSm,
 	};
@@ -243,17 +239,17 @@ int APIENTRY WinMain(
 	// create the main window
 
 	DWORD const extendedWindowStyle{ WS_EX_APPWINDOW | WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_WINDOWEDGE };
-	LPCWSTR const className{ (LPCWSTR)wndClassIdentifier };
+	LPCWSTR const className{ reinterpret_cast<LPCWSTR>(wndClassIdentifier) };
 	LPCWSTR const windowName{ L"Project1Window" };
 	DWORD const windowStyle{ WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS };
 	int const x{ CW_USEDEFAULT };
 	int const y{ CW_USEDEFAULT };
 	int const width{ CW_USEDEFAULT };
 	int const height{ 600 };
-	HWND const windowParent{ NULL };
-	HMENU const menu{ NULL };
-	HWND const window{ CreateWindowExW(extendedWindowStyle, className, windowName, windowStyle, x, y, width, height, windowParent, menu, hInstance, NULL) };
-	if (window == NULL) {
+	HWND const windowParent{ nullptr };
+	HMENU const menu{ nullptr };
+	HWND const window{ CreateWindowExW(extendedWindowStyle, className, windowName, windowStyle, x, y, width, height, windowParent, menu, hInstance, nullptr) };
+	if (window == nullptr) {
 		// call GetLastError
 		return FALSE;
 	}
@@ -263,12 +259,12 @@ int APIENTRY WinMain(
 	ShowWindow(window, nShowCmd);
 	UpdateWindow(window);
 
-	UINT_PTR const timer{ SetTimer(window, 42, updateDelayMilliseconds, NULL) };
+	UINT_PTR const timer{ SetTimer(window, 42, updateDelayMilliseconds, nullptr) };
 
 	// start the message loop
 
 	MSG msg{};
-	BOOL hasMessage{ GetMessageW(&msg, NULL, 0, 0) };
+	BOOL hasMessage{ GetMessageW(&msg, nullptr, 0, 0) };
 	while (hasMessage) {
 		if (hasMessage == -1) {
 			return -1;
@@ -276,7 +272,7 @@ int APIENTRY WinMain(
 		TranslateMessage(&msg);
 		DispatchMessageW(&msg);
 
-		hasMessage = GetMessageW(&msg, NULL, 0, 0);
+		hasMessage = GetMessageW(&msg, nullptr, 0, 0);
 	}
 
 	KillTimer(window, timer);
