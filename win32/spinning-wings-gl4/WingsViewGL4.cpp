@@ -289,8 +289,13 @@ mat4 scale(in vec3 factor) {
 
 uniform vec2 radiusAngle;
 uniform vec3 rollPitchYaw;
+uniform vec3 color;
+uniform vec3 edgeColor = vec3(1, 1, 1);
 
 in vec4 vertex;
+
+smooth out vec3 varyingWingColor;
+smooth out vec3 varyingEdgeColor;
 
 mat4 rotate(in float angle, in vec3 axis);
 mat4 translate(in vec3 move);
@@ -306,6 +311,9 @@ void main() {
     float pitch = rollPitchYaw[1];
     float yaw = rollPitchYaw[2];
 
+    varyingWingColor = color;
+    varyingEdgeColor = edgeColor;
+
     mat4 wingTransformation = rotate(angle, zAxis)
                               * translate(vec3(radius, 0, 0))
                               * rotate(-yaw, zAxis)
@@ -317,7 +325,11 @@ void main() {
 				rotateMatrixFunctionDeclaration,
 				translateMatrixFunctionDeclaration,
 			},
-			{"gl_Position"}
+			{
+				"gl_Position",
+				"varyingWingColor",
+				"varyingEdgeColor",
+			}
 		};
 		glGenVertexArrays(1, &wingTransformVertexArray);
 		glBindVertexArray(wingTransformVertexArray);
@@ -464,6 +476,8 @@ void main() {
 
 		glProgramUniform2f(wingTransformProgram->getProgram(), wingTransformProgram->getUniformLocation("radiusAngle"), radius, angle);
 		glProgramUniform3f(wingTransformProgram->getProgram(), wingTransformProgram->getUniformLocation("rollPitchYaw"), roll, pitch, yaw);
+		glProgramUniform3f(wingTransformProgram->getProgram(), wingTransformProgram->getUniformLocation("color"), red, green, blue);
+		//glProgramUniform3f(wingTransformProgram->getProgram(), wingTransformProgram->getUniformLocation("edgeColor"), 1, 1, 1);
 
 		GLuint wingVertexBuffer{ 0 };
 		GLuint wingColorBuffer{ 0 };
@@ -476,7 +490,14 @@ void main() {
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glGenBuffers(1, &wingColorBuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, wingColorBuffer);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * 4, nullptr, GL_STREAM_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 			glGenBuffers(1, &wingEdgeColorBuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, wingEdgeColorBuffer);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * 4, nullptr, GL_STREAM_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 		else
 		{
@@ -495,38 +516,6 @@ void main() {
 			wingEdgeColorBuffer,
 			deltaAngle, deltaZ) };
 
-		{
-			GLfloat const colorData[3 * 4]{
-				red, green, blue,
-				red, green, blue,
-				red, green, blue,
-				red, green, blue,
-			};
-			GLsizeiptr const colorDataSize{ sizeof(colorData) };
-			static_assert(colorDataSize == sizeof(GLfloat) * 3 * 4, "I do not know how sizeof works.");
-			glBindBuffer(GL_ARRAY_BUFFER, wingColorBuffer);
-			glBufferData(GL_ARRAY_BUFFER, colorDataSize, colorData, GL_STREAM_DRAW);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-		}
-
-		{
-			Color<GLfloat> const wingEdgeColor{ Color<GLfloat>::WHITE };
-			GLfloat const edgeRed{ wingEdgeColor.getRed() };
-			GLfloat const edgeGreen{ wingEdgeColor.getGreen() };
-			GLfloat const edgeBlue{ wingEdgeColor.getBlue() };
-			GLfloat const edgeColorData[3 * 4]{
-				edgeRed, edgeGreen, edgeBlue,
-				edgeRed, edgeGreen, edgeBlue,
-				edgeRed, edgeGreen, edgeBlue,
-				edgeRed, edgeGreen, edgeBlue,
-			};
-			GLsizeiptr const edgeColorDataSize{ sizeof(edgeColorData) };
-			static_assert(edgeColorDataSize == sizeof(GLfloat) * 3 * 4, "I do not know how sizeof works.");
-			glBindBuffer(GL_ARRAY_BUFFER, wingEdgeColorBuffer);
-			glBufferData(GL_ARRAY_BUFFER, edgeColorDataSize, edgeColorData, GL_STREAM_DRAW);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-		}
-
 		wingTransformProgram->useProgram();
 
 		glBindVertexArray(wingTransformVertexArray);
@@ -536,6 +525,8 @@ void main() {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, wingVertexBuffer);
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, wingColorBuffer);
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 2, wingEdgeColorBuffer);
 
 		glBeginTransformFeedback(GL_POINTS);
 		glDrawArrays(GL_POINTS, 0, 4);
