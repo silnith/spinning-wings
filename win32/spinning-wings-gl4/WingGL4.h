@@ -47,8 +47,10 @@ namespace silnith::wings::gl4
 		Wing(ID vertexBuffer,
 			ID colorBuffer,
 			ID edgeColorBuffer,
+			ID transformFeedbackObject,
 			T deltaAngle, T deltaZ) noexcept
 			: vertexBuffer{ vertexBuffer }, colorBuffer{ colorBuffer }, edgeColorBuffer{ edgeColorBuffer },
+			transformFeedbackObject{ transformFeedbackObject },
 			deltaAngle{ deltaAngle }, deltaZ{ deltaZ }
 		{}
 
@@ -84,6 +86,16 @@ namespace silnith::wings::gl4
 		}
 
 		/// <summary>
+		/// Returns the OpenGL transform feedback object identifier for this wing.
+		/// </summary>
+		/// <returns>the OpenGL transform feedback object identifier</returns>
+		[[nodiscard]]
+		inline ID getTransformFeedbackObject(void) const noexcept
+		{
+			return transformFeedbackObject;
+		}
+
+		/// <summary>
 		/// Returns the additional angle around the central axis that each subsequent wing should be rendered.
 		/// </summary>
 		/// <returns>the additional angle that the wing gains as it receds into history</returns>
@@ -107,6 +119,7 @@ namespace silnith::wings::gl4
 		ID const vertexBuffer{ 0 };
 		ID const colorBuffer{ 0 };
 		ID const edgeColorBuffer{ 0 };
+		ID const transformFeedbackObject{ 0 };
 		T const deltaAngle{ 15 };
 		T const deltaZ{ 0.5 };
 	};

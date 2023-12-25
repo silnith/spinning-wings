@@ -443,9 +443,11 @@ void main() {
 			GLuint const vertexBuffer{ wing.getVertexBuffer() };
 			GLuint const colorBuffer{ wing.getColorBuffer() };
 			GLuint const edgeColorBuffer{ wing.getEdgeColorBuffer() };
-			glDeleteBuffers(1, &vertexBuffer);
-			glDeleteBuffers(1, &colorBuffer);
+			GLuint const transformFeedbackObject{ wing.getTransformFeedbackObject() };
+			glDeleteTransformFeedbacks(1, &transformFeedbackObject);
 			glDeleteBuffers(1, &edgeColorBuffer);
+			glDeleteBuffers(1, &colorBuffer);
+			glDeleteBuffers(1, &vertexBuffer);
 		}
 
 		glDeleteBuffers(1, &modelViewProjectionUniformBuffer);
@@ -483,6 +485,7 @@ void main() {
 		GLuint wingVertexBuffer{ 0 };
 		GLuint wingColorBuffer{ 0 };
 		GLuint wingEdgeColorBuffer{ 0 };
+		GLuint transformFeedbackObject{ 0 };
 		if (wings.empty() || wings.size() < numWings)
 		{
 			glGenBuffers(1, &wingVertexBuffer);
@@ -499,6 +502,13 @@ void main() {
 			glBindBuffer(GL_ARRAY_BUFFER, wingEdgeColorBuffer);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * numVertices, nullptr, GL_STREAM_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			glGenTransformFeedbacks(1, &transformFeedbackObject);
+			glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, transformFeedbackObject);
+			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, wingVertexBuffer);
+			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, wingColorBuffer);
+			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 2, wingEdgeColorBuffer);
+			glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
 		}
 		else
 		{
@@ -508,6 +518,7 @@ void main() {
 				wingVertexBuffer = lastWing.getVertexBuffer();
 				wingColorBuffer = lastWing.getColorBuffer();
 				wingEdgeColorBuffer = lastWing.getEdgeColorBuffer();
+				transformFeedbackObject = lastWing.getTransformFeedbackObject();
 			}
 			wings.pop_back();
 		}
@@ -515,6 +526,7 @@ void main() {
 		wing_list::const_reference wing{ wings.emplace_front(wingVertexBuffer,
 			wingColorBuffer,
 			wingEdgeColorBuffer,
+			transformFeedbackObject,
 			deltaAngle, deltaZ) };
 
 		wingTransformProgram->useProgram();
@@ -525,13 +537,13 @@ void main() {
 		glVertexAttribPointer(wingTransformProgram->getAttributeLocation("vertex"), 2, GL_FLOAT, GL_FALSE, 0, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, wingVertexBuffer);
-		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, wingColorBuffer);
-		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 2, wingEdgeColorBuffer);
+		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, transformFeedbackObject);
 
 		glBeginTransformFeedback(GL_POINTS);
 		glDrawArrays(GL_POINTS, 0, numVertices);
 		glEndTransformFeedback();
+
+		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
 
 		glBindVertexArray(0);
 	}
