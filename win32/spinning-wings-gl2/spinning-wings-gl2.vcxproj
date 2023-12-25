@@ -183,9 +183,16 @@
   <ItemGroup>
     <ClInclude Include="FragmentShader.h" />
     <ClInclude Include="Program.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="VertexShader.h" />
     <ClInclude Include="WingsViewGL2.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="spinning-wings-gl2.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="wings.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

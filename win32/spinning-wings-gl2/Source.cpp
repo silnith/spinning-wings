@@ -16,6 +16,8 @@
 #include "WingsPixelFormat.h"
 #include "WingsViewGL2.h"
 
+#include "resource.h"
+
 UINT const updateDelayMilliseconds{ 33 };
 
 /*
@@ -47,7 +49,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		int const pixelformat{ ChoosePixelFormat(hdc, &silnith::gl::desiredPixelFormat) };
 		if (pixelformat == 0) {
-			DWORD error{ GetLastError() };
+			DWORD const error{ GetLastError() };
 			ReleaseDC(hWnd, hdc);
 			PostQuitMessage(-1);
 			return -1;
@@ -59,15 +61,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (didSetPixelFormat) {}
 		else
 		{
-			DWORD error{ GetLastError() };
+			DWORD const error{ GetLastError() };
 			ReleaseDC(hWnd, hdc);
 			PostQuitMessage(-1);
 			return -1;
 		}
 
 		hglrc = wglCreateContext(hdc);
-		if (hglrc == NULL) {
-			DWORD error{ GetLastError() };
+		if (hglrc == nullptr) {
+			DWORD const error{ GetLastError() };
 			ReleaseDC(hWnd, hdc);
 			PostQuitMessage(-1);
 			return -1;
@@ -81,7 +83,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		else
 		{
-			DWORD error{ GetLastError() };
+			DWORD const error{ GetLastError() };
 			ReleaseDC(hWnd, hdc);
 			wglDeleteContext(hglrc);
 			PostQuitMessage(-1);
@@ -109,11 +111,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// GetSystemMetricsForDpi, AdjustWindowRectExForDpi, SystemParametersInfoForDpi, GetDpiForWindow
 		WORD const yAxisDPI{ HIWORD(wParam) };
 		WORD const xAxisDPI{ LOWORD(wParam) };
-		LPRECT const suggestedSizeAndPosition{ (RECT*)lParam };
+		LPRECT const suggestedSizeAndPosition{ reinterpret_cast<LPRECT>(lParam) };
 		/*
 		* TODO: Guard this call to Windows 8.1 and later.
 		*/
-		BOOL const success{ SetWindowPos(hWnd, NULL, suggestedSizeAndPosition->left, suggestedSizeAndPosition->top, suggestedSizeAndPosition->right - suggestedSizeAndPosition->left, suggestedSizeAndPosition->bottom - suggestedSizeAndPosition->top, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS) };
+		BOOL const success{ SetWindowPos(hWnd, nullptr, suggestedSizeAndPosition->left, suggestedSizeAndPosition->top, suggestedSizeAndPosition->right - suggestedSizeAndPosition->left, suggestedSizeAndPosition->bottom - suggestedSizeAndPosition->top, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS) };
 		return 0;
 	}
 	case WM_SIZE:
@@ -129,12 +131,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		default:
 			return DefWindowProcW(hWnd, message, wParam, lParam);
 		}
+		WORD const width{ LOWORD(lParam) };
+		WORD const height{ HIWORD(lParam) };
 
 		assert(hglrc == wglGetCurrentContext());
 
-		GLsizei const width{ LOWORD(lParam) };
-		GLsizei const height{ HIWORD(lParam) };
-		silnith::wings::gl2::Resize(width, height);
+		silnith::wings::gl2::Resize(static_cast<GLsizei>(width), static_cast<GLsizei>(height));
 
 		return 0;
 	}
@@ -144,7 +146,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		silnith::wings::gl2::AdvanceAnimation();
 
-		InvalidateRgn(hWnd, NULL, FALSE);
+		InvalidateRgn(hWnd, nullptr, FALSE);
 		return 0;
 	}
 	case WM_ERASEBKGND:
@@ -167,10 +169,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		PAINTSTRUCT paintstruct;
 		HDC const hdc{ BeginPaint(hWnd, &paintstruct) };
-		if (hdc == NULL) {
+		if (hdc == nullptr) {
 			return -1;
 		}
-		//EnumDisplayMonitors(hdc, NULL, MonitorEnumProc, 0);
+		//EnumDisplayMonitors(hdc, nullptr, MonitorEnumProc, 0);
 
 		//wglMakeCurrent(hdc, hglrc);
 
@@ -192,7 +194,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		// window about to be destroyed
 		HDC const hdc{ GetDC(hWnd) };
-		wglMakeCurrent(hdc, NULL);
+		wglMakeCurrent(hdc, nullptr);
 		ReleaseDC(hWnd, hdc);
 
 		wglDeleteContext(hglrc);
@@ -220,6 +222,15 @@ int APIENTRY WinMain(
 
 	// register the window class for the main window
 
+	HICON const hIcon{ static_cast<HICON>(LoadImageW(hInstance, MAKEINTRESOURCEW(IDI_WINGS), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_SHARED)) };
+	HCURSOR const hCursor{ static_cast<HCURSOR>(LoadImageW(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED)) };
+	HBRUSH const hBrush{ GetSysColorBrush(COLOR_WINDOW) };
+	LPCWSTR const menuName{ nullptr };
+	LPCWSTR const className{ L"SpinningWingsGL2" };
+	int const iconSmWidth{ GetSystemMetrics(SM_CXSMICON) };
+	int const iconSmHeight{ GetSystemMetrics(SM_CYSMICON) };
+	HICON const hIconSm{ static_cast<HICON>(LoadImageW(hInstance, MAKEINTRESOURCEW(IDI_WINGS), IMAGE_ICON, iconSmWidth, iconSmHeight, LR_DEFAULTCOLOR | LR_SHARED)) };
+
 	WNDCLASSEXW const wndClassEx{
 		.cbSize = sizeof(WNDCLASSEXW),
 		.style = CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_OWNDC,
@@ -227,13 +238,12 @@ int APIENTRY WinMain(
 		.cbClsExtra = 0,
 		.cbWndExtra = 0,
 		.hInstance = hInstance,
-		.hIcon = NULL,  // LoadIcon
-		.hCursor = NULL,  // LoadCursor
-		// GetStockObject(BLACK_BRUSH);
-		.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1),
-		.lpszMenuName = NULL,
-		.lpszClassName = L"Project1Class",
-		.hIconSm = NULL,
+		.hIcon = hIcon,
+		.hCursor = hCursor,
+		.hbrBackground = hBrush,
+		.lpszMenuName = menuName,
+		.lpszClassName = className,
+		.hIconSm = hIconSm,
 	};
 	ATOM const wndClassIdentifier{ RegisterClassExW(&wndClassEx) };
 	if (wndClassIdentifier == 0)
@@ -244,17 +254,17 @@ int APIENTRY WinMain(
 	// create the main window
 
 	DWORD const extendedWindowStyle{ WS_EX_APPWINDOW | WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_WINDOWEDGE };
-	LPCWSTR const className{ (LPCWSTR)wndClassIdentifier };
-	LPCWSTR const windowName{ L"Project1Window" };
+	LPCWSTR const classType{ reinterpret_cast<LPCWSTR>(wndClassIdentifier) };
+	LPCWSTR const windowName{ L"Spinning Wings GL2" };
 	DWORD const windowStyle{ WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS };
 	int const x{ CW_USEDEFAULT };
 	int const y{ CW_USEDEFAULT };
 	int const width{ CW_USEDEFAULT };
 	int const height{ 600 };
-	HWND const windowParent{ NULL };
-	HMENU const menu{ NULL };
-	HWND const window{ CreateWindowExW(extendedWindowStyle, className, windowName, windowStyle, x, y, width, height, windowParent, menu, hInstance, NULL) };
-	if (window == NULL) {
+	HWND const windowParent{ nullptr };
+	HMENU const menu{ nullptr };
+	HWND const window{ CreateWindowExW(extendedWindowStyle, classType, windowName, windowStyle, x, y, width, height, windowParent, menu, hInstance, nullptr) };
+	if (window == nullptr) {
 		// call GetLastError
 		return FALSE;
 	}
@@ -264,12 +274,12 @@ int APIENTRY WinMain(
 	ShowWindow(window, nShowCmd);
 	UpdateWindow(window);
 
-	UINT_PTR const timer{ SetTimer(window, 42, updateDelayMilliseconds, NULL) };
+	UINT_PTR const timer{ SetTimer(window, 42, updateDelayMilliseconds, nullptr) };
 
 	// start the message loop
 
 	MSG msg{};
-	BOOL hasMessage{ GetMessageW(&msg, NULL, 0, 0) };
+	BOOL hasMessage{ GetMessageW(&msg, nullptr, 0, 0) };
 	while (hasMessage) {
 		if (hasMessage == -1) {
 			return -1;
@@ -277,7 +287,7 @@ int APIENTRY WinMain(
 		TranslateMessage(&msg);
 		DispatchMessageW(&msg);
 
-		hasMessage = GetMessageW(&msg, NULL, 0, 0);
+		hasMessage = GetMessageW(&msg, nullptr, 0, 0);
 	}
 
 	KillTimer(window, timer);
