@@ -385,6 +385,8 @@ void main() {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
 		glBindVertexArray(0);
 
+		glReleaseShaderCompiler();
+
 		GLsizei dataSize{ 0 };
 		{
 			GLuint const programId{ renderProgram->getProgram() };
@@ -460,6 +462,9 @@ void main() {
 		GLfloat const green{ greenCurve.getNextValue() };
 		GLfloat const blue{ blueCurve.getNextValue() };
 
+		glProgramUniform2f(wingTransformProgram->getProgram(), wingTransformProgram->getUniformLocation("radiusAngle"), radius, angle);
+		glProgramUniform3f(wingTransformProgram->getProgram(), wingTransformProgram->getUniformLocation("rollPitchYaw"), roll, pitch, yaw);
+
 		GLuint wingVertexBuffer{ 0 };
 		GLuint wingColorBuffer{ 0 };
 		GLuint wingEdgeColorBuffer{ 0 };
@@ -523,8 +528,6 @@ void main() {
 		}
 
 		wingTransformProgram->useProgram();
-		glUniform2f(wingTransformProgram->getUniformLocation("radiusAngle"), radius, angle);
-		glUniform3f(wingTransformProgram->getUniformLocation("rollPitchYaw"), roll, pitch, yaw);
 
 		glBindVertexArray(wingTransformVertexArray);
 
