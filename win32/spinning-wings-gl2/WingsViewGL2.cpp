@@ -46,7 +46,9 @@ namespace silnith::wings::gl1_0
 namespace silnith::wings
 {
 
-	GLfloat const quadVertices[2 * 4]
+	GLsizei const numVertices{ 4 };
+
+	GLfloat const quadVertices[2 * numVertices]
 	{
 		1, 1,
 		-1, 1,
@@ -54,14 +56,14 @@ namespace silnith::wings
 		1, -1,
 	};
 	GLsizeiptr const quadVerticesSize{ sizeof(quadVertices) };
-	GLuint const quadIndices[4]
+	GLuint const quadIndices[numVertices]
 	{
 		0, 1, 2, 3,
 	};
 	GLsizeiptr const quadIndicesSize{ sizeof(quadIndices) };
 
-	static_assert(quadVerticesSize == sizeof(GLfloat) * 2 * 4, "I do not know how sizeof works.");
-	static_assert(quadIndicesSize == sizeof(GLuint) * 4, "I do not know how sizeof works.");
+	static_assert(quadVerticesSize == sizeof(GLfloat) * 2 * numVertices, "I do not know how sizeof works.");
+	static_assert(quadIndicesSize == sizeof(GLuint) * numVertices, "I do not know how sizeof works.");
 
 }
 
@@ -91,7 +93,7 @@ namespace silnith::wings::gl1_1
 		 * state, and the dereferenced vertices are compiled into the
 		 * display list.
 		 */
-		glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, quadIndices);
+		glDrawElements(GL_QUADS, numVertices, GL_UNSIGNED_INT, quadIndices);
 	}
 
 	void CleanupDrawQuad(void)
@@ -143,7 +145,7 @@ namespace silnith::wings::gl1_5
 		 * Vertices indexed by the ELEMENT_ARRAY_BUFFER are interpreted according to
 		 * the current VertexPointer.
 		 */
-		glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_QUADS, numVertices, GL_UNSIGNED_INT, 0);
 	}
 
 	void CleanupDrawQuad(void)

@@ -41,6 +41,7 @@ namespace silnith::wings::gl4
 	Program* wingTransformProgram{ nullptr };
 	Program* renderProgram{ nullptr };
 
+	GLsizei const numVertices{ 4 };
 	/// <summary>
 	/// The initial untransformed vertices for a single quad.
 	/// After binding, enable using <c>glVertexAttribPointer(..., 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0)</c>.
@@ -210,7 +211,7 @@ namespace silnith::wings::gl4
 		view[15] = view2[3][3];
 
 		{
-			GLfloat const quadVertices[2 * 4]
+			GLfloat const quadVertices[2 * numVertices]
 			{
 				1, 1,
 				-1, 1,
@@ -218,7 +219,7 @@ namespace silnith::wings::gl4
 				1, -1,
 			};
 			GLsizeiptr const quadVerticesSize{ sizeof(quadVertices) };
-			static_assert(quadVerticesSize == sizeof(GLfloat) * 2 * 4, "I do not know how sizeof works.");
+			static_assert(quadVerticesSize == sizeof(GLfloat) * 2 * numVertices, "I do not know how sizeof works.");
 
 			glGenBuffers(1, &originalVertexBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
@@ -227,12 +228,12 @@ namespace silnith::wings::gl4
 		}
 
 		{
-			GLuint const quadIndices[4]
+			GLuint const quadIndices[numVertices]
 			{
 				0, 1, 2, 3,
 			};
 			GLsizeiptr const quadIndicesSize{ sizeof(quadIndices) };
-			static_assert(quadIndicesSize == sizeof(GLuint) * 4, "I do not know how sizeof works.");
+			static_assert(quadIndicesSize == sizeof(GLuint) * numVertices, "I do not know how sizeof works.");
 
 			glGenBuffers(1, &wingIndexBuffer);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
@@ -486,17 +487,17 @@ void main() {
 		{
 			glGenBuffers(1, &wingVertexBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, wingVertexBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * 4, nullptr, GL_STREAM_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * numVertices, nullptr, GL_STREAM_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glGenBuffers(1, &wingColorBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, wingColorBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * 4, nullptr, GL_STREAM_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * numVertices, nullptr, GL_STREAM_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glGenBuffers(1, &wingEdgeColorBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, wingEdgeColorBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * 4, nullptr, GL_STREAM_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * numVertices, nullptr, GL_STREAM_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 		else
@@ -529,7 +530,7 @@ void main() {
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 2, wingEdgeColorBuffer);
 
 		glBeginTransformFeedback(GL_POINTS);
-		glDrawArrays(GL_POINTS, 0, 4);
+		glDrawArrays(GL_POINTS, 0, numVertices);
 		glEndTransformFeedback();
 
 		glBindVertexArray(0);
@@ -564,13 +565,13 @@ void main() {
 			glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_LINE_LOOP, numVertices, GL_UNSIGNED_INT, 0);
 
 			glBindBuffer(GL_ARRAY_BUFFER, wing.getColorBuffer());
 			glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLE_FAN, numVertices, GL_UNSIGNED_INT, 0);
 		}
 
 		glFlush();
