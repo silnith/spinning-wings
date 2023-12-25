@@ -23,6 +23,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wings-saver", "wings-saver\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spinning-wings-gl3", "spinning-wings-gl3\spinning-wings-gl3.vcxproj", "{C05B2C32-FF0C-4585-AA31-97129DC6F93E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spinning-wings-gl4", "spinning-wings-gl4\spinning-wings-gl4.vcxproj", "{50903A5D-5B4B-4B91-9A70-BE6083FC34EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -71,6 +73,14 @@ Global
 		{C05B2C32-FF0C-4585-AA31-97129DC6F93E}.Release|x64.Build.0 = Release|x64
 		{C05B2C32-FF0C-4585-AA31-97129DC6F93E}.Release|x86.ActiveCfg = Release|Win32
 		{C05B2C32-FF0C-4585-AA31-97129DC6F93E}.Release|x86.Build.0 = Release|Win32
+		{50903A5D-5B4B-4B91-9A70-BE6083FC34EE}.Debug|x64.ActiveCfg = Debug|x64
+		{50903A5D-5B4B-4B91-9A70-BE6083FC34EE}.Debug|x64.Build.0 = Debug|x64
+		{50903A5D-5B4B-4B91-9A70-BE6083FC34EE}.Debug|x86.ActiveCfg = Debug|Win32
+		{50903A5D-5B4B-4B91-9A70-BE6083FC34EE}.Debug|x86.Build.0 = Debug|Win32
+		{50903A5D-5B4B-4B91-9A70-BE6083FC34EE}.Release|x64.ActiveCfg = Release|x64
+		{50903A5D-5B4B-4B91-9A70-BE6083FC34EE}.Release|x64.Build.0 = Release|x64
+		{50903A5D-5B4B-4B91-9A70-BE6083FC34EE}.Release|x86.ActiveCfg = Release|Win32
+		{50903A5D-5B4B-4B91-9A70-BE6083FC34EE}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
