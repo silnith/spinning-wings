@@ -12,7 +12,7 @@ env: {}
 
 defaults:
   run:
-    working-directory: "./win32"
+    working-directory: win32
 
 jobs:
   setup:
@@ -29,7 +29,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: packages
-          path: packages/
+          path: win32/packages/
   build:
     name: Build
     runs-on: windows-2019
@@ -54,7 +54,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: packages
-          path: packages/
+          path: win32/packages/
       - name: Build
         run: msbuild ${{ inputs.solution_file }} -p:Configuration=${{ matrix.configuration }} -p:Platform=${{ matrix.platform }}
       - name: Upload Artifacts
