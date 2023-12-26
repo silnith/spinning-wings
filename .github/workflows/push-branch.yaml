@@ -1,0 +1,16 @@
+name: Push Branch
+
+on:
+  push:
+    branches:
+      - '*'
+
+env: {}
+
+jobs:
+  call-build:
+    name: Standard Build
+    uses: ./.github/workflows/build.yaml
+    with:
+      solution_file: spinning-wings.sln
+    secrets: inherit

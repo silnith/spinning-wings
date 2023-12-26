@@ -1,0 +1,124 @@
+name: Build and Test
+
+on:
+  workflow_call:
+    inputs:
+      solution_file:
+        description: The name of the solution file.
+        type: string
+        required: true
+
+env: {}
+
+defaults:
+  run:
+    working-directory: "./win32"
+
+jobs:
+  setup:
+    name: Setup
+    runs-on: windows-2019
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Configure GitHub Packages
+        run: nuget sources add -Name GitHub -UserName ${{ github.actor }} -Password ${{ secrets.GITHUB_TOKEN }} -Source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json -NonInteractive
+      - name: NuGet Restore
+        run: nuget restore ${{ inputs.solution_file }} -NonInteractive
+      - name: Upload Packages Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: packages
+          path: packages/
+  build:
+    name: Build
+    runs-on: windows-2019
+    needs:
+      - setup
+    strategy:
+      matrix:
+        platform:
+          - x86
+          - x64
+        configuration:
+          - Debug
+          - Release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.1
+        with:
+          msbuild-architecture: x64
+      - name: Download Packages Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: packages
+          path: packages/
+      - name: Build
+        run: msbuild ${{ inputs.solution_file }} -p:Configuration=${{ matrix.configuration }} -p:Platform=${{ matrix.platform }}
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.configuration }}-${{ matrix.platform }}
+          path: |
+            x64/
+            Debug/
+            Release/
+#  test:
+#    name: Test
+#    runs-on: windows-2019
+#    needs:
+#      - build
+#    strategy:
+#      matrix:
+#        platform:
+#          - x86
+#          - x64
+#        configuration:
+#          - Debug
+#          - Release
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - name: Download Artifacts
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: ${{ matrix.configuration }}-${{ matrix.platform }}
+#      - name: Run Tests
+#        uses: microsoft/vstest-action@v1.0.0
+#        with:
+#          searchFolder: '.\\'
+#          testAssembly: '**\\*test*.dll'
+#          codeCoverageEnabled: false
+#  package:
+#    name: Package
+#    runs-on: windows-2019
+#    needs:
+#      - build
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - name: Download Debug x86
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: Debug-x86
+#      - name: Download Release x86
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: Release-x86
+#      - name: Download Debug x64
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: Debug-x64
+#      - name: Download Release x64
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: Release-x64
+#      - name: Create NuGet Package
+#        run: nuget pack ${{ inputs.project_name }}/${{ inputs.project_name }}.nuspec -BasePath ${{ inputs.project_name }} -NonInteractive
+#      - name: Upload NuGet Package
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: NuGet
+#          path: '*.nupkg'
