@@ -8,9 +8,15 @@ on:
 env: {}
 
 jobs:
-  call-build:
-    name: Standard Build
-    uses: ./.github/workflows/build.yaml
+  call-build-mac:
+    name: MacOS Build
+    uses: ./.github/workflows/build-mac.yaml
+    with:
+      workspace_file: Wings.xcworkspace
+    secrets: inherit
+  call-build-windows:
+    name: Windows Build
+    uses: ./.github/workflows/build-windows.yaml
     with:
       solution_file: spinning-wings.sln
     secrets: inherit
