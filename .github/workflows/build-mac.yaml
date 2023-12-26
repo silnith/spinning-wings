@@ -40,4 +40,4 @@ jobs:
         with:
           name: ${{ matrix.configuration }}
           path: |
-            Build/Products/
+            /Users/runner/Library/Developer/Xcode/DerivedData/
