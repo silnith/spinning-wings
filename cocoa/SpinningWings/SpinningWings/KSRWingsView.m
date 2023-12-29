@@ -35,6 +35,146 @@
 
 @implementation KSRWingsView
 
+- (instancetype)initWithCoder:(NSCoder *)decoder {
+    self = [super initWithCoder:decoder];
+    
+    if (self) {
+        [self setFrameOrigin:NSZeroPoint];
+        
+        GLint swapInterval = 1;
+        [self.openGLContext setValues:&swapInterval
+                         forParameter:NSOpenGLContextParameterSwapInterval];
+        
+        _numWings = 40;
+        
+        _wingList = @[];
+        
+        _radiusCurve = [[KSRCurveGenerator alloc] initWithValue:10.0
+                                                   minimumValue:-15.0
+                                                   maximumValue:15.0
+                                                          wraps:NO
+                                                maximumVelocity:0.1
+                                            maximumAcceleration:0.01
+                                     ticksPerAccelerationChange:150];
+        _angleCurve = [KSRCurveGenerator curveForAngleWithValue:0.0
+                                                maximumVelocity:2.0
+                                            maximumAcceleration:0.05
+                                     ticksPerAccelerationChange:120];
+        _deltaAngleCurve = [KSRCurveGenerator curveForAngleWithValue:15.0
+                                                     maximumVelocity:0.2
+                                                 maximumAcceleration:0.02
+                                          ticksPerAccelerationChange:80];
+        _deltaZCurve = [[KSRCurveGenerator alloc] initWithValue:0.5
+                                                   minimumValue:0.4
+                                                   maximumValue:0.7
+                                                          wraps:NO
+                                                maximumVelocity:0.01
+                                            maximumAcceleration:0.001
+                                     ticksPerAccelerationChange:200];
+        _rollCurve = [KSRCurveGenerator curveForAngleWithValue:0.0
+                                               maximumVelocity:1.0
+                                           maximumAcceleration:0.25
+                                    ticksPerAccelerationChange:80];
+        _pitchCurve = [KSRCurveGenerator curveForAngleWithValue:0.0
+                                                maximumVelocity:2.0
+                                            maximumAcceleration:0.25
+                                     ticksPerAccelerationChange:40];
+        _yawCurve = [KSRCurveGenerator curveForAngleWithValue:0.0
+                                              maximumVelocity:1.5
+                                          maximumAcceleration:0.25
+                                   ticksPerAccelerationChange:50];
+        _redCurve = [KSRCurveGenerator curveForColorComponentWithValue:0.0
+                                                       maximumVelocity:0.04
+                                                   maximumAcceleration:0.01
+                                            ticksPerAccelerationChange:95];
+        _greenCurve = [KSRCurveGenerator curveForColorComponentWithValue:0.0
+                                                         maximumVelocity:0.04
+                                                     maximumAcceleration:0.01
+                                              ticksPerAccelerationChange:40];
+        _blueCurve = [KSRCurveGenerator curveForColorComponentWithValue:0.0
+                                                        maximumVelocity:0.04
+                                                    maximumAcceleration:0.01
+                                             ticksPerAccelerationChange:70];
+        
+        _glMajorVersion = 1;
+        _glMinorVersion = 0;
+        
+        _wingDisplayList = 0;
+    }
+    
+    return self;
+}
+
+- (instancetype)initWithFrame:(NSRect)frameRect {
+    self = [super initWithFrame:frameRect];
+    
+    if (self) {
+        [self setFrameOrigin:NSZeroPoint];
+        
+        GLint swapInterval = 1;
+        [self.openGLContext setValues:&swapInterval
+                         forParameter:NSOpenGLContextParameterSwapInterval];
+        
+        _numWings = 40;
+        
+        _wingList = @[];
+        
+        _radiusCurve = [[KSRCurveGenerator alloc] initWithValue:10.0
+                                                   minimumValue:-15.0
+                                                   maximumValue:15.0
+                                                          wraps:NO
+                                                maximumVelocity:0.1
+                                            maximumAcceleration:0.01
+                                     ticksPerAccelerationChange:150];
+        _angleCurve = [KSRCurveGenerator curveForAngleWithValue:0.0
+                                                maximumVelocity:2.0
+                                            maximumAcceleration:0.05
+                                     ticksPerAccelerationChange:120];
+        _deltaAngleCurve = [KSRCurveGenerator curveForAngleWithValue:15.0
+                                                     maximumVelocity:0.2
+                                                 maximumAcceleration:0.02
+                                          ticksPerAccelerationChange:80];
+        _deltaZCurve = [[KSRCurveGenerator alloc] initWithValue:0.5
+                                                   minimumValue:0.4
+                                                   maximumValue:0.7
+                                                          wraps:NO
+                                                maximumVelocity:0.01
+                                            maximumAcceleration:0.001
+                                     ticksPerAccelerationChange:200];
+        _rollCurve = [KSRCurveGenerator curveForAngleWithValue:0.0
+                                               maximumVelocity:1.0
+                                           maximumAcceleration:0.25
+                                    ticksPerAccelerationChange:80];
+        _pitchCurve = [KSRCurveGenerator curveForAngleWithValue:0.0
+                                                maximumVelocity:2.0
+                                            maximumAcceleration:0.25
+                                     ticksPerAccelerationChange:40];
+        _yawCurve = [KSRCurveGenerator curveForAngleWithValue:0.0
+                                              maximumVelocity:1.5
+                                          maximumAcceleration:0.25
+                                   ticksPerAccelerationChange:50];
+        _redCurve = [KSRCurveGenerator curveForColorComponentWithValue:0.0
+                                                       maximumVelocity:0.04
+                                                   maximumAcceleration:0.01
+                                            ticksPerAccelerationChange:95];
+        _greenCurve = [KSRCurveGenerator curveForColorComponentWithValue:0.0
+                                                         maximumVelocity:0.04
+                                                     maximumAcceleration:0.01
+                                              ticksPerAccelerationChange:40];
+        _blueCurve = [KSRCurveGenerator curveForColorComponentWithValue:0.0
+                                                        maximumVelocity:0.04
+                                                    maximumAcceleration:0.01
+                                             ticksPerAccelerationChange:70];
+        
+        _glMajorVersion = 1;
+        _glMinorVersion = 0;
+        
+        _wingDisplayList = 0;
+    }
+    
+    return self;
+}
+
 - (instancetype)initWithFrame:(NSRect)frameRect pixelFormat:(NSOpenGLPixelFormat *)format {
     self = [super initWithFrame:frameRect pixelFormat:format];
     
@@ -169,6 +309,8 @@
 }
 
 - (void)advanceAnimation {
+//    NSLog(@"%@:advanceAnimation", self);
+    
     [self.openGLContext makeCurrentContext];
     
     GLuint displayList;

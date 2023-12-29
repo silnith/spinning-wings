@@ -1,0 +1,609 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		37E6EED72B3EC0B400E37BE9 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 37E6EED62B3EC0B400E37BE9 /* AppDelegate.m */; };
+		37E6EED92B3EC0B700E37BE9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37E6EED82B3EC0B700E37BE9 /* Assets.xcassets */; };
+		37E6EEDC2B3EC0B700E37BE9 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37E6EEDA2B3EC0B700E37BE9 /* MainMenu.xib */; };
+		37E6EEDF2B3EC0B700E37BE9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 37E6EEDE2B3EC0B700E37BE9 /* main.m */; };
+		37E6EEEA2B3EC0B700E37BE9 /* SpinningWingsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 37E6EEE92B3EC0B700E37BE9 /* SpinningWingsTests.m */; };
+		37E6EEF52B3EC0B700E37BE9 /* SpinningWingsUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 37E6EEF42B3EC0B700E37BE9 /* SpinningWingsUITests.m */; };
+		37E6EF042B3EC1A400E37BE9 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37E6EF032B3EC1A400E37BE9 /* OpenGL.framework */; };
+		37E6EF0D2B3ECABC00E37BE9 /* KSRCurveGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 37E6EF062B3ECABB00E37BE9 /* KSRCurveGenerator.m */; };
+		37E6EF0E2B3ECABC00E37BE9 /* KSRWing.m in Sources */ = {isa = PBXBuildFile; fileRef = 37E6EF092B3ECABB00E37BE9 /* KSRWing.m */; };
+		37E6EF0F2B3ECABC00E37BE9 /* KSRWingsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 37E6EF0A2B3ECABC00E37BE9 /* KSRWingsView.m */; };
+		37E6EF102B3ECABC00E37BE9 /* KSRColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 37E6EF0B2B3ECABC00E37BE9 /* KSRColor.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		37E6EEE62B3EC0B700E37BE9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 37E6EECA2B3EC0B400E37BE9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 37E6EED12B3EC0B400E37BE9;
+			remoteInfo = SpinningWings;
+		};
+		37E6EEF12B3EC0B700E37BE9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 37E6EECA2B3EC0B400E37BE9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 37E6EED12B3EC0B400E37BE9;
+			remoteInfo = SpinningWings;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		37E6EED22B3EC0B400E37BE9 /* SpinningWings.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpinningWings.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		37E6EED52B3EC0B400E37BE9 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		37E6EED62B3EC0B400E37BE9 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		37E6EED82B3EC0B700E37BE9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		37E6EEDB2B3EC0B700E37BE9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		37E6EEDD2B3EC0B700E37BE9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		37E6EEDE2B3EC0B700E37BE9 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		37E6EEE02B3EC0B700E37BE9 /* SpinningWings.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SpinningWings.entitlements; sourceTree = "<group>"; };
+		37E6EEE52B3EC0B700E37BE9 /* SpinningWingsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpinningWingsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		37E6EEE92B3EC0B700E37BE9 /* SpinningWingsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SpinningWingsTests.m; sourceTree = "<group>"; };
+		37E6EEEB2B3EC0B700E37BE9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		37E6EEF02B3EC0B700E37BE9 /* SpinningWingsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpinningWingsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		37E6EEF42B3EC0B700E37BE9 /* SpinningWingsUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SpinningWingsUITests.m; sourceTree = "<group>"; };
+		37E6EEF62B3EC0B700E37BE9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		37E6EF032B3EC1A400E37BE9 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		37E6EF052B3ECABB00E37BE9 /* KSRWingsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KSRWingsView.h; sourceTree = "<group>"; };
+		37E6EF062B3ECABB00E37BE9 /* KSRCurveGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KSRCurveGenerator.m; sourceTree = "<group>"; };
+		37E6EF072B3ECABB00E37BE9 /* KSRWing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KSRWing.h; sourceTree = "<group>"; };
+		37E6EF082B3ECABB00E37BE9 /* KSRCurveGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KSRCurveGenerator.h; sourceTree = "<group>"; };
+		37E6EF092B3ECABB00E37BE9 /* KSRWing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KSRWing.m; sourceTree = "<group>"; };
+		37E6EF0A2B3ECABC00E37BE9 /* KSRWingsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KSRWingsView.m; sourceTree = "<group>"; };
+		37E6EF0B2B3ECABC00E37BE9 /* KSRColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KSRColor.m; sourceTree = "<group>"; };
+		37E6EF0C2B3ECABC00E37BE9 /* KSRColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KSRColor.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		37E6EECF2B3EC0B400E37BE9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				37E6EF042B3EC1A400E37BE9 /* OpenGL.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		37E6EEE22B3EC0B700E37BE9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		37E6EEED2B3EC0B700E37BE9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		37E6EEC92B3EC0B400E37BE9 = {
+			isa = PBXGroup;
+			children = (
+				37E6EED42B3EC0B400E37BE9 /* SpinningWings */,
+				37E6EEE82B3EC0B700E37BE9 /* SpinningWingsTests */,
+				37E6EEF32B3EC0B700E37BE9 /* SpinningWingsUITests */,
+				37E6EED32B3EC0B400E37BE9 /* Products */,
+				37E6EF022B3EC1A400E37BE9 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		37E6EED32B3EC0B400E37BE9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				37E6EED22B3EC0B400E37BE9 /* SpinningWings.app */,
+				37E6EEE52B3EC0B700E37BE9 /* SpinningWingsTests.xctest */,
+				37E6EEF02B3EC0B700E37BE9 /* SpinningWingsUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		37E6EED42B3EC0B400E37BE9 /* SpinningWings */ = {
+			isa = PBXGroup;
+			children = (
+				37E6EF0C2B3ECABC00E37BE9 /* KSRColor.h */,
+				37E6EF0B2B3ECABC00E37BE9 /* KSRColor.m */,
+				37E6EF082B3ECABB00E37BE9 /* KSRCurveGenerator.h */,
+				37E6EF062B3ECABB00E37BE9 /* KSRCurveGenerator.m */,
+				37E6EF072B3ECABB00E37BE9 /* KSRWing.h */,
+				37E6EF092B3ECABB00E37BE9 /* KSRWing.m */,
+				37E6EF052B3ECABB00E37BE9 /* KSRWingsView.h */,
+				37E6EF0A2B3ECABC00E37BE9 /* KSRWingsView.m */,
+				37E6EED52B3EC0B400E37BE9 /* AppDelegate.h */,
+				37E6EED62B3EC0B400E37BE9 /* AppDelegate.m */,
+				37E6EED82B3EC0B700E37BE9 /* Assets.xcassets */,
+				37E6EEDA2B3EC0B700E37BE9 /* MainMenu.xib */,
+				37E6EEDD2B3EC0B700E37BE9 /* Info.plist */,
+				37E6EEDE2B3EC0B700E37BE9 /* main.m */,
+				37E6EEE02B3EC0B700E37BE9 /* SpinningWings.entitlements */,
+			);
+			path = SpinningWings;
+			sourceTree = "<group>";
+		};
+		37E6EEE82B3EC0B700E37BE9 /* SpinningWingsTests */ = {
+			isa = PBXGroup;
+			children = (
+				37E6EEE92B3EC0B700E37BE9 /* SpinningWingsTests.m */,
+				37E6EEEB2B3EC0B700E37BE9 /* Info.plist */,
+			);
+			path = SpinningWingsTests;
+			sourceTree = "<group>";
+		};
+		37E6EEF32B3EC0B700E37BE9 /* SpinningWingsUITests */ = {
+			isa = PBXGroup;
+			children = (
+				37E6EEF42B3EC0B700E37BE9 /* SpinningWingsUITests.m */,
+				37E6EEF62B3EC0B700E37BE9 /* Info.plist */,
+			);
+			path = SpinningWingsUITests;
+			sourceTree = "<group>";
+		};
+		37E6EF022B3EC1A400E37BE9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				37E6EF032B3EC1A400E37BE9 /* OpenGL.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		37E6EED12B3EC0B400E37BE9 /* SpinningWings */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 37E6EEF92B3EC0B700E37BE9 /* Build configuration list for PBXNativeTarget "SpinningWings" */;
+			buildPhases = (
+				37E6EECE2B3EC0B400E37BE9 /* Sources */,
+				37E6EECF2B3EC0B400E37BE9 /* Frameworks */,
+				37E6EED02B3EC0B400E37BE9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SpinningWings;
+			productName = SpinningWings;
+			productReference = 37E6EED22B3EC0B400E37BE9 /* SpinningWings.app */;
+			productType = "com.apple.product-type.application";
+		};
+		37E6EEE42B3EC0B700E37BE9 /* SpinningWingsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 37E6EEFC2B3EC0B700E37BE9 /* Build configuration list for PBXNativeTarget "SpinningWingsTests" */;
+			buildPhases = (
+				37E6EEE12B3EC0B700E37BE9 /* Sources */,
+				37E6EEE22B3EC0B700E37BE9 /* Frameworks */,
+				37E6EEE32B3EC0B700E37BE9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				37E6EEE72B3EC0B700E37BE9 /* PBXTargetDependency */,
+			);
+			name = SpinningWingsTests;
+			productName = SpinningWingsTests;
+			productReference = 37E6EEE52B3EC0B700E37BE9 /* SpinningWingsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		37E6EEEF2B3EC0B700E37BE9 /* SpinningWingsUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 37E6EEFF2B3EC0B700E37BE9 /* Build configuration list for PBXNativeTarget "SpinningWingsUITests" */;
+			buildPhases = (
+				37E6EEEC2B3EC0B700E37BE9 /* Sources */,
+				37E6EEED2B3EC0B700E37BE9 /* Frameworks */,
+				37E6EEEE2B3EC0B700E37BE9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				37E6EEF22B3EC0B700E37BE9 /* PBXTargetDependency */,
+			);
+			name = SpinningWingsUITests;
+			productName = SpinningWingsUITests;
+			productReference = 37E6EEF02B3EC0B700E37BE9 /* SpinningWingsUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		37E6EECA2B3EC0B400E37BE9 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1010;
+				ORGANIZATIONNAME = Silnith.org;
+				TargetAttributes = {
+					37E6EED12B3EC0B400E37BE9 = {
+						CreatedOnToolsVersion = 10.1;
+					};
+					37E6EEE42B3EC0B700E37BE9 = {
+						CreatedOnToolsVersion = 10.1;
+						TestTargetID = 37E6EED12B3EC0B400E37BE9;
+					};
+					37E6EEEF2B3EC0B700E37BE9 = {
+						CreatedOnToolsVersion = 10.1;
+						TestTargetID = 37E6EED12B3EC0B400E37BE9;
+					};
+				};
+			};
+			buildConfigurationList = 37E6EECD2B3EC0B400E37BE9 /* Build configuration list for PBXProject "SpinningWings" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 37E6EEC92B3EC0B400E37BE9;
+			productRefGroup = 37E6EED32B3EC0B400E37BE9 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				37E6EED12B3EC0B400E37BE9 /* SpinningWings */,
+				37E6EEE42B3EC0B700E37BE9 /* SpinningWingsTests */,
+				37E6EEEF2B3EC0B700E37BE9 /* SpinningWingsUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		37E6EED02B3EC0B400E37BE9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				37E6EED92B3EC0B700E37BE9 /* Assets.xcassets in Resources */,
+				37E6EEDC2B3EC0B700E37BE9 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		37E6EEE32B3EC0B700E37BE9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		37E6EEEE2B3EC0B700E37BE9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		37E6EECE2B3EC0B400E37BE9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				37E6EF0F2B3ECABC00E37BE9 /* KSRWingsView.m in Sources */,
+				37E6EF0D2B3ECABC00E37BE9 /* KSRCurveGenerator.m in Sources */,
+				37E6EF0E2B3ECABC00E37BE9 /* KSRWing.m in Sources */,
+				37E6EEDF2B3EC0B700E37BE9 /* main.m in Sources */,
+				37E6EF102B3ECABC00E37BE9 /* KSRColor.m in Sources */,
+				37E6EED72B3EC0B400E37BE9 /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		37E6EEE12B3EC0B700E37BE9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				37E6EEEA2B3EC0B700E37BE9 /* SpinningWingsTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		37E6EEEC2B3EC0B700E37BE9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				37E6EEF52B3EC0B700E37BE9 /* SpinningWingsUITests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		37E6EEE72B3EC0B700E37BE9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 37E6EED12B3EC0B400E37BE9 /* SpinningWings */;
+			targetProxy = 37E6EEE62B3EC0B700E37BE9 /* PBXContainerItemProxy */;
+		};
+		37E6EEF22B3EC0B700E37BE9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 37E6EED12B3EC0B400E37BE9 /* SpinningWings */;
+			targetProxy = 37E6EEF12B3EC0B700E37BE9 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		37E6EEDA2B3EC0B700E37BE9 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				37E6EEDB2B3EC0B700E37BE9 /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		37E6EEF72B3EC0B700E37BE9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				VALID_ARCHS = "ppc ppc64 i386 x86_64 arm arm64";
+			};
+			name = Debug;
+		};
+		37E6EEF82B3EC0B700E37BE9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				VALID_ARCHS = "ppc ppc64 i386 x86_64 arm arm64";
+			};
+			name = Release;
+		};
+		37E6EEFA2B3EC0B700E37BE9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = SpinningWings/SpinningWings.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 6F5HB64879;
+				INFOPLIST_FILE = SpinningWings/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.silnith.SpinningWings;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = "ppc ppc64 i386 x86_64 arm arm64";
+			};
+			name = Debug;
+		};
+		37E6EEFB2B3EC0B700E37BE9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = SpinningWings/SpinningWings.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 6F5HB64879;
+				INFOPLIST_FILE = SpinningWings/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.silnith.SpinningWings;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = "ppc ppc64 i386 x86_64 arm arm64";
+			};
+			name = Release;
+		};
+		37E6EEFD2B3EC0B700E37BE9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 6F5HB64879;
+				INFOPLIST_FILE = SpinningWingsTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.silnith.SpinningWingsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SpinningWings.app/Contents/MacOS/SpinningWings";
+			};
+			name = Debug;
+		};
+		37E6EEFE2B3EC0B700E37BE9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 6F5HB64879;
+				INFOPLIST_FILE = SpinningWingsTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.silnith.SpinningWingsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SpinningWings.app/Contents/MacOS/SpinningWings";
+			};
+			name = Release;
+		};
+		37E6EF002B3EC0B700E37BE9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 6F5HB64879;
+				INFOPLIST_FILE = SpinningWingsUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.silnith.SpinningWingsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = SpinningWings;
+			};
+			name = Debug;
+		};
+		37E6EF012B3EC0B700E37BE9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 6F5HB64879;
+				INFOPLIST_FILE = SpinningWingsUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.silnith.SpinningWingsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = SpinningWings;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		37E6EECD2B3EC0B400E37BE9 /* Build configuration list for PBXProject "SpinningWings" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				37E6EEF72B3EC0B700E37BE9 /* Debug */,
+				37E6EEF82B3EC0B700E37BE9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		37E6EEF92B3EC0B700E37BE9 /* Build configuration list for PBXNativeTarget "SpinningWings" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				37E6EEFA2B3EC0B700E37BE9 /* Debug */,
+				37E6EEFB2B3EC0B700E37BE9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		37E6EEFC2B3EC0B700E37BE9 /* Build configuration list for PBXNativeTarget "SpinningWingsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				37E6EEFD2B3EC0B700E37BE9 /* Debug */,
+				37E6EEFE2B3EC0B700E37BE9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		37E6EEFF2B3EC0B700E37BE9 /* Build configuration list for PBXNativeTarget "SpinningWingsUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				37E6EF002B3EC0B700E37BE9 /* Debug */,
+				37E6EF012B3EC0B700E37BE9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 37E6EECA2B3EC0B400E37BE9 /* Project object */;
+}
