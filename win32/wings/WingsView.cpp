@@ -144,11 +144,11 @@ namespace silnith::wings::gl
 
 		glNewList(displayList, GL_COMPILE);
 		glPushMatrix();
-		glRotatef(wing.getAngle(), 0, 0, 1);
-		glTranslatef(wing.getRadius(), 0, 0);
-		glRotatef(-(wing.getYaw()), 0, 0, 1);
-		glRotatef(-(wing.getPitch()), 0, 1, 0);
-		glRotatef(wing.getRoll(), 1, 0, 0);
+		glRotatef(angle, 0, 0, 1);
+		glTranslatef(radius, 0, 0);
+		glRotatef(-yaw, 0, 0, 1);
+		glRotatef(-pitch, 0, 1, 0);
+		glRotatef(roll, 1, 0, 0);
 		glCallList(wingDisplayList);
 		glPopMatrix();
 		glEndList();
