@@ -66,11 +66,13 @@ namespace silnith::wings::gl
 		ParseOpenGLVersion(glVersion);
 
 		glEnable(GL_DEPTH_TEST);
+#if defined(GL_VERSION_1_1)
 		if (hasOpenGL(1, 1))
 		{
 			glPolygonOffset(-0.5, -2);
 			glEnable(GL_POLYGON_OFFSET_LINE);
 		}
+#endif
 
 		glEnable(GL_LINE_SMOOTH);
 		glLineWidth(1.0);
@@ -155,6 +157,7 @@ namespace silnith::wings::gl
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+#if defined(GL_VERSION_1_1)
 		if (hasOpenGL(1, 1))
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -170,6 +173,7 @@ namespace silnith::wings::gl
 			glPopMatrix();
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
+#endif
 
 		glPushMatrix();
 		for (wing_list::const_reference wing : wings) {
