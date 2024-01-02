@@ -517,11 +517,11 @@ void main() {
 			wings.pop_back();
 		}
 
-		wing_list::const_reference wing{ wings.emplace_front(wingVertexBuffer,
+		wings.emplace_front(wingVertexBuffer,
 			wingColorBuffer,
 			wingEdgeColorBuffer,
 			transformFeedbackObject,
-			deltaAngle, deltaZ) };
+			deltaAngle, deltaZ);
 
 		wingTransformProgram->useProgram();
 

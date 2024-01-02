@@ -499,10 +499,10 @@ void main() {
 			wings.pop_back();
 		}
 
-		wing_list::const_reference wing{ wings.emplace_front(wingVertexBuffer,
+		wings.emplace_front(wingVertexBuffer,
 			wingColorBuffer,
 			wingEdgeColorBuffer,
-			deltaAngle, deltaZ) };
+			deltaAngle, deltaZ);
 
 		wingTransformProgram->useProgram();
 		glUniform2f(wingTransformProgram->getUniformLocation("radiusAngle"), radius, angle);
