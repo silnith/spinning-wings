@@ -113,7 +113,8 @@ namespace silnith::wings::gl
 	{
 		for (wing_list::const_reference wing : wings)
 		{
-			glDeleteLists(wing.getGLDisplayList(), 1);
+			GLuint const displayList{ wing.getGLDisplayList() };
+			glDeleteLists(displayList, 1);
 		}
 
 		glDeleteLists(wingDisplayList, 1);
