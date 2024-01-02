@@ -60,6 +60,8 @@ namespace silnith::wings::gl
 		ParseOpenGLVersion(glVersion);
 
 		glEnable(GL_DEPTH_TEST);
+		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
 #if defined(GL_VERSION_1_1)
 		if (hasOpenGL(1, 1))
 		{
@@ -69,13 +71,10 @@ namespace silnith::wings::gl
 #endif
 
 		glEnable(GL_LINE_SMOOTH);
+		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 		glLineWidth(1.0);
 
 		glEnable(GL_POLYGON_SMOOTH);
-
-		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-		glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
 		glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
 		glLoadIdentity();
