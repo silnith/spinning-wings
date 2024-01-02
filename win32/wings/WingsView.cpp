@@ -91,15 +91,6 @@ namespace silnith::wings::gl
 		glVertex2f(1, -1);
 		glEnd();
 		glEndList();
-
-		GLuint const wingLists{ glGenLists(numWings) };
-		for (GLuint displayList{ wingLists }; displayList < wingLists + numWings; displayList++) {
-			// This initializes the list of wings to hold the allocated GL display lists.
-			// These display list identifiers are reused throughout the lifetime of the program.
-			wings.emplace_back(displayList);
-			glNewList(displayList, GL_COMPILE);
-			glEndList();
-		}
 	}
 
 	void CleanupOpenGLState(void)
@@ -126,8 +117,17 @@ namespace silnith::wings::gl
 		GLfloat const green{ greenCurve.getNextValue() };
 		GLfloat const blue{ blueCurve.getNextValue() };
 
-		GLuint const displayList{ wings.back().getGLDisplayList() };
-		wings.pop_back();
+		GLuint displayList{ 0 };
+		if (wings.empty() || wings.size() < numWings)
+		{
+			displayList = glGenLists(1);
+		}
+		else
+		{
+			displayList = wings.back().getGLDisplayList();
+			wings.pop_back();
+		}
+
 		wings.emplace_front(displayList,
 			radius, angle,
 			deltaAngle, deltaZ,

@@ -403,11 +403,7 @@ void main() {
 		}
 		else
 		{
-			// This block is simply so lastWing goes out of scope before the pop_back.
-			{
-				wing_list::const_reference lastWing{ wings.back() };
-				displayList = lastWing.getGLDisplayList();
-			}
+			displayList = wings.back().getGLDisplayList();
 			wings.pop_back();
 		}
 
