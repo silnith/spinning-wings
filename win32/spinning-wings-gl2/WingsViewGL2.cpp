@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <deque>
+#include <memory>
 #include <sstream>
 
 #include "CurveGenerator.h"
@@ -184,7 +185,7 @@ namespace silnith::wings::gl2
 	CurveGenerator<GLfloat> greenCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 40) };
 	CurveGenerator<GLfloat> blueCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
 
-	Program* glslProgram{ nullptr };
+	std::unique_ptr<Program> glslProgram{ nullptr };
 
 	bool hasOpenGL(GLuint major, GLuint minor)
 	{
@@ -311,7 +312,7 @@ mat4 scale(in vec3 factor) {
 )shaderText"
 			};
 
-			glslProgram = new Program{
+			glslProgram.reset(new Program{
 				VertexShader{
 					R"shaderText(#version 120
 
@@ -360,7 +361,7 @@ void main() {
 }
 )shaderText",
 				}
-			};
+			});
 
 			deltaZAttribLocation = glslProgram->getAttributeLocation("deltaZ");
 			radiusAngleAttribLocation = glslProgram->getAttributeLocation("radiusAngle");
@@ -379,8 +380,7 @@ void main() {
 
 		cleanupDrawQuad();
 
-		delete glslProgram;
-		glslProgram = nullptr;
+		glslProgram.reset(nullptr);
 	}
 
 	void AdvanceAnimation(void)

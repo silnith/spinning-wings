@@ -6,6 +6,7 @@
 
 #include <cassert>
 #include <deque>
+#include <memory>
 #include <sstream>
 
 #include "CurveGenerator.h"
@@ -38,8 +39,8 @@ namespace silnith::wings::gl3
 	CurveGenerator<GLfloat> greenCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 40) };
 	CurveGenerator<GLfloat> blueCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
 
-	Program* wingTransformProgram{ nullptr };
-	Program* renderProgram{ nullptr };
+	std::unique_ptr<Program> wingTransformProgram{ nullptr };
+	std::unique_ptr<Program> renderProgram{ nullptr };
 
 	GLsizei const numVertices{ 4 };
 	/// <summary>
@@ -284,7 +285,7 @@ mat4 scale(in vec3 factor) {
 )shaderText"
 		};
 
-		wingTransformProgram = new Program{
+		wingTransformProgram.reset(new Program{
 			VertexShader{
 				R"shaderText(#version 150
 
@@ -331,13 +332,13 @@ void main() {
 				"varyingWingColor",
 				"varyingEdgeColor",
 			}
-		};
+		});
 		glGenVertexArrays(1, &wingTransformVertexArray);
 		glBindVertexArray(wingTransformVertexArray);
 		glEnableVertexAttribArray(wingTransformProgram->getAttributeLocation("vertex"));
 		glBindVertexArray(0);
 
-		renderProgram = new Program{
+		renderProgram.reset(new Program{
 			VertexShader{
 				R"shaderText(#version 150
 
@@ -390,7 +391,7 @@ void main() {
 )shaderText",
 			},
 			"fragmentColor"
-		};
+		});
 		glGenVertexArrays(1, &renderVertexArray);
 		glBindVertexArray(renderVertexArray);
 		glEnableVertexAttribArray(renderProgram->getAttributeLocation("vertex"));
@@ -454,10 +455,8 @@ void main() {
 		glDeleteBuffers(1, &wingIndexBuffer);
 		glDeleteBuffers(1, &originalVertexBuffer);
 
-		delete wingTransformProgram;
-		wingTransformProgram = nullptr;
-		delete renderProgram;
-		renderProgram = nullptr;
+		wingTransformProgram.reset(nullptr);
+		renderProgram.reset(nullptr);
 	}
 
 	void AdvanceAnimation(void)
