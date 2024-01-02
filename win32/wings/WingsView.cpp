@@ -135,12 +135,12 @@ namespace silnith::wings::gl
 
 		GLuint const displayList{ wings.back().getGLDisplayList() };
 		wings.pop_back();
-		wing_list::const_reference wing{ wings.emplace_front(displayList,
+		wings.emplace_front(displayList,
 			radius, angle,
 			deltaAngle, deltaZ,
 			roll, pitch, yaw,
 			Color<GLfloat>{ red, green, blue },
-			Color<GLfloat>::WHITE) };
+			Color<GLfloat>::WHITE);
 
 		glNewList(displayList, GL_COMPILE);
 		glPushMatrix();
