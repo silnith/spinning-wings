@@ -19,7 +19,9 @@
 #include "WingsPixelFormat.h"
 #include "WingsView.h"
 
-
+/// <summary>
+/// The number of milliseconds between frame updates.
+/// </summary>
 UINT constexpr updateDelayMilliseconds{ 33 };
 
 UINT_PTR constexpr animationTimerId{ 42 };
@@ -38,15 +40,45 @@ BOOL MonitorEnumProc(HMONITOR hMonitor, HDC hdc, LPRECT lpRect, LPARAM d)
 	return TRUE;
 }
 
-void CALLBACK TimerProc(HWND hWnd, UINT message, UINT_PTR timerId, DWORD currentTime)
+/// <summary>
+/// The <c>TIMERPROC</c> that advances the animation by one frame.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Pass this to <c>SetTimer</c>.
+/// </para>
+/// </remarks>
+/// <param name="hWnd">The window handle.</param>
+/// <param name="message">The message code.  Must be <c>WM_TIMER</c>.</param>
+/// <param name="timerId">The timer identifier.  Should be <c>animationTimerId</c>.</param>
+/// <param name="tickCount">The current tick count.</param>
+void CALLBACK AdvanceAnimation(HWND hWnd, UINT message, UINT_PTR timerId, DWORD tickCount)
 {
+	assert(message == WM_TIMER);
 	assert(timerId == animationTimerId);
 
 	assert(hglrc == wglGetCurrentContext());
 
 	silnith::wings::gl::AdvanceAnimation();
 
-	InvalidateRgn(hWnd, nullptr, FALSE);
+	HRGN constexpr hRegion{ nullptr };
+	BOOL constexpr eraseBackground{ FALSE };
+	InvalidateRgn(hWnd, hRegion, eraseBackground);
+}
+
+void StartAnimation(HWND hWnd)
+{
+	TIMERPROC constexpr timerProc{ AdvanceAnimation };
+	UINT_PTR const timerSet{ SetTimer(hWnd, animationTimerId, updateDelayMilliseconds, timerProc) };
+
+	assert(timerSet != 0);
+}
+
+void StopAnimation(HWND hWnd)
+{
+	BOOL const timerStopped{ KillTimer(hWnd, animationTimerId) };
+
+	assert(timerStopped);
 }
 
 // add to EXPORTS statement in module-definition (.def) file
@@ -101,9 +133,7 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 		ReleaseDC(hWnd, hdc);
 
-		UINT_PTR const timerSet{ SetTimer(hWnd, animationTimerId, updateDelayMilliseconds, nullptr) };
-
-		assert(timerSet != 0);
+		StartAnimation(hWnd);
 
 		return 0;
 	}
@@ -141,25 +171,6 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 		return 0;
 	}
-	case WM_TIMER:
-	{
-		UINT_PTR const timerId{ static_cast<UINT_PTR>(wParam) };
-		TIMERPROC const timerProc{ reinterpret_cast<TIMERPROC>(lParam) };
-
-		assert(timerId == animationTimerId);
-		assert(timerProc == nullptr);
-
-		assert(hglrc == wglGetCurrentContext());
-
-		silnith::wings::gl::AdvanceAnimation();
-
-		InvalidateRgn(hWnd, nullptr, FALSE);
-		return 0;
-	}
-	case WM_ERASEBKGND:
-	{
-		return 0;
-	}
 	case WM_PAINT:
 	{
 		/*
@@ -192,13 +203,13 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 	}
 	case WM_CLOSE:
 	{
+		StopAnimation(hWnd);
+
 		BOOL const destroyed{ DestroyWindow(hWnd) };
 		return 0;
 	}
 	case WM_DESTROY:
 	{
-		KillTimer(hWnd, animationTimerId);
-
 		silnith::wings::gl::CleanupOpenGLState();
 
 		// window about to be destroyed

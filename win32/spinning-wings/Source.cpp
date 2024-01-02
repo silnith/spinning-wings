@@ -17,6 +17,9 @@
 
 #include "resource.h"
 
+/// <summary>
+/// The number of milliseconds between frame updates.
+/// </summary>
 UINT constexpr updateDelayMilliseconds{ 33 };
 
 UINT_PTR constexpr animationTimerId{ 42 };
@@ -35,15 +38,45 @@ BOOL MonitorEnumProc(HMONITOR hMonitor, HDC hdc, LPRECT lpRect, LPARAM d)
 	return TRUE;
 }
 
-void CALLBACK TimerProc(HWND hWnd, UINT message, UINT_PTR timerId, DWORD currentTime)
+/// <summary>
+/// The <c>TIMERPROC</c> that advances the animation by one frame.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Pass this to <c>SetTimer</c>.
+/// </para>
+/// </remarks>
+/// <param name="hWnd">The window handle.</param>
+/// <param name="message">The message code.  Must be <c>WM_TIMER</c>.</param>
+/// <param name="timerId">The timer identifier.  Should be <c>animationTimerId</c>.</param>
+/// <param name="tickCount">The current tick count.</param>
+void CALLBACK AdvanceAnimation(HWND hWnd, UINT message, UINT_PTR timerId, DWORD tickCount)
 {
+	assert(message == WM_TIMER);
 	assert(timerId == animationTimerId);
 
 	assert(hglrc == wglGetCurrentContext());
 
 	silnith::wings::gl::AdvanceAnimation();
 
-	InvalidateRgn(hWnd, nullptr, FALSE);
+	HRGN constexpr hRegion{ nullptr };
+	BOOL constexpr eraseBackground{ FALSE };
+	InvalidateRgn(hWnd, hRegion, eraseBackground);
+}
+
+void StartAnimation(HWND hWnd)
+{
+	TIMERPROC constexpr timerProc{ AdvanceAnimation };
+	UINT_PTR const timerSet{ SetTimer(hWnd, animationTimerId, updateDelayMilliseconds, timerProc) };
+
+	assert(timerSet != 0);
+}
+
+void StopAnimation(HWND hWnd)
+{
+	BOOL const timerStopped{ KillTimer(hWnd, animationTimerId) };
+
+	assert(timerStopped);
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -97,6 +130,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		ReleaseDC(hWnd, hdc);
 
+		StartAnimation(hWnd);
+
 		return 0;
 	}
 	case WM_DPICHANGED:
@@ -133,25 +168,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		return 0;
 	}
-	case WM_TIMER:
-	{
-		UINT_PTR const timerId{ static_cast<UINT_PTR>(wParam) };
-		TIMERPROC const timerProc{ reinterpret_cast<TIMERPROC>(lParam) };
-
-		assert(timerId == animationTimerId);
-		assert(timerProc == nullptr);
-
-		assert(hglrc == wglGetCurrentContext());
-
-		silnith::wings::gl::AdvanceAnimation();
-
-		InvalidateRgn(hWnd, nullptr, FALSE);
-		return 0;
-	}
-	case WM_ERASEBKGND:
-	{
-		return 0;
-	}
 	case WM_PAINT:
 	{
 		/*
@@ -184,6 +200,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_CLOSE:
 	{
+		StopAnimation(hWnd);
+
 		BOOL const destroyed{ DestroyWindow(hWnd) };
 		return 0;
 	}
@@ -273,10 +291,6 @@ int APIENTRY WinMain(
 	ShowWindow(window, nShowCmd);
 	UpdateWindow(window);
 
-	UINT_PTR const timerSet{ SetTimer(window, animationTimerId, updateDelayMilliseconds, nullptr) };
-
-	assert(timerSet != 0);
-
 	// start the message loop
 
 	MSG msg{};
@@ -290,8 +304,6 @@ int APIENTRY WinMain(
 
 		hasMessage = GetMessageW(&msg, nullptr, 0, 0);
 	}
-
-	KillTimer(window, animationTimerId);
 
 	return (int)msg.wParam;
 }
