@@ -53,15 +53,9 @@ namespace silnith::wings::gl
 
 	void InitializeOpenGLState(void)
 	{
-		GLubyte const* const glVendor{ glGetString(GL_VENDOR) };
-		GLubyte const* const glRenderer{ glGetString(GL_RENDERER) };
 		GLubyte const* const glVersion{ glGetString(GL_VERSION) };
-		GLubyte const* const glExtensions{ glGetString(GL_EXTENSIONS) };
 
-		assert(glVendor != NULL);
-		assert(glRenderer != NULL);
 		assert(glVersion != NULL);
-		assert(glExtensions != NULL);
 
 		ParseOpenGLVersion(glVersion);
 
