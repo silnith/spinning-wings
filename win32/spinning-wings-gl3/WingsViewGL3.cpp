@@ -163,23 +163,18 @@ namespace silnith::wings::gl3
 
 	void InitializeOpenGLState(void)
 	{
-		GLubyte const* const glVendor{ glGetString(GL_VENDOR) };
-		GLubyte const* const glRenderer{ glGetString(GL_RENDERER) };
 		glGetIntegerv(GL_MAJOR_VERSION, &glMajorVersion);
 		glGetIntegerv(GL_MINOR_VERSION, &glMinorVersion);
 
-		assert(glVendor != NULL);
-		assert(glRenderer != NULL);
-
 		glEnable(GL_DEPTH_TEST);
+
 		glPolygonOffset(0.5, 2);
 		glEnable(GL_POLYGON_OFFSET_FILL);
 
 		glEnable(GL_LINE_SMOOTH);
+		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
 		glEnable(GL_POLYGON_SMOOTH);
-
-		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 		glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
 		glm::mat4 view2{ glm::lookAt(
