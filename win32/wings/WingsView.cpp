@@ -192,6 +192,15 @@ namespace silnith::wings::gl
 
 	void Resize(GLsizei width, GLsizei height)
 	{
+		glViewport(0, 0, width, height);
+
+		GLdouble constexpr defaultLeft{ -20 };
+		GLdouble constexpr defaultRight{ 20 };
+		GLdouble constexpr defaultBottom{ -20 };
+		GLdouble constexpr defaultTop{ 20 };
+		GLdouble constexpr defaultNear{ 35 };
+		GLdouble constexpr defaultFar{ 105 };
+
 		GLdouble xmult{ 1.0 };
 		GLdouble ymult{ 1.0 };
 		if (width > height)
@@ -203,12 +212,11 @@ namespace silnith::wings::gl
 			ymult = static_cast<GLdouble>(height) / static_cast<GLdouble>(width);
 		}
 
-		glViewport(0, 0, width, height);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(static_cast<GLdouble>(-20) * xmult, static_cast<GLdouble>(20) * xmult,
-			static_cast<GLdouble>(-20) * ymult, static_cast<GLdouble>(20) * ymult,
-			static_cast<GLdouble>(35), static_cast<GLdouble>(105));
+		glOrtho(defaultLeft * xmult, defaultRight * xmult,
+			defaultBottom * ymult, defaultTop * ymult,
+			defaultNear, defaultFar);
 		glMatrixMode(GL_MODELVIEW);
 	}
 
