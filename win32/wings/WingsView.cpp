@@ -14,7 +14,7 @@ namespace silnith::wings::gl
 
 	typedef std::deque<Wing<GLuint, GLfloat> > wing_list;
 
-	size_t const numWings{ 40 };
+	size_t constexpr numWings{ 40 };
 
 	GLuint glMajorVersion{ 1 };
 	GLuint glMinorVersion{ 0 };
