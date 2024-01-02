@@ -19,7 +19,9 @@
 
 #include "resource.h"
 
-UINT const updateDelayMilliseconds{ 33 };
+UINT constexpr updateDelayMilliseconds{ 33 };
+
+UINT_PTR constexpr animationTimerId{ 42 };
 
 /*
  * The Device Context (DC) is the Windows object that represents the drawable surface.
@@ -28,16 +30,22 @@ UINT const updateDelayMilliseconds{ 33 };
  * Each GLRC has an associated DC, but the DC is ignorant of the GLRC.
  */
 
-HGLRC hglrc{};
+HGLRC hglrc{ nullptr };
 
 BOOL MonitorEnumProc(HMONITOR hMonitor, HDC hdc, LPRECT lpRect, LPARAM d)
 {
 	return TRUE;
 }
 
-void TimerProc(HWND hWnd, UINT message, UINT_PTR bar, DWORD baz)
+void CALLBACK TimerProc(HWND hWnd, UINT message, UINT_PTR timerId, DWORD currentTime)
 {
+	assert(timerId == animationTimerId);
+
+	assert(hglrc == wglGetCurrentContext());
+
 	silnith::wings::gl4::AdvanceAnimation();
+
+	InvalidateRgn(hWnd, nullptr, FALSE);
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -156,6 +164,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_TIMER:
 	{
+		UINT_PTR const timerId{ static_cast<UINT_PTR>(wParam) };
+		TIMERPROC const timerProc{ reinterpret_cast<TIMERPROC>(lParam) };
+
+		assert(timerId == animationTimerId);
+		assert(timerProc == nullptr);
+
 		assert(hglrc == wglGetCurrentContext());
 
 		silnith::wings::gl4::AdvanceAnimation();
@@ -181,7 +195,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		silnith::wings::gl4::DrawFrame();
 
-		PAINTSTRUCT paintstruct;
+		PAINTSTRUCT paintstruct{};
 		HDC const hdc{ BeginPaint(hWnd, &paintstruct) };
 		if (hdc == nullptr) {
 			return -1;
@@ -288,7 +302,9 @@ int APIENTRY WinMain(
 	ShowWindow(window, nShowCmd);
 	UpdateWindow(window);
 
-	UINT_PTR const timer{ SetTimer(window, 42, updateDelayMilliseconds, nullptr) };
+	UINT_PTR const timerSet{ SetTimer(window, animationTimerId, updateDelayMilliseconds, nullptr) };
+
+	assert(timerSet != 0);
 
 	// start the message loop
 
@@ -304,7 +320,7 @@ int APIENTRY WinMain(
 		hasMessage = GetMessageW(&msg, nullptr, 0, 0);
 	}
 
-	KillTimer(window, timer);
+	KillTimer(window, animationTimerId);
 
 	return (int)msg.wParam;
 }

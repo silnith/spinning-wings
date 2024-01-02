@@ -20,9 +20,9 @@
 #include "WingsView.h"
 
 
-UINT const updateDelayMilliseconds{ 35 };
+UINT constexpr updateDelayMilliseconds{ 33 };
 
-UINT_PTR timer;
+UINT_PTR constexpr animationTimerId{ 42 };
 
 /*
  * The Device Context (DC) is the Windows object that represents the drawable surface.
@@ -31,16 +31,22 @@ UINT_PTR timer;
  * Each GLRC has an associated DC, but the DC is ignorant of the GLRC.
  */
 
-HGLRC hglrc{};
+HGLRC hglrc{ nullptr };
 
 BOOL MonitorEnumProc(HMONITOR hMonitor, HDC hdc, LPRECT lpRect, LPARAM d)
 {
 	return TRUE;
 }
 
-void TimerProc(HWND hWnd, UINT message, UINT_PTR bar, DWORD baz)
+void CALLBACK TimerProc(HWND hWnd, UINT message, UINT_PTR timerId, DWORD currentTime)
 {
+	assert(timerId == animationTimerId);
+
+	assert(hglrc == wglGetCurrentContext());
+
 	silnith::wings::gl::AdvanceAnimation();
+
+	InvalidateRgn(hWnd, nullptr, FALSE);
 }
 
 // add to EXPORTS statement in module-definition (.def) file
@@ -66,7 +72,7 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		if (didSetPixelFormat) {}
 		else
 		{
-			DWORD error{ GetLastError() };
+			DWORD const error{ GetLastError() };
 			ReleaseDC(hWnd, hdc);
 			PostQuitMessage(-1);
 			return -1;
@@ -74,7 +80,7 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 		hglrc = wglCreateContext(hdc);
 		if (hglrc == NULL) {
-			DWORD error{ GetLastError() };
+			DWORD const error{ GetLastError() };
 			ReleaseDC(hWnd, hdc);
 			PostQuitMessage(-1);
 			return -1;
@@ -84,7 +90,7 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		if (didMakeCurrent) {}
 		else
 		{
-			DWORD error{ GetLastError() };
+			DWORD const error{ GetLastError() };
 			ReleaseDC(hWnd, hdc);
 			wglDeleteContext(hglrc);
 			PostQuitMessage(-1);
@@ -95,7 +101,9 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 		ReleaseDC(hWnd, hdc);
 
-		timer = SetTimer(hWnd, 42, updateDelayMilliseconds, NULL);
+		UINT_PTR const timerSet{ SetTimer(hWnd, animationTimerId, updateDelayMilliseconds, nullptr) };
+
+		assert(timerSet != 0);
 
 		return 0;
 	}
@@ -104,11 +112,11 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		// GetSystemMetricsForDpi, AdjustWindowRectExForDpi, SystemParametersInfoForDpi, GetDpiForWindow
 		WORD const yAxisDPI{ HIWORD(wParam) };
 		WORD const xAxisDPI{ LOWORD(wParam) };
-		LPRECT const suggestedSizeAndPosition{ (RECT*)lParam };
+		LPRECT const suggestedSizeAndPosition{ reinterpret_cast<LPRECT>(lParam) };
 		/*
 		* TODO: Guard this call to Windows 8.1 and later.
 		*/
-		BOOL const success{ SetWindowPos(hWnd, NULL, suggestedSizeAndPosition->left, suggestedSizeAndPosition->top, suggestedSizeAndPosition->right - suggestedSizeAndPosition->left, suggestedSizeAndPosition->bottom - suggestedSizeAndPosition->top, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS) };
+		BOOL const success{ SetWindowPos(hWnd, nullptr, suggestedSizeAndPosition->left, suggestedSizeAndPosition->top, suggestedSizeAndPosition->right - suggestedSizeAndPosition->left, suggestedSizeAndPosition->bottom - suggestedSizeAndPosition->top, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS) };
 		return 0;
 	}
 	case WM_SIZE:
@@ -135,11 +143,17 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 	}
 	case WM_TIMER:
 	{
+		UINT_PTR const timerId{ static_cast<UINT_PTR>(wParam) };
+		TIMERPROC const timerProc{ reinterpret_cast<TIMERPROC>(lParam) };
+
+		assert(timerId == animationTimerId);
+		assert(timerProc == nullptr);
+
 		assert(hglrc == wglGetCurrentContext());
 
 		silnith::wings::gl::AdvanceAnimation();
 
-		InvalidateRgn(hWnd, NULL, FALSE);
+		InvalidateRgn(hWnd, nullptr, FALSE);
 		return 0;
 	}
 	case WM_ERASEBKGND:
@@ -160,12 +174,12 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 		silnith::wings::gl::DrawFrame();
 
-		PAINTSTRUCT paintstruct;
+		PAINTSTRUCT paintstruct{};
 		HDC const hdc{ BeginPaint(hWnd, &paintstruct) };
-		if (hdc == NULL) {
+		if (hdc == nullptr) {
 			return -1;
 		}
-		//EnumDisplayMonitors(hdc, NULL, MonitorEnumProc, 0);
+		//EnumDisplayMonitors(hdc, nullptr, MonitorEnumProc, 0);
 
 		//wglMakeCurrent(hdc, hglrc);
 
@@ -183,13 +197,13 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 	}
 	case WM_DESTROY:
 	{
-		KillTimer(hWnd, timer);
+		KillTimer(hWnd, animationTimerId);
 
 		silnith::wings::gl::CleanupOpenGLState();
 
 		// window about to be destroyed
 		HDC const hdc{ GetDC(hWnd) };
-		wglMakeCurrent(hdc, NULL);
+		wglMakeCurrent(hdc, nullptr);
 		ReleaseDC(hWnd, hdc);
 
 		wglDeleteContext(hglrc);
