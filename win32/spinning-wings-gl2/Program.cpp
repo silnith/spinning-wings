@@ -1,6 +1,7 @@
 #include "Program.h"
 
 #include <cstddef>
+#include <memory>
 #include <stdexcept>
 
 namespace silnith::wings::gl2
@@ -22,15 +23,12 @@ namespace silnith::wings::gl2
         glDetachShader(id, fragmentShader.getShader());
         glDetachShader(id, vertexShader.getShader());
 
-        {
-            GLint logSize{ 0 };
-            glGetProgramiv(id, GL_INFO_LOG_LENGTH, &logSize);
-            if (logSize > 0) {
-                GLchar* const log{ new GLchar[logSize] };
-                glGetProgramInfoLog(id, static_cast<GLsizei>(logSize), nullptr, log);
-                linkLog = { log };
-                delete[] log;
-            }
+        GLint logSize{ 0 };
+        glGetProgramiv(id, GL_INFO_LOG_LENGTH, &logSize);
+        if (logSize > 0) {
+            std::unique_ptr<GLchar[]> log{ std::make_unique<GLchar[]>(logSize) };
+            glGetProgramInfoLog(id, static_cast<GLsizei>(logSize), nullptr, log.get());
+            linkLog = { log.get() };
         }
 
         GLint linkSuccess{ 0 };

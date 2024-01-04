@@ -1,6 +1,7 @@
 #include "Shader.h"
 
 #include <cstddef>
+#include <memory>
 #include <stdexcept>
 #include <vector>
 
@@ -40,15 +41,12 @@ namespace silnith::wings::gl4
 
         glCompileShader(id);
 
-        {
-            GLint logSize{ 0 };
-            glGetShaderiv(id, GL_INFO_LOG_LENGTH, &logSize);
-            if (logSize > 0) {
-                GLchar* const log{ new GLchar[logSize] };
-                glGetShaderInfoLog(id, static_cast<GLsizei>(logSize), nullptr, log);
-                compilationLog = { log };
-                delete[] log;
-            }
+        GLint logSize{ 0 };
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &logSize);
+        if (logSize > 0) {
+            std::unique_ptr<GLchar[]> log{ std::make_unique<GLchar[]>(logSize) };
+            glGetShaderInfoLog(id, static_cast<GLsizei>(logSize), nullptr, log.get());
+            compilationLog = { log.get() };
         }
 
         GLint compilationSuccess{ 0 };
