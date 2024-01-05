@@ -21,7 +21,7 @@ namespace silnith::wings::gl4
 
 	typedef std::deque<Wing<GLuint, GLfloat> > wing_list;
 
-	size_t const numWings{ 40 };
+	size_t constexpr numWings{ 40 };
 
 	GLint glMajorVersion{ 1 };
 	GLint glMinorVersion{ 0 };
@@ -42,7 +42,7 @@ namespace silnith::wings::gl4
 	std::unique_ptr<Program> wingTransformProgram{ nullptr };
 	std::unique_ptr<Program> renderProgram{ nullptr };
 
-	GLsizei const numVertices{ 4 };
+	GLsizei constexpr numVertices{ 4 };
 	/// <summary>
 	/// The initial untransformed vertices for a single quad.
 	/// After binding, enable using <c>glVertexAttribPointer(..., 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0)</c>.
@@ -83,83 +83,23 @@ namespace silnith::wings::gl4
 	/// So this simply uses the first index in the array of binding points.
 	/// </para>
 	/// </remarks>
-	GLuint const modelViewProjectionBindingIndex{ 0 };
+	GLuint constexpr modelViewProjectionBindingIndex{ 0 };
 
-	/// <summary>
-	/// The model matrix to be passed to the vertex shaders.
-	/// </summary>
-	/// <remarks>
-	/// <para>
-	/// Remember that this is used in column-major order,
-	/// but in the source code it looks like it is in row-major order.
-	/// Therefore you need to transpose it in your mind.
-	/// Fortunately all the hard-coded source code appearances
-	/// are purely the identity matrix, where transposition does nothing.
-	/// </para>
-	/// </remarks>
-	GLfloat model[16]{
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1,
-	};
 	/// <summary>
 	/// The offset into the uniform buffer where the model matrix is.
 	/// </summary>
 	/// <seealso cref="modelViewProjectionUniformBuffer"/>
 	GLintptr modelOffset{ 0 };
-	GLsizeiptr const modelSize{ sizeof(model) };
-	static_assert(modelSize == sizeof(GLfloat) * 4 * 4, "Check whether the uniform buffer allocation is correct.");
-	/// <summary>
-	/// The view matrix to be passed to the vertex shaders.
-	/// </summary>
-	/// <remarks>
-	/// <para>
-	/// Remember that this is used in column-major order,
-	/// but in the source code it looks like it is in row-major order.
-	/// Therefore you need to transpose it in your mind.
-	/// Fortunately all the hard-coded source code appearances
-	/// are purely the identity matrix, where transposition does nothing.
-	/// </para>
-	/// </remarks>
-	GLfloat view[16]{
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1,
-	};
 	/// <summary>
 	/// The offset into the uniform buffer where the view matrix is.
 	/// </summary>
 	/// <seealso cref="modelViewProjectionUniformBuffer"/>
 	GLintptr viewOffset{ 0 };
-	GLsizeiptr const viewSize{ sizeof(view) };
-	static_assert(viewSize == sizeof(GLfloat) * 4 * 4, "Check whether the uniform buffer allocation is correct.");
-	/// <summary>
-	/// The projection matrix to be passed to the vertex shaders.
-	/// </summary>
-	/// <remarks>
-	/// <para>
-	/// Remember that this is used in column-major order,
-	/// but in the source code it looks like it is in row-major order.
-	/// Therefore you need to transpose it in your mind.
-	/// Fortunately all the hard-coded source code appearances
-	/// are purely the identity matrix, where transposition does nothing.
-	/// </para>
-	/// </remarks>
-	GLfloat projection[16]{
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1,
-	};
 	/// <summary>
 	/// The offset into the uniform buffer where the projection matrix is.
 	/// </summary>
 	/// <seealso cref="modelViewProjectionUniformBuffer"/>
 	GLintptr projectionOffset{ 0 };
-	GLsizeiptr const projectionSize{ sizeof(projection) };
-	static_assert(projectionSize == sizeof(GLfloat) * 4 * 4, "Check whether the uniform buffer allocation is correct.");
 
 	void InitializeOpenGLState(void)
 	{
@@ -177,44 +117,20 @@ namespace silnith::wings::gl4
 		glEnable(GL_POLYGON_SMOOTH);
 		glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
-		glm::mat4 view2{ glm::lookAt(
+		glm::mat4 const view2{ glm::lookAt(
 			glm::vec3{ 0, 50, 50 },
 			glm::vec3{ 0, 0, 13 },
 			glm::vec3{ 0, 0, 1 }) };
-		/*
-		 * I deliberately assign individual elements and avoid the array
-		 * block initialization syntax so that the column-major order
-		 * behavior is not confused with the row-major syntax of C++.
-		 */
-		view[0] = view2[0][0];
-		view[1] = view2[0][1];
-		view[2] = view2[0][2];
-		view[3] = view2[0][3];
-
-		view[4] = view2[1][0];
-		view[5] = view2[1][1];
-		view[6] = view2[1][2];
-		view[7] = view2[1][3];
-
-		view[8] = view2[2][0];
-		view[9] = view2[2][1];
-		view[10] = view2[2][2];
-		view[11] = view2[2][3];
-
-		view[12] = view2[3][0];
-		view[13] = view2[3][1];
-		view[14] = view2[3][2];
-		view[15] = view2[3][3];
 
 		{
-			GLfloat const quadVertices[2 * numVertices]
+			GLfloat constexpr quadVertices[2 * numVertices]
 			{
 				1, 1,
 				-1, 1,
 				-1, -1,
 				1, -1,
 			};
-			GLsizeiptr const quadVerticesSize{ sizeof(quadVertices) };
+			GLsizeiptr constexpr quadVerticesSize{ sizeof(quadVertices) };
 			static_assert(quadVerticesSize == sizeof(GLfloat) * 2 * numVertices, "I do not know how sizeof works.");
 
 			glGenBuffers(1, &originalVertexBuffer);
@@ -224,11 +140,11 @@ namespace silnith::wings::gl4
 		}
 
 		{
-			GLuint const quadIndices[numVertices]
+			GLuint constexpr quadIndices[numVertices]
 			{
 				0, 1, 2, 3,
 			};
-			GLsizeiptr const quadIndicesSize{ sizeof(quadIndices) };
+			GLsizeiptr constexpr quadIndicesSize{ sizeof(quadIndices) };
 			static_assert(quadIndicesSize == sizeof(GLuint) * numVertices, "I do not know how sizeof works.");
 
 			glGenBuffers(1, &wingIndexBuffer);
@@ -424,11 +340,48 @@ void main() {
 		glGenBuffers(1, &modelViewProjectionUniformBuffer);
 		glBindBufferBase(GL_UNIFORM_BUFFER, modelViewProjectionBindingIndex, modelViewProjectionUniformBuffer);
 
+		/*
+		 * The C++ syntax makes this look like it is row-major, but OpenGL will read it as column-major.
+		 * However, that is irrelevant because the identity matrix is its own transposition.
+		 */
+		GLfloat constexpr identity[16]{
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			0, 0, 0, 1,
+		};
+		GLsizeiptr constexpr identitySize{ sizeof(identity) };
+		static_assert(identitySize == sizeof(GLfloat) * 4 * 4, "I do not know how sizeof works.");
+
+		GLfloat const view[16]{
+			view2[0][0],
+			view2[0][1],
+			view2[0][2],
+			view2[0][3],
+
+			view2[1][0],
+			view2[1][1],
+			view2[1][2],
+			view2[1][3],
+
+			view2[2][0],
+			view2[2][1],
+			view2[2][2],
+			view2[2][3],
+
+			view2[3][0],
+			view2[3][1],
+			view2[3][2],
+			view2[3][3],
+		};
+		GLsizeiptr constexpr viewSize{ sizeof(view) };
+		static_assert(viewSize == sizeof(GLfloat) * 4 * 4, "I do not know how sizeof works.");
+
 		glBindBuffer(GL_UNIFORM_BUFFER, modelViewProjectionUniformBuffer);
 		glBufferData(GL_UNIFORM_BUFFER, dataSize, nullptr, GL_STATIC_DRAW);
-		glBufferSubData(GL_UNIFORM_BUFFER, modelOffset, modelSize, model);
+		glBufferSubData(GL_UNIFORM_BUFFER, modelOffset, identitySize, identity);
 		glBufferSubData(GL_UNIFORM_BUFFER, viewOffset, viewSize, view);
-		glBufferSubData(GL_UNIFORM_BUFFER, projectionOffset, projectionSize, projection);
+		glBufferSubData(GL_UNIFORM_BUFFER, projectionOffset, identitySize, identity);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
@@ -548,9 +501,6 @@ void main() {
 		GLuint const vertexAttribLocation{ renderProgram->getAttributeLocation("vertex") };
 		GLuint const colorAttribLocation{ renderProgram->getAttributeLocation("color") };
 
-		GLuint deltaAttribBuffer{ 0 };
-		glGenBuffers(1, &deltaAttribBuffer);
-
 		glBindVertexArray(renderVertexArray);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -582,8 +532,6 @@ void main() {
 
 		glFlush();
 
-		glDeleteBuffers(1, &deltaAttribBuffer);
-
 		glBindVertexArray(0);
 	}
 
@@ -599,42 +547,52 @@ void main() {
 		{
 			ymult = height / width;
 		}
-		
-		GLfloat const left{ -20 * xmult };
-		GLfloat const right{ 20 * xmult };
-		GLfloat const bottom{ -20 * ymult };
-		GLfloat const top{ 20 * ymult };
-		GLfloat const nearZ{ 15 };
-		GLfloat const farZ{ 105 };
+
+		GLfloat constexpr defaultLeft{ -20 };
+		GLfloat constexpr defaultRight{ 20 };
+		GLfloat constexpr defaultBottom{ -20 };
+		GLfloat constexpr defaultTop{ 20 };
+		GLfloat constexpr defaultNear{ 35 };
+		GLfloat constexpr defaultFar{ 105 };
+
+		GLfloat const left{ defaultLeft * xmult };
+		GLfloat const right{ defaultRight * xmult };
+		GLfloat const bottom{ defaultBottom * ymult };
+		GLfloat const top{ defaultTop * ymult };
+		GLfloat const nearZ{ defaultNear };
+		GLfloat const farZ{ defaultFar };
 
 		GLfloat const viewWidth{ right - left };
 		GLfloat const viewHeight{ top - bottom };
 		GLfloat const viewDepth{ farZ - nearZ };
 
-		/*
-		 * I deliberately assign individual elements and avoid the array
-		 * block initialization syntax so that the column-major order
-		 * behavior is not confused with the row-major syntax of C++.
-		 */
-		projection[0] = static_cast<GLfloat>(2) / viewWidth;
-		projection[1] = 0;
-		projection[2] = 0;
-		projection[3] = 0;
+		GLfloat const projection[16]{
+			// column 0
+			static_cast<GLfloat>(2) / viewWidth,
+			0,
+			0,
+			0,
 
-		projection[4] = 0;
-		projection[5] = static_cast<GLfloat>(2) / viewHeight;
-		projection[6] = 0;
-		projection[7] = 0;
+			// column 1
+			0,
+			static_cast<GLfloat>(2) / viewHeight,
+			0,
+			0,
 
-		projection[8] = 0;
-		projection[9] = 0;
-		projection[10] = static_cast<GLfloat>(-2) / viewDepth;
-		projection[11] = 0;
+			// column 2
+			0,
+			0,
+			static_cast<GLfloat>(-2) / viewDepth,
+			0,
 
-		projection[12] = -(right + left) / viewWidth;
-		projection[13] = -(top + bottom) / viewHeight;
-		projection[14] = -(farZ + nearZ) / viewDepth;
-		projection[15] = static_cast<GLfloat>(1);
+			// column 3
+			-(right + left) / viewWidth,
+			-(top + bottom) / viewHeight,
+			-(farZ + nearZ) / viewDepth,
+			static_cast<GLfloat>(1),
+		};
+		GLsizeiptr constexpr projectionSize{ sizeof(projection) };
+		static_assert(projectionSize == sizeof(GLfloat) * 4 * 4, "I do not know how sizeof works.");
 
 		glBindBuffer(GL_UNIFORM_BUFFER, modelViewProjectionUniformBuffer);
 		glBufferSubData(GL_UNIFORM_BUFFER, projectionOffset, projectionSize, projection);
@@ -644,6 +602,7 @@ void main() {
 	void Resize(GLsizei width, GLsizei height)
 	{
 		glViewport(0, 0, width, height);
+
 		Ortho(static_cast<GLfloat>(width), static_cast<GLfloat>(height));
 	}
 
