@@ -47,21 +47,21 @@ namespace silnith::wings::gl1_0
 namespace silnith::wings
 {
 
-	GLsizei const numVertices{ 4 };
+	GLsizei constexpr numVertices{ 4 };
 
-	GLfloat const quadVertices[2 * numVertices]
+	GLfloat constexpr quadVertices[2 * numVertices]
 	{
 		1, 1,
 		-1, 1,
 		-1, -1,
 		1, -1,
 	};
-	GLsizeiptr const quadVerticesSize{ sizeof(quadVertices) };
-	GLuint const quadIndices[numVertices]
+	GLsizeiptr constexpr quadVerticesSize{ sizeof(quadVertices) };
+	GLuint constexpr quadIndices[numVertices]
 	{
 		0, 1, 2, 3,
 	};
-	GLsizeiptr const quadIndicesSize{ sizeof(quadIndices) };
+	GLsizeiptr constexpr quadIndicesSize{ sizeof(quadIndices) };
 
 	static_assert(quadVerticesSize == sizeof(GLfloat) * 2 * numVertices, "I do not know how sizeof works.");
 	static_assert(quadIndicesSize == sizeof(GLuint) * numVertices, "I do not know how sizeof works.");
@@ -167,7 +167,7 @@ namespace silnith::wings::gl2
 
 	typedef std::deque<Wing<GLuint, GLfloat> > wing_list;
 
-	size_t const numWings{ 40 };
+	size_t constexpr numWings{ 40 };
 
 	GLuint glMajorVersion{ 1 };
 	GLuint glMinorVersion{ 0 };
@@ -375,7 +375,8 @@ void main() {
 	{
 		for (wing_list::const_reference wing : wings)
 		{
-			glDeleteLists(wing.getGLDisplayList(), 1);
+			GLuint const displayList{ wing.getGLDisplayList() };
+			glDeleteLists(displayList, 1);
 		}
 
 		cleanupDrawQuad();
