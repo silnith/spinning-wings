@@ -513,9 +513,9 @@ void main() {
 			glDrawElements(GL_TRIANGLE_FAN, numIndices, GL_UNSIGNED_INT, 0);
 		}
 
-		glFlush();
-
 		glBindVertexArray(0);
+
+		glFlush();
 	}
 
 	void Ortho(GLfloat const width, GLfloat const height)
