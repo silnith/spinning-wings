@@ -49,6 +49,7 @@ namespace silnith::wings
 {
 
 	GLsizei constexpr numVertices{ 4 };
+	GLsizei constexpr numIndices{ 4 };
 
 	std::array<GLfloat, 2 * numVertices> constexpr quadVertices{
 		1, 1,
@@ -58,7 +59,7 @@ namespace silnith::wings
 	};
 	GLsizeiptr constexpr quadVerticesDataSize{ sizeof(GLfloat) * quadVertices.size() };
 
-	std::array<GLuint, numVertices> constexpr quadIndices{
+	std::array<GLuint, numIndices> constexpr quadIndices{
 		0, 1, 2, 3,
 	};
 	GLsizeiptr constexpr quadIndicesDataSize{ sizeof(GLuint) * quadIndices.size() };
@@ -91,7 +92,7 @@ namespace silnith::wings::gl1_1
 		 * state, and the dereferenced vertices are compiled into the
 		 * display list.
 		 */
-		glDrawElements(GL_QUADS, quadIndices.size(), GL_UNSIGNED_INT, quadIndices.data());
+		glDrawElements(GL_QUADS, numIndices, GL_UNSIGNED_INT, quadIndices.data());
 	}
 
 	void CleanupDrawQuad(void)
@@ -143,7 +144,7 @@ namespace silnith::wings::gl1_5
 		 * Vertices indexed by the ELEMENT_ARRAY_BUFFER are interpreted according to
 		 * the current VertexPointer.
 		 */
-		glDrawElements(GL_QUADS, quadIndices.size(), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_QUADS, numIndices, GL_UNSIGNED_INT, 0);
 	}
 
 	void CleanupDrawQuad(void)
@@ -164,7 +165,7 @@ namespace silnith::wings::gl2
 
 	typedef std::deque<Wing<GLuint, GLfloat> > wing_list;
 
-	size_t constexpr numWings{ 40 };
+	std::size_t constexpr numWings{ 40 };
 
 	GLuint glMajorVersion{ 1 };
 	GLuint glMinorVersion{ 0 };
@@ -219,7 +220,7 @@ namespace silnith::wings::gl2
 	{
 		GLubyte const* const glVersion{ glGetString(GL_VERSION) };
 
-		assert(glVersion != NULL);
+		assert(glVersion != nullptr);
 
 		ParseOpenGLVersion(glVersion);
 
