@@ -14,7 +14,7 @@ namespace silnith::wings::gl
 
 	typedef std::deque<Wing<GLuint, GLfloat> > wing_list;
 
-	size_t constexpr numWings{ 40 };
+	std::size_t constexpr numWings{ 40 };
 
 	GLuint glMajorVersion{ 1 };
 	GLuint glMinorVersion{ 0 };
@@ -55,7 +55,7 @@ namespace silnith::wings::gl
 	{
 		GLubyte const* const glVersion{ glGetString(GL_VERSION) };
 
-		assert(glVersion != NULL);
+		assert(glVersion != nullptr);
 
 		ParseOpenGLVersion(glVersion);
 
