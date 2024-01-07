@@ -316,13 +316,13 @@ void main() {
 			glUniformBlockBinding(programId, blockIndex, modelViewProjectionBindingIndex);
 
 			{
-				std::array<GLchar const*, 3> constexpr names{ "model", "view", "projection" };
-				std::array<GLuint, names.size()> uniformIndices{ 0, 0, 0 };
-				static_assert(names.size() == uniformIndices.size());
-				glGetUniformIndices(programId, names.size(), names.data(), uniformIndices.data());
+				GLsizei constexpr numUniforms{ 3 };
+				std::array<GLchar const*, numUniforms> constexpr names{ "model", "view", "projection" };
+				std::array<GLuint, numUniforms> uniformIndices{ 0, 0, 0 };
+				glGetUniformIndices(programId, numUniforms, names.data(), uniformIndices.data());
 
-				std::array<GLint, uniformIndices.size()> uniformOffsets{ 0, 0, 0, };
-				glGetActiveUniformsiv(programId, uniformIndices.size(), uniformIndices.data(), GL_UNIFORM_OFFSET, uniformOffsets.data());
+				std::array<GLint, numUniforms> uniformOffsets{ 0, 0, 0, };
+				glGetActiveUniformsiv(programId, numUniforms, uniformIndices.data(), GL_UNIFORM_OFFSET, uniformOffsets.data());
 				modelOffset = uniformOffsets[0];
 				viewOffset = uniformOffsets[1];
 				projectionOffset = uniformOffsets[2];
