@@ -1,5 +1,6 @@
 #include "WingsViewGL2.h"
 
+#include <array>
 #include <cassert>
 #include <deque>
 #include <memory>
@@ -49,22 +50,18 @@ namespace silnith::wings
 
 	GLsizei constexpr numVertices{ 4 };
 
-	GLfloat constexpr quadVertices[2 * numVertices]
-	{
+	std::array<GLfloat, 2 * numVertices> constexpr quadVertices{
 		1, 1,
 		-1, 1,
 		-1, -1,
 		1, -1,
 	};
-	GLsizeiptr constexpr quadVerticesSize{ sizeof(quadVertices) };
-	GLuint constexpr quadIndices[numVertices]
-	{
+	GLsizeiptr constexpr quadVerticesDataSize{ sizeof(GLfloat) * quadVertices.size() };
+
+	std::array<GLuint, numVertices> constexpr quadIndices{
 		0, 1, 2, 3,
 	};
-	GLsizeiptr constexpr quadIndicesSize{ sizeof(quadIndices) };
-
-	static_assert(quadVerticesSize == sizeof(GLfloat) * 2 * numVertices, "I do not know how sizeof works.");
-	static_assert(quadIndicesSize == sizeof(GLuint) * numVertices, "I do not know how sizeof works.");
+	GLsizeiptr constexpr quadIndicesDataSize{ sizeof(GLuint) * quadIndices.size() };
 
 }
 
@@ -77,7 +74,7 @@ namespace silnith::wings::gl1_1
 		 * Specifies vertex data to be used by subsequent calls to
 		 * DrawArrays and DrawElements.
 		 */
-		glVertexPointer(2, GL_FLOAT, 0, quadVertices);
+		glVertexPointer(2, GL_FLOAT, 0, quadVertices.data());
 
 		/*
 		 * EnableClientState is executed immediately, it is not compiled into
@@ -94,7 +91,7 @@ namespace silnith::wings::gl1_1
 		 * state, and the dereferenced vertices are compiled into the
 		 * display list.
 		 */
-		glDrawElements(GL_QUADS, numVertices, GL_UNSIGNED_INT, quadIndices);
+		glDrawElements(GL_QUADS, quadIndices.size(), GL_UNSIGNED_INT, quadIndices.data());
 	}
 
 	void CleanupDrawQuad(void)
@@ -114,7 +111,7 @@ namespace silnith::wings::gl1_5
 	{
 		glGenBuffers(1, &wingBufferObject);
 		glBindBuffer(GL_ARRAY_BUFFER, wingBufferObject);
-		glBufferData(GL_ARRAY_BUFFER, quadVerticesSize, quadVertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, quadVerticesDataSize, quadVertices.data(), GL_STATIC_DRAW);
 		/*
 		 * Specifies vertex data to be used by subsequent calls to
 		 * DrawArrays and DrawElements.
@@ -126,7 +123,7 @@ namespace silnith::wings::gl1_5
 
 		glGenBuffers(1, &wingIndicesBufferObject);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBufferObject);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesSize, quadIndices, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesDataSize, quadIndices.data(), GL_STATIC_DRAW);
 
 		glEnableClientState(GL_VERTEX_ARRAY);
 	}
@@ -146,7 +143,7 @@ namespace silnith::wings::gl1_5
 		 * Vertices indexed by the ELEMENT_ARRAY_BUFFER are interpreted according to
 		 * the current VertexPointer.
 		 */
-		glDrawElements(GL_QUADS, numVertices, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_QUADS, quadIndices.size(), GL_UNSIGNED_INT, 0);
 	}
 
 	void CleanupDrawQuad(void)

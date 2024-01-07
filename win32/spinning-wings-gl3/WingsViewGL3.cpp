@@ -4,6 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <array>
 #include <cassert>
 #include <deque>
 #include <memory>
@@ -43,6 +44,7 @@ namespace silnith::wings::gl3
 	std::unique_ptr<Program> renderProgram{ nullptr };
 
 	GLsizei constexpr numVertices{ 4 };
+	GLsizei constexpr numIndices{ 4 };
 	/// <summary>
 	/// The initial untransformed vertices for a single quad.
 	/// After binding, enable using <c>glVertexAttribPointer(..., 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0)</c>.
@@ -123,33 +125,30 @@ namespace silnith::wings::gl3
 			glm::vec3{ 0, 0, 1 }) };
 
 		{
-			GLfloat constexpr quadVertices[2 * numVertices]
-			{
+			std::array<GLfloat, 2 * numVertices> constexpr quadVertices{
 				1, 1,
 				-1, 1,
 				-1, -1,
 				1, -1,
 			};
-			GLsizeiptr constexpr quadVerticesSize{ sizeof(quadVertices) };
-			static_assert(quadVerticesSize == sizeof(GLfloat) * 2 * numVertices, "I do not know how sizeof works.");
+			GLsizeiptr constexpr quadVerticesDataSize{ sizeof(GLfloat) * quadVertices.size() };
 
 			glGenBuffers(1, &originalVertexBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
-			glBufferData(GL_ARRAY_BUFFER, quadVerticesSize, quadVertices, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, quadVerticesDataSize, quadVertices.data(), GL_STATIC_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 
 		{
-			GLuint constexpr quadIndices[numVertices]
-			{
+			std::array<GLuint, numIndices> constexpr quadIndices{
 				0, 1, 2, 3,
 			};
-			GLsizeiptr constexpr quadIndicesSize{ sizeof(quadIndices) };
-			static_assert(quadIndicesSize == sizeof(GLuint) * numVertices, "I do not know how sizeof works.");
+			GLsizeiptr constexpr quadIndicesDataSize{ sizeof(GLuint) * quadIndices.size() };
+			// TODO: static_assert that each index is less than numVertices
 
 			glGenBuffers(1, &wingIndexBuffer);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesSize, quadIndices, GL_STATIC_DRAW);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesDataSize, quadIndices.data(), GL_STATIC_DRAW);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
@@ -317,12 +316,13 @@ void main() {
 			glUniformBlockBinding(programId, blockIndex, modelViewProjectionBindingIndex);
 
 			{
-				GLuint uniformIndices[3]{ 0, 0, 0, };
-				GLchar const* const names[3]{ "model", "view", "projection" };
-				glGetUniformIndices(programId, 3, names, uniformIndices);
+				std::array<GLchar const*, 3> constexpr names{ "model", "view", "projection" };
+				std::array<GLuint, names.size()> uniformIndices{ 0, 0, 0 };
+				static_assert(names.size() == uniformIndices.size());
+				glGetUniformIndices(programId, names.size(), names.data(), uniformIndices.data());
 
-				GLint uniformOffsets[3]{ 0, 0, 0, };
-				glGetActiveUniformsiv(programId, 3, uniformIndices, GL_UNIFORM_OFFSET, uniformOffsets);
+				std::array<GLint, uniformIndices.size()> uniformOffsets{ 0, 0, 0, };
+				glGetActiveUniformsiv(programId, uniformIndices.size(), uniformIndices.data(), GL_UNIFORM_OFFSET, uniformOffsets.data());
 				modelOffset = uniformOffsets[0];
 				viewOffset = uniformOffsets[1];
 				projectionOffset = uniformOffsets[2];
@@ -342,16 +342,15 @@ void main() {
 		 * The C++ syntax makes this look like it is row-major, but OpenGL will read it as column-major.
 		 * However, that is irrelevant because the identity matrix is its own transposition.
 		 */
-		GLfloat constexpr identity[16]{
+		std::array<GLfloat, 16> constexpr identity{
 			1, 0, 0, 0,
 			0, 1, 0, 0,
 			0, 0, 1, 0,
 			0, 0, 0, 1,
 		};
-		GLsizeiptr constexpr identitySize{ sizeof(identity) };
-		static_assert(identitySize == sizeof(GLfloat) * 4 * 4, "I do not know how sizeof works.");
+		GLsizeiptr constexpr identityDataSize{ sizeof(GLfloat) * identity.size() };
 
-		GLfloat const view[16]{
+		std::array<GLfloat, 16> const view{
 			view2[0][0],
 			view2[0][1],
 			view2[0][2],
@@ -372,14 +371,13 @@ void main() {
 			view2[3][2],
 			view2[3][3],
 		};
-		GLsizeiptr constexpr viewSize{ sizeof(view) };
-		static_assert(viewSize == sizeof(GLfloat) * 4 * 4, "I do not know how sizeof works.");
+		GLsizeiptr constexpr viewDataSize{ sizeof(GLfloat) * view.size() };
 
 		glBindBuffer(GL_UNIFORM_BUFFER, modelViewProjectionUniformBuffer);
 		glBufferData(GL_UNIFORM_BUFFER, dataSize, nullptr, GL_STATIC_DRAW);
-		glBufferSubData(GL_UNIFORM_BUFFER, modelOffset, identitySize, identity);
-		glBufferSubData(GL_UNIFORM_BUFFER, viewOffset, viewSize, view);
-		glBufferSubData(GL_UNIFORM_BUFFER, projectionOffset, identitySize, identity);
+		glBufferSubData(GL_UNIFORM_BUFFER, modelOffset, identityDataSize, identity.data());
+		glBufferSubData(GL_UNIFORM_BUFFER, viewOffset, viewDataSize, view.data());
+		glBufferSubData(GL_UNIFORM_BUFFER, projectionOffset, identityDataSize, identity.data());
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
@@ -486,9 +484,6 @@ void main() {
 		GLuint const vertexAttribLocation{ renderProgram->getAttributeLocation("vertex") };
 		GLuint const colorAttribLocation{ renderProgram->getAttributeLocation("color") };
 
-		GLuint deltaAttribBuffer{ 0 };
-		glGenBuffers(1, &deltaAttribBuffer);
-
 		glBindVertexArray(renderVertexArray);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -509,18 +504,16 @@ void main() {
 			glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glDrawElements(GL_LINE_LOOP, numVertices, GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_LINE_LOOP, numIndices, GL_UNSIGNED_INT, 0);
 
 			glBindBuffer(GL_ARRAY_BUFFER, wing.getColorBuffer());
 			glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glDrawElements(GL_TRIANGLE_FAN, numVertices, GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLE_FAN, numIndices, GL_UNSIGNED_INT, 0);
 		}
 
 		glFlush();
-
-		glDeleteBuffers(1, &deltaAttribBuffer);
 
 		glBindVertexArray(0);
 	}
@@ -556,7 +549,7 @@ void main() {
 		GLfloat const viewHeight{ top - bottom };
 		GLfloat const viewDepth{ farZ - nearZ };
 
-		GLfloat const projection[16]{
+		std::array<GLfloat, 16> const projection{
 			// column 0
 			static_cast<GLfloat>(2) / viewWidth,
 			0,
@@ -581,11 +574,10 @@ void main() {
 			-(farZ + nearZ) / viewDepth,
 			static_cast<GLfloat>(1),
 		};
-		GLsizeiptr constexpr projectionSize{ sizeof(projection) };
-		static_assert(projectionSize == sizeof(GLfloat) * 4 * 4, "I do not know how sizeof works.");
+		GLsizeiptr constexpr projectionDataSize{ sizeof(GLfloat) * projection.size() };
 
 		glBindBuffer(GL_UNIFORM_BUFFER, modelViewProjectionUniformBuffer);
-		glBufferSubData(GL_UNIFORM_BUFFER, projectionOffset, projectionSize, projection);
+		glBufferSubData(GL_UNIFORM_BUFFER, projectionOffset, projectionDataSize, projection.data());
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
