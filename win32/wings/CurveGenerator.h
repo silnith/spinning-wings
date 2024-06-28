@@ -196,7 +196,7 @@ namespace silnith::wings
 		T acceleration{ 0 };
 		unsigned int ticks{ ticksPerAccelerationChange };
 
-		void setValue(T _value) noexcept
+		void setValue(T _value)
 		{
 			if (valueWraps)
 			{
@@ -208,7 +208,7 @@ namespace silnith::wings
 			}
 		}
 
-		void setVelocity(T _velocity) noexcept
+		void setVelocity(T _velocity)
 		{
 			velocity = std::clamp(_velocity, -maximumVelocity, maximumVelocity);
 		}
