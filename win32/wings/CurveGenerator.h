@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <concepts>
 #include <random>
 
 #include <cmath>
@@ -11,7 +12,7 @@ namespace silnith::wings
 	/// <summary>
 	/// A class that produces a sequence of numbers that slowly shift within predefined boundaries.
 	/// </summary>
-	template<typename T>
+	template<std::floating_point T>
 	class CurveGenerator
 	{
 	public:
@@ -232,7 +233,7 @@ namespace silnith::wings
 		static std::random_device randomDevice;
 	};
 
-	template<typename T>
+	template<std::floating_point T>
 	std::random_device CurveGenerator<T>::randomDevice{ "default" };
 
 }

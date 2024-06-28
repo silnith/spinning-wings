@@ -2,6 +2,8 @@
 
 #include "Color.h"
 
+#include <concepts>
+
 namespace silnith::wings
 {
 
@@ -25,7 +27,7 @@ namespace silnith::wings
 	/// All angles are in degrees.
 	/// </para>
 	/// </remarks>
-	template<typename ID, typename T>
+	template<std::integral ID, std::floating_point T>
 	class Wing
 	{
 	public:

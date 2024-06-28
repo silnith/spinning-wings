@@ -1,12 +1,14 @@
 #pragma once
 
+#include <concepts>
+
 namespace silnith::wings
 {
 
 	/// <summary>
 	/// A simple RGB color value.
 	/// </summary>
-	template<typename T>
+	template<std::floating_point T>
 	class Color
 	{
 	public:
@@ -80,10 +82,10 @@ namespace silnith::wings
 		T const blue{ 0 };
 	};
 
-	template<typename T>
+	template<std::floating_point T>
 	Color<T> const Color<T>::BLACK{ 0, 0, 0 };
 
-	template<typename T>
+	template<std::floating_point T>
 	Color<T> const Color<T>::WHITE{ 1, 1, 1 };
 
 }
