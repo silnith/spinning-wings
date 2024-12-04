@@ -26,7 +26,7 @@ jobs:
       - name: NuGet Restore
         run: nuget restore ${{ inputs.solution_file }} -NonInteractive
       - name: Upload Packages Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: packages
           path: win32/packages/
@@ -51,14 +51,14 @@ jobs:
         with:
           msbuild-architecture: x64
       - name: Download Packages Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: packages
           path: win32/packages/
       - name: Build
         run: msbuild ${{ inputs.solution_file }} -p:Configuration=${{ matrix.configuration }} -p:Platform=${{ matrix.platform }}
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.configuration }}-${{ matrix.platform }}
           path: |
@@ -82,7 +82,7 @@ jobs:
 #      - name: Checkout
 #        uses: actions/checkout@v3
 #      - name: Download Artifacts
-#        uses: actions/download-artifact@v3
+#        uses: actions/download-artifact@v4
 #        with:
 #          name: ${{ matrix.configuration }}-${{ matrix.platform }}
 #      - name: Run Tests
@@ -100,25 +100,25 @@ jobs:
 #      - name: Checkout
 #        uses: actions/checkout@v3
 #      - name: Download Debug x86
-#        uses: actions/download-artifact@v3
+#        uses: actions/download-artifact@v4
 #        with:
 #          name: Debug-x86
 #      - name: Download Release x86
-#        uses: actions/download-artifact@v3
+#        uses: actions/download-artifact@v4
 #        with:
 #          name: Release-x86
 #      - name: Download Debug x64
-#        uses: actions/download-artifact@v3
+#        uses: actions/download-artifact@v4
 #        with:
 #          name: Debug-x64
 #      - name: Download Release x64
-#        uses: actions/download-artifact@v3
+#        uses: actions/download-artifact@v4
 #        with:
 #          name: Release-x64
 #      - name: Create NuGet Package
 #        run: nuget pack ${{ inputs.project_name }}/${{ inputs.project_name }}.nuspec -BasePath ${{ inputs.project_name }} -NonInteractive
 #      - name: Upload NuGet Package
-#        uses: actions/upload-artifact@v3
+#        uses: actions/upload-artifact@v4
 #        with:
 #          name: NuGet
 #          path: '*.nupkg'
