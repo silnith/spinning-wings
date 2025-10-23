@@ -458,7 +458,12 @@ void main() {
 
 	void Resize(GLsizei width, GLsizei height)
 	{
-		glViewport(0, 0, width, height);
+		Resize(0, 0, width, height);
+	}
+
+	void Resize(GLint x, GLint y, GLsizei width, GLsizei height)
+	{
+		glViewport(x, y, width, height);
 
 		GLdouble constexpr defaultLeft{ -20 };
 		GLdouble constexpr defaultRight{ 20 };

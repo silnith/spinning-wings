@@ -48,4 +48,13 @@ namespace silnith::wings::gl4
     /// <param name="height">the new viewport height</param>
     void Resize(GLsizei width, GLsizei height);
 
+    /// <summary>
+    /// Updates the OpenGL rendering context for the new viewport size.
+    /// </summary>
+    /// <param name="x">the new viewport starting X coordinate</param>
+    /// <param name="y">the new viewport starting Y coordinate</param>
+    /// <param name="width">the new viewport width</param>
+    /// <param name="height">the new viewport height</param>
+    void Resize(GLint x, GLint y, GLsizei width, GLsizei height);
+
 }
