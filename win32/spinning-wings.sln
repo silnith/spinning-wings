@@ -11,7 +11,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8D65F710-568C-4627-BE04-F6F9BF40D297}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		..\.github\workflows\build-mac.yaml = ..\.github\workflows\build-mac.yaml
+		..\.github\workflows\build-windows.yaml = ..\.github\workflows\build-windows.yaml
 		..\LICENSE = ..\LICENSE
+		..\.github\workflows\push-branch.yaml = ..\.github\workflows\push-branch.yaml
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
