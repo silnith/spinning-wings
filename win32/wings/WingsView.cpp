@@ -25,15 +25,14 @@ namespace silnith::wings::gl
 		{
 			glPolygonOffset(-0.5, -2);
 			glEnable(GL_POLYGON_OFFSET_LINE);
+
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+			glEnable(GL_LINE_SMOOTH);
+			glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+			glLineWidth(1.0);
 		}
 #endif
-
-		glEnable(GL_LINE_SMOOTH);
-		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-		glLineWidth(1.0);
-
-		glEnable(GL_POLYGON_SMOOTH);
-		glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
 		glLoadIdentity();
 		gluLookAt(0, 50, 50,
@@ -106,9 +105,21 @@ namespace silnith::wings::gl
 
 	void WingsView::DrawFrame(void) const
 	{
+		glPushMatrix();
+		for (std::deque<Wing<GLuint, GLfloat> >::const_reference wing : wings) {
+			glTranslatef(0, 0, wing.getDeltaZ());
+			glRotatef(wing.getDeltaAngle(), 0, 0, 1);
+
+			Color<GLfloat> const& color{ wing.getColor() };
+			glColor3f(color.getRed(), color.getGreen(), color.getBlue());
+			glCallList(wing.getGLDisplayList());
+		}
+		glPopMatrix();
+
 #if defined(GL_VERSION_1_1)
 		if (enablePolygonOffset)
 		{
+			glEnable(GL_BLEND);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glPushMatrix();
 			for (std::deque<Wing<GLuint, GLfloat> >::const_reference wing : wings) {
@@ -121,19 +132,9 @@ namespace silnith::wings::gl
 			}
 			glPopMatrix();
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			glDisable(GL_BLEND);
 		}
 #endif
-
-		glPushMatrix();
-		for (std::deque<Wing<GLuint, GLfloat> >::const_reference wing : wings) {
-			glTranslatef(0, 0, wing.getDeltaZ());
-			glRotatef(wing.getDeltaAngle(), 0, 0, 1);
-
-			Color<GLfloat> const& color{ wing.getColor() };
-			glColor3f(color.getRed(), color.getGreen(), color.getBlue());
-			glCallList(wing.getGLDisplayList());
-		}
-		glPopMatrix();
 
 		glFlush();
 	}
