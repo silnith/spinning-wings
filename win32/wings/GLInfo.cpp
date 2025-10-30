@@ -23,7 +23,7 @@ namespace silnith::wings::gl
 		versionStringInput >> minorVersion;
     }
 
-	bool GLInfo::hasOpenGL(GLuint major, GLuint minor) const
+	bool GLInfo::isAtLeastVersion(GLuint major, GLuint minor) const
 	{
 		return (majorVersion > major)
 			|| (majorVersion == major && minorVersion >= minor);

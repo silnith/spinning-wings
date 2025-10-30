@@ -28,7 +28,7 @@ namespace silnith::wings::gl
         /// <param name="major">The major version number expected.</param>
         /// <param name="minor">The minor version number expected.</param>
         /// <returns><see langword="true"/> if the OpenGL implementation satisfies the requested version.</returns>
-        bool hasOpenGL(GLuint major, GLuint minor) const;
+        bool isAtLeastVersion(GLuint major, GLuint minor) const;
 
     private:
         GLuint majorVersion{ 1 };

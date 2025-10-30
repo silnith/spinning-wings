@@ -14,7 +14,7 @@ namespace silnith::wings::gl
 {
 
 	WingsView::WingsView(GLInfo const& glInfo) :
-		enablePolygonOffset{ glInfo.hasOpenGL(1, 1) },
+		enablePolygonOffset{ glInfo.isAtLeastVersion(1, 1) },
 		wingDisplayList{ glGenLists(1) }
 	{
 		glEnable(GL_DEPTH_TEST);
