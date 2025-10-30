@@ -289,7 +289,10 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		if (hdc == nullptr) {
 			return -1;
 		}
-		EnumDisplayMonitors(hdc, nullptr, RenderWingsOnMonitor, 0);
+		LPCRECT constexpr lprcClip{ nullptr };
+		MONITORENUMPROC constexpr lpfnEnum{ RenderWingsOnMonitor };
+		LPARAM constexpr dwData{ 0 };
+		EnumDisplayMonitors(hdc, lprcClip, lpfnEnum, dwData);
 
 		SwapBuffers(hdc);
 
