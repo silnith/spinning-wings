@@ -86,7 +86,7 @@ GLsizei currentWindowHeight{ 0 };
 /// <returns><c>TRUE</c> to continue the enumeration.</returns>
 /// <seealso cref="MONITORENUMPROC"/>
 /// <seealso cref="EnumDisplayMonitors"/>
-BOOL RenderWingsOnMonitor(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData)
+BOOL CALLBACK RenderWingsOnMonitor(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData)
 {
 	LONG const visibleTop{ lprcMonitor->top };
 	LONG const visibleBottom{ lprcMonitor->bottom };
