@@ -17,7 +17,7 @@ defaults:
 jobs:
   setup:
     name: Setup
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -32,7 +32,7 @@ jobs:
           path: win32/packages/
   build:
     name: Build
-    runs-on: windows-2019
+    runs-on: windows-2022
     needs:
       - setup
     strategy:
@@ -67,7 +67,7 @@ jobs:
             win32/Release/
 #  test:
 #    name: Test
-#    runs-on: windows-2019
+#    runs-on: windows-2022
 #    needs:
 #      - build
 #    strategy:
@@ -93,7 +93,7 @@ jobs:
 #          codeCoverageEnabled: false
 #  package:
 #    name: Package
-#    runs-on: windows-2019
+#    runs-on: windows-2022
 #    needs:
 #      - build
 #    steps:
