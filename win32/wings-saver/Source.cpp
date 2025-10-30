@@ -50,6 +50,10 @@ UINT_PTR constexpr animationTimerId{ 42 };
 /// </remarks>
 HGLRC hglrc{ nullptr };
 
+/// <summary>
+/// The object that encapsulates all of the logic for drawing and animating
+/// the spinning wings.
+/// </summary>
 std::unique_ptr<silnith::wings::gl::WingsView> wingsView{ nullptr };
 
 /// <summary>
@@ -164,7 +168,7 @@ void StartAnimation(HWND hWnd)
 	BOOL suppressExceptions{ FALSE };
 	PVOID const buffer_address{ &suppressExceptions };
 	DWORD constexpr buffer_length{ sizeof(suppressExceptions) };
-	BOOL const exceptionHandlerDisabled{ SetUserObjectInformation(processHandle, UOI_TIMERPROC_EXCEPTION_SUPPRESSION, buffer_address, buffer_length) };
+	BOOL const exceptionHandlerDisabled{ SetUserObjectInformationW(processHandle, UOI_TIMERPROC_EXCEPTION_SUPPRESSION, buffer_address, buffer_length) };
 
 	if (exceptionHandlerDisabled) {}
 	else
@@ -252,6 +256,11 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		StartAnimation(hWnd);
 
 		return 0;
+	}
+	case WM_DISPLAYCHANGE:
+	{
+		// TODO: monitors changed?
+		return DefWindowProcW(hWnd, message, wParam, lParam);
 	}
 	case WM_DPICHANGED:
 	{
