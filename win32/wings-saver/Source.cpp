@@ -15,7 +15,9 @@
 #pragma comment (lib, "glu32.lib")
 
 #include <cassert>
+#include <memory>
 
+#include "GLInfo.h"
 #include "WingsPixelFormat.h"
 #include "WingsView.h"
 
@@ -47,6 +49,8 @@ UINT_PTR constexpr animationTimerId{ 42 };
 /// </para>
 /// </remarks>
 HGLRC hglrc{ nullptr };
+
+std::unique_ptr<silnith::wings::gl::WingsView> wingsView{ nullptr };
 
 /// <summary>
 /// The current width of the display window.
@@ -102,11 +106,11 @@ BOOL CALLBACK RenderWingsOnMonitor(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lpr
 	GLsizei const width{ static_cast<GLsizei>(visibleWidth) };
 	GLsizei const height{ static_cast<GLsizei>(visibleHeight) };
 
-	silnith::wings::gl::Resize(x, y, width, height);
+	wingsView->Resize(x, y, width, height);
 
 	glScissor(x, y, width, height);
 
-	silnith::wings::gl::DrawFrame();
+	wingsView->DrawFrame();
 
 	return TRUE;
 }
@@ -135,7 +139,7 @@ void CALLBACK AdvanceAnimation(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwT
 
 	assert(hglrc == wglGetCurrentContext());
 
-	silnith::wings::gl::AdvanceAnimation();
+	wingsView->AdvanceAnimation();
 
 	HRGN constexpr hRegion{ nullptr };
 	BOOL constexpr eraseBackground{ FALSE };
@@ -241,7 +245,7 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 			return -1;
 		}
 
-		silnith::wings::gl::InitializeOpenGLState();
+		wingsView = std::make_unique<silnith::wings::gl::WingsView>(silnith::wings::gl::GLInfo{});
 
 		ReleaseDC(hWnd, hdc);
 
@@ -312,7 +316,7 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 	}
 	case WM_DESTROY:
 	{
-		silnith::wings::gl::CleanupOpenGLState();
+		wingsView.release();
 
 		// window about to be destroyed
 		HDC const hdc{ GetDC(hWnd) };

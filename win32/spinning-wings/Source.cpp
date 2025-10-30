@@ -11,7 +11,9 @@
 #pragma comment (lib, "glu32.lib")
 
 #include <cassert>
+#include <memory>
 
+#include "GLInfo.h"
 #include "WingsPixelFormat.h"
 #include "WingsView.h"
 
@@ -32,6 +34,8 @@ UINT_PTR constexpr animationTimerId{ 42 };
  */
 
 HGLRC hglrc{ nullptr };
+
+std::unique_ptr<silnith::wings::gl::WingsView> wingsView{ nullptr };
 
 void ExplainLastError(void)
 {
@@ -86,7 +90,7 @@ void CALLBACK AdvanceAnimation(HWND hWnd, UINT message, UINT_PTR timerId, DWORD 
 
 	assert(hglrc == wglGetCurrentContext());
 
-	silnith::wings::gl::AdvanceAnimation();
+	wingsView->AdvanceAnimation();
 
 	HRGN constexpr hRegion{ nullptr };
 	BOOL constexpr eraseBackground{ FALSE };
@@ -155,7 +159,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return -1;
 		}
 
-		silnith::wings::gl::InitializeOpenGLState();
+		wingsView = std::make_unique<silnith::wings::gl::WingsView>(silnith::wings::gl::GLInfo{});
 
 		ReleaseDC(hWnd, hdc);
 
@@ -188,7 +192,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		assert(hglrc == wglGetCurrentContext());
 
-		silnith::wings::gl::Resize(width, height);
+		wingsView->Resize(width, height);
 
 		return 0;
 	}
@@ -206,7 +210,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		silnith::wings::gl::DrawFrame();
+		wingsView->DrawFrame();
 
 		PAINTSTRUCT paintstruct{};
 		HDC const hdc{ BeginPaint(hWnd, &paintstruct) };
@@ -228,7 +232,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_DESTROY:
 	{
-		silnith::wings::gl::CleanupOpenGLState();
+		wingsView.release();
 
 		// window about to be destroyed
 		HDC const hdc{ GetDC(hWnd) };

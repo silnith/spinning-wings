@@ -13,58 +13,15 @@
 namespace silnith::wings::gl
 {
 
-	typedef std::deque<Wing<GLuint, GLfloat> > wing_list;
-
-	std::size_t constexpr numWings{ 40 };
-
-	GLuint glMajorVersion{ 1 };
-	GLuint glMinorVersion{ 0 };
-
-	GLuint wingDisplayList{ 0 };
-	wing_list wings{};
-
-	CurveGenerator<GLfloat> radiusCurve{ 10.0f, -15.0f, 15.0f, false, 0.1f, 0.01f, 150 };
-	CurveGenerator<GLfloat> angleCurve{ CurveGenerator<GLfloat>::createGeneratorForAngles(0.0f, 2.0f, 0.05f, 120) };
-	CurveGenerator<GLfloat> deltaAngleCurve{ CurveGenerator<GLfloat>::createGeneratorForAngles(15.0f, 0.2f, 0.02f, 80) };
-	CurveGenerator<GLfloat> deltaZCurve{ 0.5f, 0.4f, 0.7f, false, 0.01f, 0.001f, 200 };
-	CurveGenerator<GLfloat> rollCurve{ CurveGenerator<GLfloat>::createGeneratorForAngles(0.0f, 1.0f, 0.25f, 80) };
-	CurveGenerator<GLfloat> pitchCurve{ CurveGenerator<GLfloat>::createGeneratorForAngles(0.0f, 2.0f, 0.25f, 40) };
-	CurveGenerator<GLfloat> yawCurve{ CurveGenerator<GLfloat>::createGeneratorForAngles(0.0f, 1.5f, 0.25f, 50) };
-	CurveGenerator<GLfloat> redCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 95) };
-	CurveGenerator<GLfloat> greenCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 40) };
-	CurveGenerator<GLfloat> blueCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
-
-	bool hasOpenGL(GLuint major, GLuint minor)
+	WingsView::WingsView(GLInfo const& glInfo) :
+		enablePolygonOffset{ glInfo.hasOpenGL(1, 1) },
+		wingDisplayList{ glGenLists(1) }
 	{
-		return (glMajorVersion > major)
-			|| (glMajorVersion == major && glMinorVersion >= minor);
-	}
-
-	void ParseOpenGLVersion(GLubyte const* glVersion)
-	{
-		std::istringstream versionStringInput{ std::string{ reinterpret_cast<char const*>(glVersion) } };
-		//std::basic_istringstream<GLubyte> versionStringInput{ std::basic_string<GLubyte>{glVersion} };
-
-		versionStringInput >> glMajorVersion;
-		GLubyte period;
-		versionStringInput >> period;
-		assert(period == '.');
-		versionStringInput >> glMinorVersion;
-	}
-
-	void InitializeOpenGLState(void)
-	{
-		GLubyte const* const glVersion{ glGetString(GL_VERSION) };
-
-		assert(glVersion != nullptr);
-
-		ParseOpenGLVersion(glVersion);
-
 		glEnable(GL_DEPTH_TEST);
 		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
 #if defined(GL_VERSION_1_1)
-		if (hasOpenGL(1, 1))
+		if (enablePolygonOffset)
 		{
 			glPolygonOffset(-0.5, -2);
 			glEnable(GL_POLYGON_OFFSET_LINE);
@@ -83,7 +40,6 @@ namespace silnith::wings::gl
 			0, 0, 13,
 			0, 0, 1);
 
-		wingDisplayList = glGenLists(1);
 		glNewList(wingDisplayList, GL_COMPILE);
 		glBegin(GL_QUADS);
 		glVertex2f(1, 1);
@@ -94,9 +50,9 @@ namespace silnith::wings::gl
 		glEndList();
 	}
 
-	void CleanupOpenGLState(void)
+	WingsView::~WingsView(void) noexcept
 	{
-		for (wing_list::const_reference wing : wings)
+		for (std::deque<Wing<GLuint, GLfloat> >::const_reference wing : wings)
 		{
 			GLuint const displayList{ wing.getGLDisplayList() };
 			glDeleteLists(displayList, 1);
@@ -105,7 +61,7 @@ namespace silnith::wings::gl
 		glDeleteLists(wingDisplayList, 1);
 	}
 
-	void AdvanceAnimation(void)
+	void WingsView::AdvanceAnimation(void)
 	{
 		GLfloat const radius{ radiusCurve.getNextValue() };
 		GLfloat const angle{ angleCurve.getNextValue() };
@@ -148,14 +104,14 @@ namespace silnith::wings::gl
 		glEndList();
 	}
 
-	void DrawFrame(void)
+	void WingsView::DrawFrame(void) const
 	{
 #if defined(GL_VERSION_1_1)
-		if (hasOpenGL(1, 1))
+		if (enablePolygonOffset)
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glPushMatrix();
-			for (wing_list::const_reference wing : wings) {
+			for (std::deque<Wing<GLuint, GLfloat> >::const_reference wing : wings) {
 				glTranslatef(0, 0, wing.getDeltaZ());
 				glRotatef(wing.getDeltaAngle(), 0, 0, 1);
 
@@ -169,7 +125,7 @@ namespace silnith::wings::gl
 #endif
 
 		glPushMatrix();
-		for (wing_list::const_reference wing : wings) {
+		for (std::deque<Wing<GLuint, GLfloat> >::const_reference wing : wings) {
 			glTranslatef(0, 0, wing.getDeltaZ());
 			glRotatef(wing.getDeltaAngle(), 0, 0, 1);
 
@@ -182,12 +138,12 @@ namespace silnith::wings::gl
 		glFlush();
 	}
 
-	void Resize(GLsizei width, GLsizei height)
+	void WingsView::Resize(GLsizei width, GLsizei height) const
 	{
 		Resize(0, 0, width, height);
 	}
 
-	void Resize(GLint x, GLint y, GLsizei width, GLsizei height)
+	void WingsView::Resize(GLint x, GLint y, GLsizei width, GLsizei height) const
 	{
 		glViewport(x, y, width, height);
 
