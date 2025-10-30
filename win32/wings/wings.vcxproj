@@ -173,11 +173,13 @@
   <ItemGroup>
     <ClInclude Include="Color.h" />
     <ClInclude Include="CurveGenerator.h" />
+    <ClInclude Include="GLInfo.h" />
     <ClInclude Include="Wing.h" />
     <ClInclude Include="WingsView.h" />
     <ClInclude Include="WingsPixelFormat.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GLInfo.cpp" />
     <ClCompile Include="WingsView.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
