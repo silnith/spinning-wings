@@ -53,7 +53,7 @@ HGLRC hglrc{ nullptr };
 /// </summary>
 /// <remarks>
 /// <para>
-/// This is updated after every <see cref="WM_SIZE"/> message received.
+/// This is updated after every <see cref="WM_WINDOWPOSCHANGED"/> message received.
 /// </para>
 /// </remarks>
 GLsizei currentWindowWidth{ 0 };
@@ -63,7 +63,7 @@ GLsizei currentWindowWidth{ 0 };
 /// </summary>
 /// <remarks>
 /// <para>
-/// This is updated after every <see cref="WM_SIZE"/> message received.
+/// This is updated after every <see cref="WM_WINDOWPOSCHANGED"/> message received.
 /// </para>
 /// </remarks>
 GLsizei currentWindowHeight{ 0 };
