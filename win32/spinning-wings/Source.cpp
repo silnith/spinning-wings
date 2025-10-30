@@ -33,9 +33,38 @@ UINT_PTR constexpr animationTimerId{ 42 };
 
 HGLRC hglrc{ nullptr };
 
-BOOL MonitorEnumProc(HMONITOR hMonitor, HDC hdc, LPRECT lpRect, LPARAM d)
+void ExplainLastError(void)
 {
-	return TRUE;
+	DWORD const error{ GetLastError() };
+
+	HLOCAL buffer{ nullptr };
+	HANDLE foo{};
+	void* bar{};
+	WCHAR* baz{};
+	wchar_t* buffer2{};
+
+	DWORD dwFlags{ FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS };
+	LPCVOID lpSource{ nullptr };
+	DWORD dwMessageId{ error };
+	DWORD dwLanguageId{ 0 };
+	LPWSTR lpBuffer{ reinterpret_cast<LPWSTR>(&buffer) };
+	DWORD nSize{ 0 };
+	va_list* Arguments{ nullptr };
+	DWORD const numCharsFormatted{ FormatMessageW(dwFlags, lpSource, dwMessageId, dwLanguageId, lpBuffer, nSize, Arguments) };
+	if (numCharsFormatted == 0)
+	{
+		// call GetLastError(), again!
+	}
+
+	HLOCAL const freeSucceeded{ LocalFree(buffer) };
+	if (freeSucceeded == NULL)
+	{
+	}
+	else
+	{
+		assert(freeSucceeded == buffer);
+		// call GetLastError(), continuing the infinite death spiral!
+	}
 }
 
 /// <summary>
@@ -134,6 +163,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		return 0;
 	}
+	case WM_DISPLAYCHANGE:
+	{
+		// monitors changed?
+	}
 	case WM_DPICHANGED:
 	{
 		// GetSystemMetricsForDpi, AdjustWindowRectExForDpi, SystemParametersInfoForDpi, GetDpiForWindow
@@ -146,25 +179,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		BOOL const success{ SetWindowPos(hWnd, nullptr, suggestedSizeAndPosition->left, suggestedSizeAndPosition->top, suggestedSizeAndPosition->right - suggestedSizeAndPosition->left, suggestedSizeAndPosition->bottom - suggestedSizeAndPosition->top, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS) };
 		return 0;
 	}
-	case WM_SIZE:
+	case WM_WINDOWPOSCHANGED:
 	{
-		switch (wParam)
-		{
-		case SIZE_MAXHIDE:
-		case SIZE_MAXSHOW:
-		case SIZE_MAXIMIZED:
-		case SIZE_RESTORED:
-			break;
-		case SIZE_MINIMIZED:
-		default:
-			return DefWindowProcW(hWnd, message, wParam, lParam);
-		}
-		WORD const width{ LOWORD(lParam) };
-		WORD const height{ HIWORD(lParam) };
+		WINDOWPOS const* windowPos{ reinterpret_cast<WINDOWPOS*>(lParam) };
+
+		GLsizei const width{ static_cast<GLsizei>(windowPos->cx) };
+		GLsizei const height{ static_cast<GLsizei>(windowPos->cy) };
 
 		assert(hglrc == wglGetCurrentContext());
 
-		silnith::wings::gl::Resize(static_cast<GLsizei>(width), static_cast<GLsizei>(height));
+		silnith::wings::gl::Resize(width, height);
 
 		return 0;
 	}
@@ -180,6 +204,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		 */
 		assert(hglrc == wglGetCurrentContext());
 
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		silnith::wings::gl::DrawFrame();
 
 		PAINTSTRUCT paintstruct{};
@@ -187,11 +213,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (hdc == nullptr) {
 			return -1;
 		}
-		//EnumDisplayMonitors(hdc, nullptr, MonitorEnumProc, 0);
-
-		//wglMakeCurrent(hdc, hglrc);
-
-		//silnith::wings::gl::DrawFrame();
 
 		SwapBuffers(hdc);
 

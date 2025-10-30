@@ -35,11 +35,6 @@ UINT_PTR constexpr animationTimerId{ 42 };
 
 HGLRC hglrc{ nullptr };
 
-BOOL MonitorEnumProc(HMONITOR hMonitor, HDC hdc, LPRECT lpRect, LPARAM d)
-{
-	return TRUE;
-}
-
 /// <summary>
 /// The <c>TIMERPROC</c> that advances the animation by one frame.
 /// </summary>
@@ -175,25 +170,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		BOOL const success{ SetWindowPos(hWnd, nullptr, suggestedSizeAndPosition->left, suggestedSizeAndPosition->top, suggestedSizeAndPosition->right - suggestedSizeAndPosition->left, suggestedSizeAndPosition->bottom - suggestedSizeAndPosition->top, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS) };
 		return 0;
 	}
-	case WM_SIZE:
+	case WM_WINDOWPOSCHANGED:
 	{
-		switch (wParam)
-		{
-		case SIZE_MAXHIDE:
-		case SIZE_MAXSHOW:
-		case SIZE_MAXIMIZED:
-		case SIZE_RESTORED:
-			break;
-		case SIZE_MINIMIZED:
-		default:
-			return DefWindowProcW(hWnd, message, wParam, lParam);
-		}
-		WORD const width{ LOWORD(lParam) };
-		WORD const height{ HIWORD(lParam) };
+		WINDOWPOS const* windowPos{ reinterpret_cast<WINDOWPOS*>(lParam) };
+
+		GLsizei const width{ static_cast<GLsizei>(windowPos->cx) };
+		GLsizei const height{ static_cast<GLsizei>(windowPos->cy) };
 
 		assert(hglrc == wglGetCurrentContext());
 
-		silnith::wings::gl4::Resize(static_cast<GLsizei>(width), static_cast<GLsizei>(height));
+		silnith::wings::gl4::Resize(width, height);
 
 		return 0;
 	}
@@ -209,6 +195,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		 */
 		assert(hglrc == wglGetCurrentContext());
 
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		silnith::wings::gl4::DrawFrame();
 
 		PAINTSTRUCT paintstruct{};
@@ -216,11 +204,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (hdc == nullptr) {
 			return -1;
 		}
-		//EnumDisplayMonitors(hdc, nullptr, MonitorEnumProc, 0);
-
-		//wglMakeCurrent(hdc, hglrc);
-
-		//silnith::wings::gl4::DrawFrame();
 
 		SwapBuffers(hdc);
 

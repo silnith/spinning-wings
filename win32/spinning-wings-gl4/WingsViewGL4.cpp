@@ -500,8 +500,6 @@ void main() {
 
 		glBindVertexArray(renderVertexArray);
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
 		GLfloat deltaZ{ 0 };
 		GLfloat deltaAngle{ 0 };
 		for (wing_list::const_reference wing : wings) {
@@ -562,6 +560,10 @@ void main() {
 		GLfloat const viewWidth{ right - left };
 		GLfloat const viewHeight{ top - bottom };
 		GLfloat const viewDepth{ farZ - nearZ };
+
+		assert(viewWidth > 0);
+		assert(viewHeight > 0);
+		assert(viewDepth > 0);
 
 		std::array<GLfloat, 16> const projection{
 			// column 0

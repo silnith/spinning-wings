@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include <deque>
+#include <string>
 #include <sstream>
 
 #include "CurveGenerator.h"
@@ -149,8 +150,6 @@ namespace silnith::wings::gl
 
 	void DrawFrame(void)
 	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 #if defined(GL_VERSION_1_1)
 		if (hasOpenGL(1, 1))
 		{
@@ -199,6 +198,13 @@ namespace silnith::wings::gl
 		GLdouble constexpr defaultNear{ 35 };
 		GLdouble constexpr defaultFar{ 105 };
 
+		/*
+		 * These multipliers account for the aspect ratio of the window, so that
+		 * the rendering does not distort.  The conditional is so that the larger
+		 * number is always divided by the smaller, resulting in a multiplier no
+		 * less than one.  This way, the viewing area is always expanded rather than
+		 * contracted, and the expected viewing frustum is never clipped.
+		 */
 		GLdouble xmult{ 1.0 };
 		GLdouble ymult{ 1.0 };
 		if (width > height)

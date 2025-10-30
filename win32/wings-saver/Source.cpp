@@ -243,8 +243,6 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 		silnith::wings::gl::InitializeOpenGLState();
 
-		glEnable(GL_SCISSOR_TEST);
-
 		ReleaseDC(hWnd, hdc);
 
 		StartAnimation(hWnd);
@@ -283,6 +281,12 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		 * TODO: Is this only for double-buffered windows?
 		 */
 		assert(hglrc == wglGetCurrentContext());
+
+		glDisable(GL_SCISSOR_TEST);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glEnable(GL_SCISSOR_TEST);
 
 		PAINTSTRUCT paintstruct{};
 		HDC const hdc{ BeginPaint(hWnd, &paintstruct) };
