@@ -52,7 +52,18 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_WINGS               ICON                    "wings.ico"
+ID_APP                  ICON                    "wings.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_DESCRIPTION         "A graphics hack of spinning wings."
+END
 
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////

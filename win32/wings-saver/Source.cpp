@@ -22,40 +22,116 @@
 /// <summary>
 /// The number of milliseconds between frame updates.
 /// </summary>
+/// <remarks>
+/// <para>
+/// Windows will clamp this value to the range
+/// <c>[<see cref="USER_TIMER_MINIMUM"/>, <see cref="USER_TIMER_MAXIMUM"/>]</c>.
+/// </para>
+/// </remarks>
 UINT constexpr updateDelayMilliseconds{ 33 };
 
+/// <summary>
+/// A randomly-chosen identifier for the animation timer.
+/// </summary>
 UINT_PTR constexpr animationTimerId{ 42 };
 
-/*
- * The Device Context (DC) is the Windows object that represents the drawable surface.
- * The OpenGL rendering context (GLRC) is the OpenGL state machine.
- * A thread has a current GLRC specified by wglMakeCurrent.
- * Each GLRC has an associated DC, but the DC is ignorant of the GLRC.
- */
-
+/// <summary>
+/// The OpenGL rendering context.
+/// </summary>
+/// <remarks>
+/// <para>
+/// The Device Context (DC) is the Windows object that represents the drawable surface.
+/// The OpenGL rendering context (GLRC) is the OpenGL state machine.
+/// A thread has a current GLRC specified by <see cref="wglMakeCurrent"/>.
+/// Each GLRC has an associated DC, but the DC is ignorant of the GLRC.
+/// </para>
+/// </remarks>
 HGLRC hglrc{ nullptr };
 
-BOOL MonitorEnumProc(HMONITOR hMonitor, HDC hdc, LPRECT lpRect, LPARAM d)
+/// <summary>
+/// The current width of the display window.
+/// </summary>
+/// <remarks>
+/// <para>
+/// This is updated after every <see cref="WM_SIZE"/> message received.
+/// </para>
+/// </remarks>
+GLsizei currentWindowWidth{ 0 };
+
+/// <summary>
+/// The current height of the display window.
+/// </summary>
+/// <remarks>
+/// <para>
+/// This is updated after every <see cref="WM_SIZE"/> message received.
+/// </para>
+/// </remarks>
+GLsizei currentWindowHeight{ 0 };
+
+/// <summary>
+/// Renders the current view to the portion of the window that is visible on a single monitor.
+/// This sets the drawing area to the visible portion for the monitor, sets the GL scissor to discard
+/// fragments outside of the visible portion, then draws the current frame.
+/// </summary>
+/// <remarks>
+/// <para>
+/// This is an instance of <see cref="MONITORENUMPROC"/> intended to be passed to
+/// <see cref="EnumDisplayMonitors"/>.
+/// </para>
+/// </remarks>
+/// <param name="hMonitor">A handle to the display monitor.  This value will always be non-<c>NULL</c>.</param>
+/// <param name="hdcMonitor">A handle to a device context.  This may be <c>NULL</c>.</param>
+/// <param name="lprcMonitor">The clipping rectangle of the device context portion that appears on this monitor.</param>
+/// <param name="dwData">Whatever the fourth parameter to <see cref="EnumDisplayMonitors"/> was.</param>
+/// <returns><c>TRUE</c> to continue the enumeration.</returns>
+/// <seealso cref="MONITORENUMPROC"/>
+/// <seealso cref="EnumDisplayMonitors"/>
+BOOL RenderWingsOnMonitor(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData)
 {
+	LONG const visibleTop{ lprcMonitor->top };
+	LONG const visibleBottom{ lprcMonitor->bottom };
+	LONG const visibleLeft{ lprcMonitor->left };
+	LONG const visibleRight{ lprcMonitor->right };
+
+	LONG const visibleWidth{ visibleRight - visibleLeft };
+	LONG const visibleHeight{ visibleBottom - visibleTop };
+
+	GLint const x{ visibleLeft };
+	GLint const y{ currentWindowHeight - visibleBottom };
+
+	GLsizei const width{ static_cast<GLsizei>(visibleWidth) };
+	GLsizei const height{ static_cast<GLsizei>(visibleHeight) };
+
+	silnith::wings::gl::Resize(x, y, width, height);
+
+	glScissor(x, y, width, height);
+
+	silnith::wings::gl::DrawFrame();
+
 	return TRUE;
 }
 
 /// <summary>
-/// The <c>TIMERPROC</c> that advances the animation by one frame.
+/// The <see cref="TIMERPROC"/> that advances the animation by one frame.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Pass this to <c>SetTimer</c>.
+/// Pass this to <see cref="SetTimer"/>.
 /// </para>
 /// </remarks>
-/// <param name="hWnd">The window handle.</param>
-/// <param name="message">The message code.  Must be <c>WM_TIMER</c>.</param>
-/// <param name="timerId">The timer identifier.  Should be <c>animationTimerId</c>.</param>
-/// <param name="tickCount">The current tick count.</param>
-void CALLBACK AdvanceAnimation(HWND hWnd, UINT message, UINT_PTR timerId, DWORD tickCount)
+/// <param name="hWnd">A handle to the window associated with the timer.</param>
+/// <param name="uMsg">The message code.  Must be <see cref="WM_TIMER"/>.</param>
+/// <param name="idEvent">The timer identifier.  Should be <see cref="animationTimerId"/>.</param>
+/// <param name="dwTime">The number of milliseconds that have elapsed since the system was started.
+/// This is the value returned by the <see cref="GetTickCount"/> function.</param>
+/// <seealso cref="TIMERPROC"/>
+/// <seealso cref="SetTimer"/>
+/// <seealso cref="StartAnimation"/>
+/// <seealso cref="StopAnimation"/>
+void CALLBACK AdvanceAnimation(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
-	assert(message == WM_TIMER);
-	assert(timerId == animationTimerId);
+	assert(uMsg == WM_TIMER);
+	assert(idEvent == animationTimerId);
 
 	assert(hglrc == wglGetCurrentContext());
 
@@ -66,14 +142,50 @@ void CALLBACK AdvanceAnimation(HWND hWnd, UINT message, UINT_PTR timerId, DWORD 
 	InvalidateRgn(hWnd, hRegion, eraseBackground);
 }
 
+/// <summary>
+/// Begins a timer that calls <see cref="AdvanceAnimation"/> every <see cref="updateDelayMilliseconds"/> milliseconds.
+/// </summary>
+/// <param name="hWnd">The window handle.  This is required for the timer.</param>
+/// <seealso cref="animationTimerId"/>
+/// <seealso cref="StopAnimation"/>
+/// <seealso cref="SetTimer"/>
 void StartAnimation(HWND hWnd)
 {
+	/*
+	 * This is to disable the "helpful" exception handler that Windows puts around timers, starting with Windows 2000.
+	 * They added it, then immediately realized it was a terrible idea and a security vulnerability,
+	 * but kept it for "compatibility" and instead told everybody to change their code to disable it instead.
+	 */
+	HANDLE const processHandle{ GetCurrentProcess() };
+	BOOL suppressExceptions{ FALSE };
+	PVOID const buffer_address{ &suppressExceptions };
+	DWORD constexpr buffer_length{ sizeof(suppressExceptions) };
+	BOOL const exceptionHandlerDisabled{ SetUserObjectInformation(processHandle, UOI_TIMERPROC_EXCEPTION_SUPPRESSION, buffer_address, buffer_length) };
+
+	if (exceptionHandlerDisabled) {}
+	else
+	{
+		DWORD const error{ GetLastError() };
+	}
+
 	TIMERPROC constexpr timerProc{ AdvanceAnimation };
 	UINT_PTR const timerSet{ SetTimer(hWnd, animationTimerId, updateDelayMilliseconds, timerProc) };
 
 	assert(timerSet != 0);
+
+	if (timerSet == 0)
+	{
+		DWORD const error{ GetLastError() };
+	}
 }
 
+/// <summary>
+/// Ends the timer that calls <see cref="AdvanceAnimation"/>.
+/// </summary>
+/// <param name="hWnd">The window handle.</param>
+/// <seealso cref="animationTimerId"/>
+/// <seealso cref="StartAnimation"/>
+/// <seealso cref="KillTimer"/>
 void StopAnimation(HWND hWnd)
 {
 	BOOL const timerStopped{ KillTimer(hWnd, animationTimerId) };
@@ -131,6 +243,8 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 		silnith::wings::gl::InitializeOpenGLState();
 
+		glEnable(GL_SCISSOR_TEST);
+
 		ReleaseDC(hWnd, hdc);
 
 		StartAnimation(hWnd);
@@ -149,25 +263,12 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		BOOL const success{ SetWindowPos(hWnd, nullptr, suggestedSizeAndPosition->left, suggestedSizeAndPosition->top, suggestedSizeAndPosition->right - suggestedSizeAndPosition->left, suggestedSizeAndPosition->bottom - suggestedSizeAndPosition->top, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS) };
 		return 0;
 	}
-	case WM_SIZE:
+	case WM_WINDOWPOSCHANGED:
 	{
-		switch (wParam)
-		{
-		case SIZE_MAXHIDE:
-		case SIZE_MAXSHOW:
-		case SIZE_MAXIMIZED:
-		case SIZE_RESTORED:
-			break;
-		case SIZE_MINIMIZED:
-		default:
-			return DefScreenSaverProc(hWnd, message, wParam, lParam);
-		}
+		WINDOWPOS const* windowPos{ reinterpret_cast<WINDOWPOS*>(lParam) };
 
-		assert(hglrc == wglGetCurrentContext());
-
-		GLsizei const width{ LOWORD(lParam) };
-		GLsizei const height{ HIWORD(lParam) };
-		silnith::wings::gl::Resize(width, height);
+		currentWindowWidth = static_cast<GLsizei>(windowPos->cx);
+		currentWindowHeight = static_cast<GLsizei>(windowPos->cy);
 
 		return 0;
 	}
@@ -183,18 +284,12 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		 */
 		assert(hglrc == wglGetCurrentContext());
 
-		silnith::wings::gl::DrawFrame();
-
 		PAINTSTRUCT paintstruct{};
 		HDC const hdc{ BeginPaint(hWnd, &paintstruct) };
 		if (hdc == nullptr) {
 			return -1;
 		}
-		//EnumDisplayMonitors(hdc, nullptr, MonitorEnumProc, 0);
-
-		//wglMakeCurrent(hdc, hglrc);
-
-		//silnith::wings::gl::DrawFrame();
+		EnumDisplayMonitors(hdc, nullptr, RenderWingsOnMonitor, 0);
 
 		SwapBuffers(hdc);
 
