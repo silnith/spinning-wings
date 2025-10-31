@@ -21,35 +21,53 @@
 /// <summary>
 /// The number of milliseconds between frame updates.
 /// </summary>
+/// <remarks>
+/// <para>
+/// Windows will clamp this value to the range
+/// <c>[<see cref="USER_TIMER_MINIMUM"/>, <see cref="USER_TIMER_MAXIMUM"/>]</c>.
+/// </para>
+/// </remarks>
 UINT constexpr updateDelayMilliseconds{ 33 };
 
+/// <summary>
+/// A randomly-chosen identifier for the animation timer.
+/// </summary>
 UINT_PTR constexpr animationTimerId{ 42 };
 
-/*
- * The Device Context (DC) is the Windows object that represents the drawable surface.
- * The OpenGL rendering context (GLRC) is the OpenGL state machine.
- * A thread has a current GLRC specified by wglMakeCurrent.
- * Each GLRC has an associated DC, but the DC is ignorant of the GLRC.
- */
-
-HGLRC hglrc{ nullptr };
-
 /// <summary>
-/// The <c>TIMERPROC</c> that advances the animation by one frame.
+/// The OpenGL rendering context.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Pass this to <c>SetTimer</c>.
+/// The Device Context (DC) is the Windows object that represents the drawable surface.
+/// The OpenGL rendering context (GLRC) is the OpenGL state machine.
+/// A thread has a current GLRC specified by <see cref="wglMakeCurrent"/>.
+/// Each GLRC has an associated DC, but the DC is ignorant of the GLRC.
 /// </para>
 /// </remarks>
-/// <param name="hWnd">The window handle.</param>
-/// <param name="message">The message code.  Must be <c>WM_TIMER</c>.</param>
-/// <param name="timerId">The timer identifier.  Should be <c>animationTimerId</c>.</param>
-/// <param name="tickCount">The current tick count.</param>
-void CALLBACK AdvanceAnimation(HWND hWnd, UINT message, UINT_PTR timerId, DWORD tickCount)
+HGLRC hglrc{ nullptr };
+
+/// <summary>
+/// The <see cref="TIMERPROC"/> that advances the animation by one frame.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Pass this to <see cref="SetTimer"/>.
+/// </para>
+/// </remarks>
+/// <param name="hWnd">A handle to the window associated with the timer.</param>
+/// <param name="uMsg">The message code.  Must be <see cref="WM_TIMER"/>.</param>
+/// <param name="idEvent">The timer identifier.  Should be <see cref="animationTimerId"/>.</param>
+/// <param name="dwTime">The number of milliseconds that have elapsed since the system was started.
+/// This is the value returned by the <see cref="GetTickCount"/> function.</param>
+/// <seealso cref="TIMERPROC"/>
+/// <seealso cref="SetTimer"/>
+/// <seealso cref="StartAnimation"/>
+/// <seealso cref="StopAnimation"/>
+void CALLBACK AdvanceAnimation(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
-	assert(message == WM_TIMER);
-	assert(timerId == animationTimerId);
+	assert(uMsg == WM_TIMER);
+	assert(idEvent == animationTimerId);
 
 	assert(hglrc == wglGetCurrentContext());
 
@@ -60,14 +78,50 @@ void CALLBACK AdvanceAnimation(HWND hWnd, UINT message, UINT_PTR timerId, DWORD 
 	InvalidateRgn(hWnd, hRegion, eraseBackground);
 }
 
+/// <summary>
+/// Begins a timer that calls <see cref="AdvanceAnimation"/> every <see cref="updateDelayMilliseconds"/> milliseconds.
+/// </summary>
+/// <param name="hWnd">The window handle.  This is required for the timer.</param>
+/// <seealso cref="animationTimerId"/>
+/// <seealso cref="StopAnimation"/>
+/// <seealso cref="SetTimer"/>
 void StartAnimation(HWND hWnd)
 {
+	/*
+	 * This is to disable the "helpful" exception handler that Windows puts around timers, starting with Windows 2000.
+	 * They added it, then immediately realized it was a terrible idea and a security vulnerability,
+	 * but kept it for "compatibility" and instead told everybody to change their code to disable it instead.
+	 */
+	HANDLE const processHandle{ GetCurrentProcess() };
+	BOOL suppressExceptions{ FALSE };
+	PVOID const buffer_address{ &suppressExceptions };
+	DWORD constexpr buffer_length{ sizeof(suppressExceptions) };
+	BOOL const exceptionHandlerDisabled{ SetUserObjectInformationW(processHandle, UOI_TIMERPROC_EXCEPTION_SUPPRESSION, buffer_address, buffer_length) };
+
+	if (exceptionHandlerDisabled) {}
+	else
+	{
+		DWORD const error{ GetLastError() };
+	}
+
 	TIMERPROC constexpr timerProc{ AdvanceAnimation };
 	UINT_PTR const timerSet{ SetTimer(hWnd, animationTimerId, updateDelayMilliseconds, timerProc) };
 
 	assert(timerSet != 0);
+
+	if (timerSet == 0)
+	{
+		DWORD const error{ GetLastError() };
+	}
 }
 
+/// <summary>
+/// Ends the timer that calls <see cref="AdvanceAnimation"/>.
+/// </summary>
+/// <param name="hWnd">The window handle.</param>
+/// <seealso cref="animationTimerId"/>
+/// <seealso cref="StartAnimation"/>
+/// <seealso cref="KillTimer"/>
 void StopAnimation(HWND hWnd)
 {
 	BOOL const timerStopped{ KillTimer(hWnd, animationTimerId) };
