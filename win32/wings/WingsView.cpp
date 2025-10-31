@@ -73,6 +73,21 @@ namespace silnith::wings::gl
 		GLfloat const green{ greenCurve.getNextValue() };
 		GLfloat const blue{ blueCurve.getNextValue() };
 
+		/// <summary>
+		/// The display list for the new wing.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// This display list will be compiled to apply the transformations
+		/// that are specific to the wing.  This includes the orientation of
+		/// the wing (roll, pitch, yaw) as well as its radius and angle from
+		/// the central axis.  It does not include the "delta" parameters,
+		/// because those are relative between successive wings and so must
+		/// be applied by the core rendering loop.  The colors are also not
+		/// included because the display list will be used twice with different
+		/// colors and rendering modes (assuming GL 1.1 is supported).
+		/// </para>
+		/// </remarks>
 		GLuint displayList{ 0 };
 		if (wings.empty() || wings.size() < numWings)
 		{
@@ -105,6 +120,9 @@ namespace silnith::wings::gl
 
 	void WingsView::DrawFrame(void) const
 	{
+		/*
+		 * First, draw the solid wings using their solid color.
+		 */
 		glPushMatrix();
 		for (std::deque<Wing<GLuint, GLfloat> >::const_reference wing : wings) {
 			glTranslatef(0, 0, wing.getDeltaZ());
@@ -119,6 +137,11 @@ namespace silnith::wings::gl
 #if defined(GL_VERSION_1_1)
 		if (enablePolygonOffset)
 		{
+			/*
+			 * Second, draw the wing outlines using the outline color.
+			 * The outlines have smoothing (antialiasing) enabled, which
+			 * requires blending.
+			 */
 			glEnable(GL_BLEND);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glPushMatrix();
@@ -146,8 +169,18 @@ namespace silnith::wings::gl
 
 	void WingsView::Resize(GLint x, GLint y, GLsizei width, GLsizei height) const
 	{
+		/*
+		 * The projection matrix transforms the fragment coordinates to the
+		 * scale of [-1, 1], called "normalized device coordinates".
+		 * The viewport transforms those into the coordinates expected by the
+		 * windowing system.
+		 */
 		glViewport(x, y, width, height);
 
+		/*
+		 * The view frustum was hand-selected to match the parameters to the
+		 * curve generators and the initial gluLookAt().
+		 */
 		GLdouble constexpr defaultLeft{ -20 };
 		GLdouble constexpr defaultRight{ 20 };
 		GLdouble constexpr defaultBottom{ -20 };
