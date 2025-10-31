@@ -163,7 +163,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source.cpp" />
+    <ClCompile Include="SpinningWings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\wings\wings.vcxproj">

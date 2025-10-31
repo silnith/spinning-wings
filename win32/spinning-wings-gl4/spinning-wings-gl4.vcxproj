@@ -179,7 +179,7 @@
     <ClCompile Include="FragmentShader.cpp" />
     <ClCompile Include="Program.cpp" />
     <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="Source.cpp" />
+    <ClCompile Include="SpinningWingsGL4.cpp" />
     <ClCompile Include="VertexShader.cpp" />
     <ClCompile Include="WingGL4.cpp" />
     <ClCompile Include="WingsViewGL4.cpp" />

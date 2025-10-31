@@ -172,7 +172,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source.cpp" />
+    <ClCompile Include="WingsSaver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
