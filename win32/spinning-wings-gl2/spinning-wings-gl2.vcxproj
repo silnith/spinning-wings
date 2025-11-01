@@ -165,6 +165,9 @@
   <ItemGroup>
     <ClCompile Include="FragmentShader.cpp" />
     <ClCompile Include="Program.cpp" />
+    <ClCompile Include="QuadRendererGL10.cpp" />
+    <ClCompile Include="QuadRendererGL11.cpp" />
+    <ClCompile Include="QuadRendererGL15.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SpinningWingsGL2.cpp" />
     <ClCompile Include="VertexShader.cpp" />
@@ -183,6 +186,11 @@
   <ItemGroup>
     <ClInclude Include="FragmentShader.h" />
     <ClInclude Include="Program.h" />
+    <ClInclude Include="Quad.h" />
+    <ClInclude Include="QuadRenderer.h" />
+    <ClInclude Include="QuadRendererGL10.h" />
+    <ClInclude Include="QuadRendererGL11.h" />
+    <ClInclude Include="QuadRendererGL15.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="VertexShader.h" />
