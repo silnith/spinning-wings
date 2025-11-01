@@ -6,6 +6,8 @@
 #include "QuadRendererGL11.h"
 #include "QuadRendererGL15.h"
 
+using namespace std::literals::string_literals;
+
 namespace silnith::wings::gl2
 {
 
@@ -90,7 +92,7 @@ mat4 scale(in vec3 factor) {
 )shaderText"
 			};
 
-			glslProgram.reset(new Program{
+			glslProgram = std::make_unique<Program>(
 				VertexShader{
 					R"shaderText(#version 120
 
@@ -139,11 +141,11 @@ void main() {
 }
 )shaderText",
 				}
-			});
+			);
 
-			deltaZAttribLocation = glslProgram->getAttributeLocation("deltaZ");
-			radiusAngleAttribLocation = glslProgram->getAttributeLocation("radiusAngle");
-			rollPitchYawAttribLocation = glslProgram->getAttributeLocation("rollPitchYaw");
+			deltaZAttribLocation = glslProgram->getAttributeLocation("deltaZ"s);
+			radiusAngleAttribLocation = glslProgram->getAttributeLocation("radiusAngle"s);
+			rollPitchYawAttribLocation = glslProgram->getAttributeLocation("rollPitchYaw"s);
 
 			glslProgram->useProgram();
 		}
@@ -151,6 +153,7 @@ void main() {
 		{
 			// Does not have OpenGL 2.1, abort!
 			assert(false);
+			// This makes the quad renderer selection above irrelevant.  Heh heh.
 		}
 	}
 
@@ -164,7 +167,7 @@ void main() {
 
 		quadRenderer.release();
 
-		glslProgram.reset(nullptr);
+		glslProgram.release();
 	}
 
 	void WingsViewGL2::AdvanceAnimation(void)
