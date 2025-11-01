@@ -7,11 +7,6 @@
 namespace silnith::wings::gl2
 {
 
-    Program::~Program(void) noexcept
-    {
-        glDeleteProgram(id);
-    }
-
     Program::Program(VertexShader const& vertexShader, FragmentShader const& fragmentShader)
         : id{ glCreateProgram() }, linkLog{}
     {
@@ -50,6 +45,11 @@ namespace silnith::wings::gl2
         }
     }
 
+    Program::~Program(void) noexcept
+    {
+        glDeleteProgram(id);
+    }
+
     GLuint Program::getProgram(void) const noexcept
     {
         return id;
@@ -65,7 +65,7 @@ namespace silnith::wings::gl2
         return static_cast<GLuint>(attributeLocation);
     }
 
-    void Program::useProgram(void) const noexcept
+    void Program::useProgram(void) const
     {
         glUseProgram(id);
     }

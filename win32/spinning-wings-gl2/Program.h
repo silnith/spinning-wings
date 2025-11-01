@@ -39,14 +39,15 @@ namespace silnith::wings::gl2
         /// Returns the OpenGL name for the program.
         /// </summary>
         /// <returns>The OpenGL identifier for the program.</returns>
-        [[nodiscard]] GLuint getProgram(void) const noexcept;
+        [[nodiscard]]
+        GLuint getProgram(void) const noexcept;
 
         GLuint getAttributeLocation(std::string const&) const;
 
-        void useProgram(void) const noexcept;
+        void useProgram(void) const;
 
     private:
-        GLuint id{ 0 };
+        GLuint const id{ 0 };
         std::string linkLog{};
     };
 
