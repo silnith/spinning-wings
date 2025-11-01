@@ -11,6 +11,7 @@
 #pragma comment (lib, "glu32.lib")
 
 #include <cassert>
+#include <memory>
 #include <stdexcept>
 
 #include "WingsPixelFormat.h"
