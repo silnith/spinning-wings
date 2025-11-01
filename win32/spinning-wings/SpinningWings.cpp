@@ -343,7 +343,7 @@ int APIENTRY wWinMain(
 	int constexpr windowInstanceExtraBytes{ 0 };
 	HICON const classIcon{ static_cast<HICON>(LoadImageW(hInstance, MAKEINTRESOURCEW(IDI_WINGS), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_SHARED)) };
 	HCURSOR const classCursor{ static_cast<HCURSOR>(LoadImageW(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED)) };
-	HBRUSH const classBackgroundBrush{ nullptr };
+	HBRUSH constexpr classBackgroundBrush{ nullptr };
 	LPCWSTR constexpr classMenuName{ nullptr };
 	LPCWSTR constexpr windowClassName{ L"SpinningWings" };
 	// TODO: Investigate GetSystemMetricsForDpi
@@ -373,7 +373,7 @@ int APIENTRY wWinMain(
 
 	// create the main window
 
-	DWORD const extendedWindowStyle{ WS_EX_APPWINDOW | WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_WINDOWEDGE };
+	DWORD constexpr extendedWindowStyle{ WS_EX_APPWINDOW | WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_WINDOWEDGE };
 	LPCWSTR const classType{ reinterpret_cast<LPCWSTR>(wndClassIdentifier) };
 	LPCWSTR constexpr windowName{ L"Spinning Wings" };
 	DWORD constexpr windowStyle{ WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS };
