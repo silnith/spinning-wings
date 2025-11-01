@@ -1,271 +1,51 @@
 #include "WingsViewGL2.h"
 
-#include <array>
 #include <cassert>
-#include <deque>
-#include <memory>
-#include <sstream>
 
-#include "CurveGenerator.h"
-#include "Wing.h"
-
-#include "FragmentShader.h"
-#include "Program.h"
-#include "VertexShader.h"
-
-namespace silnith::wings::gl1_0
-{
-
-	// The GL display list for rendering a single quad.
-	// This is used for the GL 1.0 rendering path.
-	GLuint quadDisplayList{ 0 };
-
-	void InitializeDrawQuad(void)
-	{
-		quadDisplayList = glGenLists(1);
-		glNewList(quadDisplayList, GL_COMPILE);
-		glBegin(GL_QUADS);
-		glVertex2f(1, 1);
-		glVertex2f(-1, 1);
-		glVertex2f(-1, -1);
-		glVertex2f(1, -1);
-		glEnd();
-		glEndList();
-	}
-
-	void DrawQuad(void)
-	{
-		glCallList(quadDisplayList);
-	}
-
-	void CleanupDrawQuad(void)
-	{
-		glDeleteLists(quadDisplayList, 1);
-	}
-
-}
-
-namespace silnith::wings
-{
-
-	GLsizei constexpr numVertices{ 4 };
-	GLsizei constexpr numIndices{ 4 };
-
-	std::array<GLfloat, 2 * numVertices> constexpr quadVertices{
-		1, 1,
-		-1, 1,
-		-1, -1,
-		1, -1,
-	};
-	GLsizeiptr constexpr quadVerticesDataSize{ sizeof(GLfloat) * quadVertices.size() };
-
-	std::array<GLuint, numIndices> constexpr quadIndices{
-		0, 1, 2, 3,
-	};
-	GLsizeiptr constexpr quadIndicesDataSize{ sizeof(GLuint) * quadIndices.size() };
-
-}
-
-namespace silnith::wings::gl1_1
-{
-
-	void InitializeDrawQuad(void)
-	{
-		/*
-		 * Specifies vertex data to be used by subsequent calls to
-		 * DrawArrays and DrawElements.
-		 */
-		glVertexPointer(2, GL_FLOAT, 0, quadVertices.data());
-
-		/*
-		 * EnableClientState is executed immediately, it is not compiled into
-		 * a display list.
-		 */
-		glEnableClientState(GL_VERTEX_ARRAY);
-	}
-
-	void DrawQuad(void)
-	{
-		/*
-		 * When creating a display list,
-		 * DrawElements dereferences vertex pointers according to the client
-		 * state, and the dereferenced vertices are compiled into the
-		 * display list.
-		 */
-		glDrawElements(GL_QUADS, numIndices, GL_UNSIGNED_INT, quadIndices.data());
-	}
-
-	void CleanupDrawQuad(void)
-	{
-		glDisableClientState(GL_VERTEX_ARRAY);
-	}
-
-}
-
-namespace silnith::wings::gl1_5
-{
-
-	GLuint wingBufferObject{ 0 };
-	GLuint wingIndicesBufferObject{ 0 };
-
-	void InitializeDrawQuad(void)
-	{
-		glGenBuffers(1, &wingBufferObject);
-		glBindBuffer(GL_ARRAY_BUFFER, wingBufferObject);
-		glBufferData(GL_ARRAY_BUFFER, quadVerticesDataSize, quadVertices.data(), GL_STATIC_DRAW);
-		/*
-		 * Specifies vertex data to be used by subsequent calls to
-		 * DrawArrays and DrawElements.
-		 *
-		 * If there is an ARRAY_BUFFER bound, then the last parameter is interpreted
-		 * as an index/offset into the ARRAY_BUFFER.
-		 */
-		glVertexPointer(2, GL_FLOAT, 0, 0);
-
-		glGenBuffers(1, &wingIndicesBufferObject);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBufferObject);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesDataSize, quadIndices.data(), GL_STATIC_DRAW);
-
-		glEnableClientState(GL_VERTEX_ARRAY);
-	}
-
-	void DrawQuad(void)
-	{
-		/*
-		 * When compiled into a display list,
-		 * DrawElements dereferences vertex pointers according to the client
-		 * state, and the dereferenced vertices are compiled into the
-		 * display list.
-		 * 
-		 * If there is an ELEMENT_ARRAY_BUFFER bound, then the last parameter
-		 * to DrawElements is interpreted as an index/offset into the
-		 * ELEMENT_ARRAY_BUFFER.
-		 *
-		 * Vertices indexed by the ELEMENT_ARRAY_BUFFER are interpreted according to
-		 * the current VertexPointer.
-		 */
-		glDrawElements(GL_QUADS, numIndices, GL_UNSIGNED_INT, 0);
-	}
-
-	void CleanupDrawQuad(void)
-	{
-		glDisableClientState(GL_VERTEX_ARRAY);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		glDeleteBuffers(1, &wingIndicesBufferObject);
-		glDeleteBuffers(1, &wingBufferObject);
-	}
-
-}
+#include "QuadRendererGL10.h"
+#include "QuadRendererGL11.h"
+#include "QuadRendererGL15.h"
 
 namespace silnith::wings::gl2
 {
 
-	typedef std::deque<Wing<GLuint, GLfloat> > wing_list;
-
-	std::size_t constexpr numWings{ 40 };
-
-	GLuint glMajorVersion{ 1 };
-	GLuint glMinorVersion{ 0 };
-
-	wing_list wings{};
-
-	CurveGenerator<GLfloat> radiusCurve{ 10.0f, -15.0f, 15.0f, false, 0.1f, 0.01f, 150 };
-	CurveGenerator<GLfloat> angleCurve{ CurveGenerator<GLfloat>::createGeneratorForAngles(0.0f, 2.0f, 0.05f, 120) };
-	CurveGenerator<GLfloat> deltaAngleCurve{ CurveGenerator<GLfloat>::createGeneratorForAngles(15.0f, 0.2f, 0.02f, 80) };
-	CurveGenerator<GLfloat> deltaZCurve{ 0.5f, 0.4f, 0.7f, false, 0.01f, 0.001f, 200 };
-	CurveGenerator<GLfloat> rollCurve{ CurveGenerator<GLfloat>::createGeneratorForAngles(0.0f, 1.0f, 0.25f, 80) };
-	CurveGenerator<GLfloat> pitchCurve{ CurveGenerator<GLfloat>::createGeneratorForAngles(0.0f, 2.0f, 0.25f, 40) };
-	CurveGenerator<GLfloat> yawCurve{ CurveGenerator<GLfloat>::createGeneratorForAngles(0.0f, 1.5f, 0.25f, 50) };
-	CurveGenerator<GLfloat> redCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 95) };
-	CurveGenerator<GLfloat> greenCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 40) };
-	CurveGenerator<GLfloat> blueCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
-
-	std::unique_ptr<Program> glslProgram{ nullptr };
-
-	bool hasOpenGL(GLuint major, GLuint minor)
+	WingsViewGL2::WingsViewGL2(silnith::wings::gl::GLInfo const & glInfo) :
+		enablePolygonOffset{ glInfo.isAtLeastVersion(1, 1) }
 	{
-		return (glMajorVersion > major)
-			|| (glMajorVersion == major && glMinorVersion >= minor);
-	}
-
-	void ParseOpenGLVersion(GLubyte const* glVersion)
-	{
-		std::istringstream versionStringInput{ std::string{ reinterpret_cast<char const*>(glVersion) } };
-		//std::basic_istringstream<GLubyte> versionStringInput{ std::basic_string<GLubyte>{glVersion} };
-
-		versionStringInput >> glMajorVersion;
-		GLubyte period;
-		versionStringInput >> period;
-		assert(period == '.');
-		versionStringInput >> glMinorVersion;
-	}
-
-	void (*initializeDrawQuad)(void) { silnith::wings::gl1_0::InitializeDrawQuad };
-
-	// The rendering path for rendering a single quad.
-	// This points to the appropriate rendering path for the
-	// active version of the GL.
-	void (*drawQuad)(void) { silnith::wings::gl1_0::DrawQuad };
-
-	void (*cleanupDrawQuad)(void) { silnith::wings::gl1_0::CleanupDrawQuad };
-
-	GLuint deltaZAttribLocation{ 0 };
-	GLuint radiusAngleAttribLocation{ 0 };
-	GLuint rollPitchYawAttribLocation{ 0 };
-
-	void InitializeOpenGLState(void)
-	{
-		GLubyte const* const glVersion{ glGetString(GL_VERSION) };
-
-		assert(glVersion != nullptr);
-
-		ParseOpenGLVersion(glVersion);
-
 		glEnable(GL_DEPTH_TEST);
 		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-		if (hasOpenGL(1, 1))
+		if (enablePolygonOffset)
 		{
 			glPolygonOffset(-0.5, -2);
 			glEnable(GL_POLYGON_OFFSET_LINE);
+
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+			glEnable(GL_LINE_SMOOTH);
+			glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+			glLineWidth(1.0);
 		}
-
-		glEnable(GL_LINE_SMOOTH);
-		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-		glLineWidth(1.0);
-
-		glEnable(GL_POLYGON_SMOOTH);
-		glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
 		glLoadIdentity();
 		gluLookAt(0, 50, 50,
 			0, 0, 13,
 			0, 0, 1);
 
-		if (hasOpenGL(1, 5))
+		if (glInfo.isAtLeastVersion(1, 5))
 		{
-			initializeDrawQuad = silnith::wings::gl1_5::InitializeDrawQuad;
-			drawQuad = silnith::wings::gl1_5::DrawQuad;
-			cleanupDrawQuad = silnith::wings::gl1_5::CleanupDrawQuad;
+			quadRenderer = std::make_unique<silnith::wings::gl::QuadRendererGL15>();
 		}
-		else if (hasOpenGL(1, 1))
+		else if (glInfo.isAtLeastVersion(1, 1))
 		{
-			initializeDrawQuad = silnith::wings::gl1_1::InitializeDrawQuad;
-			drawQuad = silnith::wings::gl1_1::DrawQuad;
-			cleanupDrawQuad = silnith::wings::gl1_1::CleanupDrawQuad;
+			quadRenderer = std::make_unique<silnith::wings::gl::QuadRendererGL11>();
 		}
 		else
 		{
-			initializeDrawQuad = silnith::wings::gl1_0::InitializeDrawQuad;
-			drawQuad = silnith::wings::gl1_0::DrawQuad;
-			cleanupDrawQuad = silnith::wings::gl1_0::CleanupDrawQuad;
+			quadRenderer = std::make_unique<silnith::wings::gl::QuadRendererGL10>();
 		}
-		initializeDrawQuad();
 
-		if (hasOpenGL(2, 1))
+		if (glInfo.isAtLeastVersion(2, 1))
 		{
 			std::string const rotateMatrixFunctionDeclaration{
 				R"shaderText(
@@ -367,22 +147,27 @@ void main() {
 
 			glslProgram->useProgram();
 		}
+		else
+		{
+			// Does not have OpenGL 2.1, abort!
+			assert(false);
+		}
 	}
 
-	void CleanupOpenGLState(void)
+	WingsViewGL2::~WingsViewGL2(void)
 	{
-		for (wing_list::const_reference wing : wings)
+		for (std::deque<Wing<GLuint, GLfloat> >::const_reference wing : wings)
 		{
 			GLuint const displayList{ wing.getGLDisplayList() };
 			glDeleteLists(displayList, 1);
 		}
 
-		cleanupDrawQuad();
+		quadRenderer.release();
 
 		glslProgram.reset(nullptr);
 	}
 
-	void AdvanceAnimation(void)
+	void WingsViewGL2::AdvanceAnimation(void)
 	{
 		GLfloat const radius{ radiusCurve.getNextValue() };
 		GLfloat const angle{ angleCurve.getNextValue() };
@@ -416,18 +201,18 @@ void main() {
 		glNewList(displayList, GL_COMPILE);
 		glVertexAttrib2f(radiusAngleAttribLocation, radius, angle);
 		glVertexAttrib3f(rollPitchYawAttribLocation, roll, pitch, yaw);
-		drawQuad();
+		quadRenderer->DrawQuad();
 		glEndList();
 	}
 
-	void DrawFrame(void)
+	void WingsViewGL2::DrawFrame(void) const
 	{
-		if (hasOpenGL(1, 1))
+		if (enablePolygonOffset)
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			GLfloat deltaZ{ 0 };
 			GLfloat deltaAngle{ 0 };
-			for (wing_list::const_reference wing : wings) {
+			for (std::deque<Wing<GLuint, GLfloat> >::const_reference wing : wings) {
 				deltaZ += wing.getDeltaZ();
 				deltaAngle += wing.getDeltaAngle();
 
@@ -441,7 +226,7 @@ void main() {
 
 		GLfloat deltaZ{ 0 };
 		GLfloat deltaAngle{ 0 };
-		for (wing_list::const_reference wing : wings) {
+		for (std::deque<Wing<GLuint, GLfloat> >::const_reference wing : wings) {
 			deltaZ += wing.getDeltaZ();
 			deltaAngle += wing.getDeltaAngle();
 
@@ -454,12 +239,12 @@ void main() {
 		glFlush();
 	}
 
-	void Resize(GLsizei width, GLsizei height)
+	void WingsViewGL2::Resize(GLsizei width, GLsizei height) const
 	{
 		Resize(0, 0, width, height);
 	}
 
-	void Resize(GLint x, GLint y, GLsizei width, GLsizei height)
+	void WingsViewGL2::Resize(GLint x, GLint y, GLsizei width, GLsizei height) const
 	{
 		glViewport(x, y, width, height);
 
