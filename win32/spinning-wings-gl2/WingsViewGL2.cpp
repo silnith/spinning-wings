@@ -180,6 +180,21 @@ void main() {
 		GLfloat const green{ greenCurve.getNextValue() };
 		GLfloat const blue{ blueCurve.getNextValue() };
 
+		/// <summary>
+		/// The display list for the new wing.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// This display list will be compiled to apply the transformations
+		/// that are specific to the wing.  This includes the orientation of
+		/// the wing (roll, pitch, yaw) as well as its radius and angle from
+		/// the central axis.  It does not include the "delta" parameters,
+		/// because those are relative between successive wings and so must
+		/// be applied by the core rendering loop.  The colors are also not
+		/// included because the display list will be used twice with different
+		/// colors and rendering modes.
+		/// </para>
+		/// </remarks>
 		GLuint displayList{ 0 };
 		if (wings.empty() || wings.size() < numWings)
 		{
@@ -207,23 +222,9 @@ void main() {
 
 	void WingsViewGL2::DrawFrame(void) const
 	{
-		if (enablePolygonOffset)
-		{
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			GLfloat deltaZ{ 0 };
-			GLfloat deltaAngle{ 0 };
-			for (std::deque<Wing<GLuint, GLfloat> >::const_reference wing : wings) {
-				deltaZ += wing.getDeltaZ();
-				deltaAngle += wing.getDeltaAngle();
-
-				Color<GLfloat> const& edgeColor{ wing.getEdgeColor() };
-				glColor3f(edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
-				glVertexAttrib2f(deltaZAttribLocation, deltaAngle, deltaZ);
-				glCallList(wing.getGLDisplayList());
-			}
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		}
-
+		/*
+		 * First, draw the solid wings using their solid color.
+		 */
 		GLfloat deltaZ{ 0 };
 		GLfloat deltaAngle{ 0 };
 		for (std::deque<Wing<GLuint, GLfloat> >::const_reference wing : wings) {
@@ -236,6 +237,30 @@ void main() {
 			glCallList(wing.getGLDisplayList());
 		}
 
+		if (enablePolygonOffset)
+		{
+			/*
+			 * Second, draw the wing outlines using the outline color.
+			 * The outlines have smoothing (antialiasing) enabled, which
+			 * requires blending.
+			 */
+			glEnable(GL_BLEND);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			deltaZ = 0;
+			deltaAngle = 0;
+			for (std::deque<Wing<GLuint, GLfloat> >::const_reference wing : wings) {
+				deltaZ += wing.getDeltaZ();
+				deltaAngle += wing.getDeltaAngle();
+
+				Color<GLfloat> const& edgeColor{ wing.getEdgeColor() };
+				glColor3f(edgeColor.getRed(), edgeColor.getGreen(), edgeColor.getBlue());
+				glVertexAttrib2f(deltaZAttribLocation, deltaAngle, deltaZ);
+				glCallList(wing.getGLDisplayList());
+			}
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			glDisable(GL_BLEND);
+		}
+
 		glFlush();
 	}
 
@@ -246,8 +271,18 @@ void main() {
 
 	void WingsViewGL2::Resize(GLint x, GLint y, GLsizei width, GLsizei height) const
 	{
+		/*
+		 * The projection matrix transforms the fragment coordinates to the
+		 * scale of [-1, 1], called "normalized device coordinates".
+		 * The viewport transforms those into the coordinates expected by the
+		 * windowing system.
+		 */
 		glViewport(x, y, width, height);
 
+		/*
+		 * The view frustum was hand-selected to match the parameters to the
+		 * curve generators and the initial gluLookAt().
+		 */
 		GLdouble constexpr defaultLeft{ -20 };
 		GLdouble constexpr defaultRight{ 20 };
 		GLdouble constexpr defaultBottom{ -20 };
@@ -255,6 +290,13 @@ void main() {
 		GLdouble constexpr defaultNear{ 35 };
 		GLdouble constexpr defaultFar{ 105 };
 
+		/*
+		 * These multipliers account for the aspect ratio of the window, so that
+		 * the rendering does not distort.  The conditional is so that the larger
+		 * number is always divided by the smaller, resulting in a multiplier no
+		 * less than one.  This way, the viewing area is always expanded rather than
+		 * contracted, and the expected viewing frustum is never clipped.
+		 */
 		GLdouble xmult{ 1.0 };
 		GLdouble ymult{ 1.0 };
 		if (width > height)
