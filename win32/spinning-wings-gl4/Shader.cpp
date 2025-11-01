@@ -18,7 +18,7 @@ namespace silnith::wings::gl4
     {
         if (id == 0)
         {
-            throw new std::runtime_error{ "Failed to allocate shader." };
+            throw std::runtime_error{ "Failed to allocate shader." };
         }
 
         // Limit scope of copies of string sources.

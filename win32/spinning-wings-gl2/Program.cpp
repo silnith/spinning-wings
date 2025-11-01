@@ -15,7 +15,7 @@ namespace silnith::wings::gl2
     {
         if (id == 0)
         {
-            throw new std::runtime_error{ "Failed to allocate GLSL program."s };
+            throw std::runtime_error{ "Failed to allocate GLSL program."s };
         }
 
         glAttachShader(id, vertexShader.getShader());
@@ -71,7 +71,7 @@ namespace silnith::wings::gl2
         GLint const attributeLocation{ glGetAttribLocation(id, name.c_str()) };
         if (attributeLocation < 0)
         {
-            throw new std::runtime_error{ "Attribute "s + name + " not bound."s };
+            throw std::runtime_error{ "Attribute "s + name + " not bound."s };
         }
         return static_cast<GLuint>(attributeLocation);
     }

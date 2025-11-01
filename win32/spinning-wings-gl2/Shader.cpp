@@ -19,7 +19,7 @@ namespace silnith::wings::gl2
 
         if (id == 0)
         {
-            throw new std::runtime_error{ "Failed to allocate GLSL shader."s };
+            throw std::runtime_error{ "Failed to allocate GLSL shader."s };
         }
 
         // Limit scope of copies of string sources.

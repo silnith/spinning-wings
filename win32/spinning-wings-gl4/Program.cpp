@@ -109,7 +109,7 @@ namespace silnith::wings::gl4
         GLint const attributeLocation{ glGetAttribLocation(id, name.c_str()) };
         if (attributeLocation < 0)
         {
-            throw new std::runtime_error{ "Attribute " + name + " not bound." };
+            throw std::runtime_error{ "Attribute " + name + " not bound." };
         }
         return static_cast<GLuint>(attributeLocation);
     }
@@ -119,7 +119,7 @@ namespace silnith::wings::gl4
         GLint const uniformLocation{ glGetUniformLocation(id, name.c_str()) };
         if (uniformLocation < 0)
         {
-            throw new std::runtime_error{ "Uniform " + name + " not bound." };
+            throw std::runtime_error{ "Uniform " + name + " not bound." };
         }
         return static_cast<GLint>(uniformLocation);
     }
