@@ -299,7 +299,7 @@ int APIENTRY WinMain(
 
 	HICON const hIcon{ static_cast<HICON>(LoadImageW(hInstance, MAKEINTRESOURCEW(IDI_WINGS), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_SHARED)) };
 	HCURSOR const hCursor{ static_cast<HCURSOR>(LoadImageW(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED)) };
-	HBRUSH const hBrush{ GetSysColorBrush(COLOR_WINDOW) };
+	HBRUSH const hBrush{ nullptr };
 	LPCWSTR const menuName{ nullptr };
 	LPCWSTR const className{ L"SpinningWingsGL2" };
 	int const iconSmWidth{ GetSystemMetrics(SM_CXSMICON) };
