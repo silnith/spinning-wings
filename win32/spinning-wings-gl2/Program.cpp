@@ -2,7 +2,10 @@
 
 #include <cstddef>
 #include <memory>
+#include <sstream>
 #include <stdexcept>
+
+using namespace std::literals::string_literals;
 
 namespace silnith::wings::gl2
 {
@@ -10,6 +13,11 @@ namespace silnith::wings::gl2
     Program::Program(VertexShader const& vertexShader, FragmentShader const& fragmentShader)
         : id{ glCreateProgram() }, linkLog{}
     {
+        if (id == 0)
+        {
+            throw new std::runtime_error{ "Failed to allocate GLSL program."s };
+        }
+
         glAttachShader(id, vertexShader.getShader());
         glAttachShader(id, fragmentShader.getShader());
 
@@ -40,7 +48,10 @@ namespace silnith::wings::gl2
         default:
         {
             glDeleteProgram(id);
-            throw std::runtime_error{ "Unknown link status: " + linkSuccess };
+            std::ostringstream errorMessage{};
+            errorMessage << "Unknown link status: "s;
+            errorMessage << linkSuccess;
+            throw std::runtime_error{ errorMessage.str() };
         }
         }
     }
@@ -60,7 +71,7 @@ namespace silnith::wings::gl2
         GLint const attributeLocation{ glGetAttribLocation(id, name.c_str()) };
         if (attributeLocation < 0)
         {
-            throw new std::runtime_error{ "Attribute " + name + " not bound." };
+            throw new std::runtime_error{ "Attribute "s + name + " not bound."s };
         }
         return static_cast<GLuint>(attributeLocation);
     }

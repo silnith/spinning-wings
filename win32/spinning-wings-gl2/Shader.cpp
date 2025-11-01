@@ -19,7 +19,7 @@ namespace silnith::wings::gl2
 
         if (id == 0)
         {
-            throw new std::runtime_error{ "Failed to allocate shader." };
+            throw new std::runtime_error{ "Failed to allocate GLSL shader."s };
         }
 
         // Limit scope of copies of string sources.
@@ -64,7 +64,7 @@ namespace silnith::wings::gl2
         default:
         {
             glDeleteShader(id);
-            std::ostringstream errorMessage;
+            std::ostringstream errorMessage{};
             errorMessage << "Unknown compilation status: "s;
             errorMessage << compilationSuccess;
             throw std::runtime_error{ errorMessage.str() };
