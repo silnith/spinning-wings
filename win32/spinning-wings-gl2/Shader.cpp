@@ -45,7 +45,7 @@ namespace silnith::wings::gl2
         GLint logSize{ 0 };
         glGetShaderiv(id, GL_INFO_LOG_LENGTH, &logSize);
         if (logSize > 0) {
-            std::unique_ptr<GLchar[]> log{ std::make_unique<GLchar[]>(logSize) };
+            std::unique_ptr<GLchar[]> log{ std::make_unique<GLchar[]>(static_cast<std::size_t>(logSize)) };
             glGetShaderInfoLog(id, static_cast<GLsizei>(logSize), nullptr, log.get());
             compilationLog = { log.get() };
         }
