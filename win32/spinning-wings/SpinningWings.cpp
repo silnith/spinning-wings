@@ -1,5 +1,5 @@
 /*
-* TODO: Disable PCA in manifest.
+* TODO: Disable Program Compatibility Assistant (PCA) in manifest.
 * mark as DPI-aware
 */
 
@@ -170,9 +170,19 @@ void StopAnimation(HWND hWnd)
 	assert(timerStopped);
 }
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+/// <summary>
+/// The window procedure for the spinning wings window.
+/// This handles the messages dispatched by Windows.
+/// </summary>
+/// <param name="hWnd">A handle to the window.</param>
+/// <param name="uMsg">The message code.</param>
+/// <param name="wParam">Additional message information.  The contents depend on the value of the <paramref name="uMsg"/> parameter.</param>
+/// <param name="lParam">Additional message information.  The contents depend on the value of the <paramref name="uMsg"/> parameter.</param>
+/// <returns>Depends on the message sent.</returns>
+/// <seealso cref="WNDPROC"/>
+LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	switch (message)
+	switch (uMsg)
 	{
 	case WM_CREATE:
 	{
@@ -300,13 +310,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	default:
 	{
-		return DefWindowProcW(hWnd, message, wParam, lParam);
+		return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 	}
 	}
 
 	return 0;
 }
 
+/// <summary>
+/// The Unicode entry point for a Windows program.
+/// </summary>
+/// <param name="hInstance">A handle to the current instance of the application.</param>
+/// <param name="hPrevInstance">A handle to the previous instance of the application.  This is always <c>NULL</c>.</param>
+/// <param name="lpCmdLine">The command line for the application, excluding the program name.</param>
+/// <param name="nShowCmd">Specifies how the window should be shown.  See <see cref="ShowWindow"/>.</param>
+/// <returns>The value of the <see cref="WM_QUIT"/> message, or <c>0</c> if the program never procesed any messages.</returns>
 int APIENTRY wWinMain(
 	_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -318,28 +336,34 @@ int APIENTRY wWinMain(
 
 	// register the window class for the main window
 
-	HICON const hIcon{ static_cast<HICON>(LoadImageW(hInstance, MAKEINTRESOURCEW(IDI_WINGS), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_SHARED)) };
-	HCURSOR const hCursor{ static_cast<HCURSOR>(LoadImageW(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED)) };
-	HBRUSH const hBrush{ GetSysColorBrush(COLOR_WINDOW) };
-	LPCWSTR const menuName{ nullptr };
-	LPCWSTR const className{ L"SpinningWings" };
+	UINT constexpr structureSize{ sizeof(WNDCLASSEXW) };
+	UINT constexpr classStyles{ CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_OWNDC };
+	WNDPROC constexpr windowProcedure{ WndProc };
+	int constexpr windowClassExtraBytes{ 0 };
+	int constexpr windowInstanceExtraBytes{ 0 };
+	HICON const classIcon{ static_cast<HICON>(LoadImageW(hInstance, MAKEINTRESOURCEW(IDI_WINGS), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_SHARED)) };
+	HCURSOR const classCursor{ static_cast<HCURSOR>(LoadImageW(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED)) };
+	HBRUSH const classBackgroundBrush{ GetSysColorBrush(COLOR_WINDOW) };
+	LPCWSTR constexpr classMenuName{ nullptr };
+	LPCWSTR constexpr windowClassName{ L"SpinningWings" };
+	// TODO: Investigate GetSystemMetricsForDpi
 	int const iconSmWidth{ GetSystemMetrics(SM_CXSMICON) };
 	int const iconSmHeight{ GetSystemMetrics(SM_CYSMICON) };
-	HICON const hIconSm{ static_cast<HICON>(LoadImageW(hInstance, MAKEINTRESOURCEW(IDI_WINGS), IMAGE_ICON, iconSmWidth, iconSmHeight, LR_DEFAULTCOLOR | LR_SHARED)) };
+	HICON const classSmallIcon{ static_cast<HICON>(LoadImageW(hInstance, MAKEINTRESOURCEW(IDI_WINGS), IMAGE_ICON, iconSmWidth, iconSmHeight, LR_DEFAULTCOLOR | LR_SHARED)) };
 
 	WNDCLASSEXW const wndClassEx{
-		.cbSize = sizeof(WNDCLASSEXW),
-		.style = CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS | CS_OWNDC,
-		.lpfnWndProc = WndProc,
-		.cbClsExtra = 0,
-		.cbWndExtra = 0,
+		.cbSize = structureSize,
+		.style = classStyles,
+		.lpfnWndProc = windowProcedure,
+		.cbClsExtra = windowClassExtraBytes,
+		.cbWndExtra = windowInstanceExtraBytes,
 		.hInstance = hInstance,
-		.hIcon = hIcon,
-		.hCursor = hCursor,
-		.hbrBackground = hBrush,
-		.lpszMenuName = menuName,
-		.lpszClassName = className,
-		.hIconSm = hIconSm,
+		.hIcon = classIcon,
+		.hCursor = classCursor,
+		.hbrBackground = classBackgroundBrush,
+		.lpszMenuName = classMenuName,
+		.lpszClassName = windowClassName,
+		.hIconSm = classSmallIcon,
 	};
 	ATOM const wndClassIdentifier{ RegisterClassExW(&wndClassEx) };
 	if (wndClassIdentifier == 0)
@@ -351,14 +375,14 @@ int APIENTRY wWinMain(
 
 	DWORD const extendedWindowStyle{ WS_EX_APPWINDOW | WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_WINDOWEDGE };
 	LPCWSTR const classType{ reinterpret_cast<LPCWSTR>(wndClassIdentifier) };
-	LPCWSTR const windowName{ L"Spinning Wings" };
-	DWORD const windowStyle{ WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS };
-	int const x{ CW_USEDEFAULT };
-	int const y{ CW_USEDEFAULT };
-	int const width{ CW_USEDEFAULT };
-	int const height{ 600 };
-	HWND const windowParent{ nullptr };
-	HMENU const menu{ nullptr };
+	LPCWSTR constexpr windowName{ L"Spinning Wings" };
+	DWORD constexpr windowStyle{ WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS };
+	int constexpr x{ CW_USEDEFAULT };
+	int constexpr y{ CW_USEDEFAULT };
+	int constexpr width{ CW_USEDEFAULT };
+	int constexpr height{ 600 };
+	HWND constexpr windowParent{ nullptr };
+	HMENU constexpr menu{ nullptr };
 	HWND const window{ CreateWindowExW(extendedWindowStyle, classType, windowName, windowStyle, x, y, width, height, windowParent, menu, hInstance, nullptr) };
 	if (window == nullptr) {
 		// call GetLastError
