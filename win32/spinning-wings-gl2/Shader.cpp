@@ -1,21 +1,22 @@
 #include "Shader.h"
 
+#include <cassert>
 #include <cstddef>
 #include <memory>
+#include <sstream>
 #include <stdexcept>
 #include <vector>
+
+using namespace std::literals::string_literals;
 
 namespace silnith::wings::gl2
 {
 
-    Shader::~Shader(void) noexcept
-    {
-        glDeleteShader(id);
-    }
-
     Shader::Shader(GLenum type, std::initializer_list<std::string> const& sources)
         : id{ glCreateShader(type) }, compilationLog{}
     {
+        assert((type == GL_VERTEX_SHADER) || (type == GL_FRAGMENT_SHADER));
+
         if (id == 0)
         {
             throw new std::runtime_error{ "Failed to allocate shader." };
@@ -63,9 +64,17 @@ namespace silnith::wings::gl2
         default:
         {
             glDeleteShader(id);
-            throw std::runtime_error{ "Unknown compilation status: " + compilationSuccess };
+            std::ostringstream errorMessage;
+            errorMessage << "Unknown compilation status: "s;
+            errorMessage << compilationSuccess;
+            throw std::runtime_error{ errorMessage.str() };
         }
         }
+    }
+
+    Shader::~Shader(void) noexcept
+    {
+        glDeleteShader(id);
     }
 
     GLuint Shader::getShader(void) const noexcept
