@@ -1,0 +1,322 @@
+<html>
+<head>
+<title>API Comparison</title>
+</head>
+<body>
+
+    <h1>What makes a good <abbr title="application programming interface">API</abbr>?</h1>
+
+    <p>
+        One of the key aspects of making a good API is guiding users of the API
+        to use it correctly.  Many security vulnerabilities arise from people
+        using APIs incorrectly.  As a demonstration of how an API can guide
+        programmers or not, consider these simple examples of specifying
+        geometry to render using OpenGL.
+    </p>
+
+    <h2>OpenGL&nbsp;1.0</h2>
+
+    <blockquote>
+        <code style="white-space: pre">
+// Initialization
+GLuint displayList{ glGenLists(1) };
+glNewList(displayList, GL_COMPILE);
+glBegin(GL_QUADS);
+glVertex2f(1, 1);
+glVertex2f(-1, 1);
+glVertex2f(-1, -1);
+glVertex2f(1, -1);
+glEnd();
+glEndList();
+
+// Rendering
+glCallList(displayList);
+
+// Cleanup
+glDeleteLists(displayList, 1);
+        </code>
+    </blockquote>
+
+    <p>
+        This code is simple and direct.  There are a few ways that a programmer
+        can make mistakes, but the impact of those mistakes is strictly limited.
+        The most obvious mistake is that the programmer can provide the wrong number
+        of vertices for the primitive type <code>GL_QUADS</code>.  While frustrating,
+        the outcome for this is strictly defined by the OpenGL standard and it
+        poses no risk of compromising the integrity of the GL or the program.
+    </p>
+
+    <p>
+        Another common mistake is to ignore the calls to <code>glGenLists</code>
+        and <code>glDeleteLists</code> and instead just hard-code a random identifier.
+        While not best practice, this actually works fine because OpenGL creates
+        the list when <code>glEndList</code> is executed and associates it with
+        whatever identifier was passed to <code>glNewList</code>, replacing any
+        list that might have been previously associated with the identifier.
+        The worst a programmer can do is foolishly overwrite their previously-defined
+        display lists because they messed up their identifiers.  There is no risk
+        of compromising the integrity of the GL.
+    </p>
+
+    <p>
+        One potential mistake that is completely eliminated is data type mismatches.
+        The calls to <code>glVertex2f</code> are type-checked by the compiler, and
+        only the correct data type can be passed in.  <code>glVertex2f</code> takes
+        two <code>GLfloat</code> parameters, anything else will be coerced to that
+        type, and mistakes (like narrowing conversions) will cause compilation to fail.
+        If the programmer desires three-dimensional coordinates of double precision,
+        they can instead call <code>glVertex3d</code>.  Internally, the GL always
+        treats vertices as having four coordinates (x, y, z, w) regardless of how
+        many coordinates are provided when the vertex is created.  (Z defaults to
+        0 and W defaults to 1.)
+    </p>
+
+    <p>
+        Incidentally, the data type that the programmer chooses when specifying
+        vertex data is not binding on the GL.  The implementation is free to choose
+        whatever type it believes is most appropriate for storing vertices in call
+        lists and during rendering.
+    </p>
+
+    <h2>OpenGL&nbsp;1.1</h2>
+
+    <blockquote>
+<code style="white-space: pre">
+// Initialization
+std::array&lt;GLfloat, 8&gt; quadVertices{
+    1, 1,
+    -1, 1,
+    -1, -1,
+    1, -1,
+};
+glVertexPointer(2, GL_FLOAT, 0, quadVertices.data());
+glEnableClientState(GL_VERTEX_ARRAY);
+std::array&lt;GLuint, 4&gt; quadIndices{
+    0, 1, 2, 3,
+};
+
+// Rendering
+glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, quadIndices.data());
+
+// Cleanup
+glDisableClientState(GL_VERTEX_ARRAY);
+</code>
+    </blockquote>
+
+    <p>
+        This uses the client state functionality introduced with OpenGL&nbsp;1.1.
+        This example represents how most people use this type of functionality,
+        but it is an unfair comparison.  The previous example transferred all
+        vertex data into graphics memory when the display list was compiled,
+        so the actual rendering command required no memory transfer except for
+        the single integer identifying the compiled display list.  Therefore
+        here is a modified version that works the same way.
+    </p>
+
+    <blockquote>
+<code style="white-space: pre">
+// Initialization
+std::array&lt;GLfloat, 8&gt; quadVertices{
+    1, 1,
+    -1, 1,
+    -1, -1,
+    1, -1,
+};
+glVertexPointer(2, GL_FLOAT, 0, quadVertices.data());
+std::array&lt;GLuint, 4&gt; quadIndices{
+    0, 1, 2, 3,
+};
+GLuint displayList{ glGenLists(1) };
+glEnableClientState(GL_VERTEX_ARRAY);
+glNewList(displayList, GL_COMPILE);
+glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, quadIndices.data());
+glEndList();
+glDisableClientState(GL_VERTEX_ARRAY);
+
+// Rendering
+glCallList(displayList);
+
+// Cleanup
+glDeleteLists(displayList, 1);
+</code>
+    </blockquote>
+
+    <p>
+        The vertex and index arrays are read when the display list is compiled,
+        so the data is transferred into graphics memory at that time.  After
+        that the arrays can be safely modified or deallocated.
+    </p>
+
+    <p>
+        What about potential mistakes?  Once we start dealing with arrays, those
+        become plentiful and dangerous.  Since the entry points <code>glVertexPointer</code>
+        and <code>glDrawElements</code> can accept arrays of a variety of data
+        types, they necessarily take <code>void&nbsp;*</code> as parameters.  Therefore
+        the compiler is incapable of even warning of any potential mismatches in
+        data types.  If the programmer specifies arrays of type <code>GLfloat</code>
+        but passes <code>GL_DOUBLE</code> as the second parameter of <code>glVertexPointer</code>,
+        the GL will happily read way past the end of the array, either copying arbitrary
+        memory or else triggering a segmentation fault.
+    </p>
+
+    <p>
+        Even more insidious, the number of vertices that will be read depends
+        on the values of the index array passed to <code>glDrawElements</code>.
+        In this case, indices 0, 1, 2, and 3 are specified, so the vertex pointer
+        will be dereferenced and four sequential vertices will be read from the
+        beginning.  If the programmer mistakenly passes 8 as the second parameter
+        to <code>glDrawElements</code>, then whatever memory follows the index
+        array will be read, interpreted as <code>GLuint</code> data, and used
+        to index into the vertex array.  And unlike with the OpenGL&nbsp;1.0 version,
+        there is really no way for the graphics driver to determine that these
+        parameters are mistakes, and so no meaningful error reporting (or handling)
+        is possible.  The compiler cannot do much either, since the types are
+        converted to <code>void&nbsp;*</code>, and the correlation between
+        <code>glDrawElements</code> and <code>glVertexPointer</code> is not
+        discernible to the compiler.
+    </p>
+
+    <h2>OpenGL&nbsp;1.5</h2>
+
+    <blockquote>
+        <code style="white-space: pre">
+// Initialization
+GLuint wingBufferObject{ 0 };
+glGenBuffers(1, &wingBufferObject);
+glBindBuffer(GL_ARRAY_BUFFER, wingBufferObject);
+std::array&lt;GLfloat, 8&gt; quadVertices{
+    1, 1,
+    -1, 1,
+    -1, -1,
+    1, -1,
+};
+glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 8, quadVertices.data(), GL_STATIC_DRAW);
+glVertexPointer(2, GL_FLOAT, 0, 0);
+
+GLuint wingIndicesBufferObject{ 0 };
+glGenBuffers(1, &wingIndicesBufferObject);
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBufferObject);
+std::array&lt;GLuint, 4&gt; quadIndices{
+    0, 1, 2, 3
+};
+glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * 4, quadIndices.data(), GL_STATIC_DRAW);
+glEnableClientState(GL_VERTEX_ARRAY);
+
+// Rendering
+glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, 0);
+
+// Cleanup
+glDisableClientState(GL_VERTEX_ARRAY);
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+glBindBuffer(GL_ARRAY_BUFFER, 0);
+glDeleteBuffers(1, &wingIndicesBufferObject);
+glDeleteBuffers(1, &wingBufferObject);
+        </code>
+    </blockquote>
+
+    <p>
+        This can also be wrapped in a display list in the same way as the OpenGL&nbsp;1.1
+        client array version, but since the arrays are transferred into graphics
+        memory with the calls to <code>glBufferData</code> and the call to
+        <code>glDrawElements</code> just references the buffers in graphics memory,
+        it is not as important.  Four words is not much worse than the one word
+        of the OpenGL&nbsp;1.0 version.
+    </p>
+
+    <p>
+        This version is better than the simple client arrays, because at least
+        this version explicitly specifies the size of the arrays that will be
+        read and transferred.  Once the data is transferred to the graphics
+        memory, the GL can do bounds checking on all accesses.  It still allows
+        the programmer to make a mistake when calling <code>glBufferData</code>,
+        for example using <code>sizeof</code> incorrectly or failing to multiply
+        by the right count.
+    </p>
+
+    <p>
+        Even though the buffers in graphics memory can be bounds-checked, they are still
+        just blocks of raw memory.  They are only interpreted as specific types
+        during the calls to <code>glVertexPointer</code> and <code>glDrawElements</code>.
+        So the programmer can easily make a mistake by failing to match the
+        data types of the buffers with the calls to use them, such as uploading
+        <code>GLfloat</code> vertex coordinates but passing <code>GL_DOUBLE</code>
+        to the call to <code>glVertexPointer</code>.  Since those two calls can
+        often appear in different parts of the program, even different source files,
+        making this mistake is quite easy.  The same problem exists for the array
+        of indices into the vertex data.  The call to <code>glDrawElements</code>
+        pulls its data from the <code>GL_ELEMENT_ARRAY_BUFFER</code>, but those
+        two calls are almost always in radically different places in the code,
+        so any type mismatches between the two calls will be difficult to spot,
+        and the symptom will be that the index will reference an incorrect vertex,
+        or possibly no vertex at all, resulting in completely unrecognizable geometry
+        that often just looks like very thin strips of color at odd angles across
+        the entire screen.  On the bright side it should not cause a segmentation fault.
+    </p>
+
+    <p>
+        Perhaps the most frustrating thing is that the <code>void&nbsp;*</code> parameters
+        to <code>glVertexPointer</code> and <code>glDrawElements</code>
+        that previously were used to specify the data are now treated as byte offsets
+        into the buffers in graphics memory.  In C++ terminology, the programmer needs
+        to use <code>reinterpret_cast</code> to convert a <code>std::size_t</code>
+        into a <code>void&nbsp;*</code>.  While C programmers may not flinch at this,
+        C++ has spent decades creating alternatives to avoid this exact scenario.
+    </p>
+
+    <p>
+        One potential error most people might not notice is how the call to
+        <code>glGenBuffers</code> works.  The first parameter is the number of
+        buffer identifiers to generate.  The second parameter is a pointer to
+        an array to receive the requested number of identifiers.  Most real uses
+        request just one buffer identifier, and so allocate a single variable
+        to receive it and pass the address of the variable as the second parameter.
+        But in the case that a programmer actually wants more than one identifier,
+        they will need to allocate an array and pass a pointer to the first element
+        where they want the sequence of identifiers written.  The potential
+        problem is that programmers are accustomed to array-passing patterns such
+        as used in the call to <code>glBufferData</code>, where the receiving
+        buffer size is specified in bytes when associated with a pointer.  But
+        this case is a count.  Situations where fetching multiple identifiers
+        at once often coincide with having very large arrays for a type of data,
+        and filling in that array in multiple batches.  Suppose the programmer
+        has an array of 100 elements, and requests identifiers in batches of 10.
+        When generating the second batch, the size parameter will again be 10,
+        but the pointer will need to be offset by 10 times the <code>sizeof(GLuint)</code>.
+        Alternately, the programmer could use <code>&amp;(buf[10])</code>, not
+        a very common syntax.  In any event, the programmer needs to make use of
+        <code>sizeof</code>, but in the opposite way as with <code>glBufferData</code>.
+    </p>
+
+    <h2>OpenGL&nbsp;3.0 and beyond</h2>
+
+    <p>
+        The latest versions of OpenGL have deprecated <code>glVertex</code> and
+        related functions entirely.  They now use buffers like the OpenGL&nbsp;1.5
+        example exclusively, with the modification that buffers with special
+        meaning like <code>glVertexPointer</code> have been replaced with a
+        generic system using <code>glVertexAttribPointer</code>, and the
+        programmer must associate semantics with each &ldquo;attribute&rdquo;
+        in their <abbr title="OpenGL Shading Language">GLSL</abbr> programs.
+        While conceptually simple, this means that programmers must expend a
+        great deal of effort (and write substantial code) to manage the mapping
+        of attributes between their C or C++ code running on the CPU and their
+        GLSL code running in the GPU.  This is in addition to also managing the
+        multiple GLSL programs needed for various rendering conditions and truly
+        absurd number of buffers needed to store vertex coordinates, colors,
+        surface normals, texture coordinates, transformation matrices, and any
+        other data needed during rendering.
+    </p>
+
+    <p>
+        Modern graphics rendering functions are mostly long lists of interleaved
+        calls to <code>glBindBuffer</code> and <code>glVertexAttribPointer</code>,
+        before a call to <code>glDrawElements</code> or something similar to
+        trigger the actual rendering.  Trying to determine what was rendered and
+        how usually involves tracking down where various buffers were modified,
+        which GLSL program was active, what attributes that program took as inputs,
+        and then correlating that back to the buffers bound at the time of the
+        render call.
+    </p>
+
+</body>
+</html>

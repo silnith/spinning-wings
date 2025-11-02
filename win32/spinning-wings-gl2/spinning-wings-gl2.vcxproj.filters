@@ -51,6 +51,7 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="packages.config" />
+    <None Include="Comparison.html" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WingsViewGL2.h">
