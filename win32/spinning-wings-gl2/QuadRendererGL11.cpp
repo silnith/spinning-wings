@@ -1,3 +1,6 @@
+#include <Windows.h>
+#include <GL/glew.h>
+
 #include "QuadRendererGL11.h"
 
 #include "Quad.h"

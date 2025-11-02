@@ -1,11 +1,16 @@
-#include "Shader.h"
+#include <Windows.h>
+#include <GL/glew.h>
 
-#include <cassert>
-#include <cstddef>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
+#include <string>
 #include <vector>
+
+#include <cassert>
+#include <cstddef>
+
+#include "Shader.h"
 
 using namespace std::literals::string_literals;
 

@@ -1,12 +1,16 @@
-#include "WingsView.h"
-
+#include <Windows.h>
+#include <gl/GL.h>
 #include <gl/GLU.h>
 
-#include <cassert>
 #include <deque>
 #include <string>
 #include <sstream>
 
+#include <cassert>
+
+#include "WingsView.h"
+
+#include "Color.h"
 #include "CurveGenerator.h"
 #include "Wing.h"
 

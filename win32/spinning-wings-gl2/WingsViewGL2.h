@@ -6,6 +6,8 @@
 #include <deque>
 #include <memory>
 
+#include <cstddef>
+
 #include "CurveGenerator.h"
 #include "GLInfo.h"
 #include "QuadRenderer.h"

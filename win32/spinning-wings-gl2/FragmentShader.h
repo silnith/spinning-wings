@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Shader.h"
-
 #include <initializer_list>
 #include <string>
+
+#include "Shader.h"
 
 namespace silnith::wings::gl2
 {
@@ -23,7 +23,7 @@ namespace silnith::wings::gl2
         FragmentShader& operator=(FragmentShader const&) noexcept = delete;
         FragmentShader(FragmentShader&&) noexcept = delete;
         FragmentShader& operator=(FragmentShader&&) noexcept = delete;
-        virtual ~FragmentShader(void) noexcept = default;
+        virtual ~FragmentShader(void) noexcept override = default;
     public:
         /// <summary>
         /// Creates and compiles a fragment shader from the given GLSL sources.

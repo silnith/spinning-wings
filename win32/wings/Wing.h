@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Color.h"
-
 #include <concepts>
+
+#include "Color.h"
 
 namespace silnith::wings
 {

@@ -1,3 +1,6 @@
+#include <Windows.h>
+#include <GL/glew.h>
+
 #include "QuadRendererGL10.h"
 
 namespace silnith::wings::gl

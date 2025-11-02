@@ -1,5 +1,8 @@
 #pragma once
 
+#include <Windows.h>
+#include <GL/glew.h>
+
 #include "QuadRenderer.h"
 
 namespace silnith::wings::gl
@@ -19,7 +22,7 @@ namespace silnith::wings::gl
 		virtual ~QuadRendererGL11(void) noexcept override;
 
 	public:
-		virtual void DrawQuad(void) const;
+		virtual void DrawQuad(void) const override;
 	};
 
 }

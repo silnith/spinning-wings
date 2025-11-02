@@ -1,9 +1,12 @@
 #pragma once
 
-#include "Shader.h"
+#include <Windows.h>
+#include <GL/glew.h>
 
 #include <initializer_list>
 #include <string>
+
+#include "Shader.h"
 
 namespace silnith::wings::gl2
 {
@@ -23,7 +26,7 @@ namespace silnith::wings::gl2
         VertexShader& operator=(VertexShader const&) noexcept = delete;
         VertexShader(VertexShader&&) noexcept = delete;
         VertexShader& operator=(VertexShader&&) noexcept = delete;
-        virtual ~VertexShader(void) noexcept = default;
+        virtual ~VertexShader(void) noexcept override = default;
     public:
         /// <summary>
         /// Creates and compiles a vertex shader from the given GLSL sources.

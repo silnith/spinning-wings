@@ -10,8 +10,9 @@
 #pragma comment (lib, "opengl32.lib")
 #pragma comment (lib, "glu32.lib")
 
-#include <cassert>
 #include <memory>
+
+#include <cassert>
 
 #include "GLInfo.h"
 #include "WingsPixelFormat.h"

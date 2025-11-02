@@ -1,9 +1,12 @@
-#include "GLInfo.h"
+#include <Windows.h>
+#include <gl/GL.h>
 
 #include <string>
 #include <sstream>
 
 #include <cassert>
+
+#include "GLInfo.h"
 
 namespace silnith::wings::gl
 {

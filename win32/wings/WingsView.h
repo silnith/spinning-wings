@@ -5,6 +5,8 @@
 
 #include <deque>
 
+#include <cstddef>
+
 #include "CurveGenerator.h"
 #include "GLInfo.h"
 #include "Wing.h"

@@ -1,10 +1,24 @@
-#include "WingsViewGL2.h"
+#include <Windows.h>
+#include <GL/glew.h>
+
+#include <deque>
+#include <memory>
+#include <string>
 
 #include <cassert>
 
+#include "WingsViewGL2.h"
+
+#include "Color.h"
+#include "CurveGenerator.h"
+#include "FragmentShader.h"
+#include "GLInfo.h"
+#include "Program.h"
 #include "QuadRendererGL10.h"
 #include "QuadRendererGL11.h"
 #include "QuadRendererGL15.h"
+#include "VertexShader.h"
+#include "Wing.h"
 
 using namespace std::literals::string_literals;
 

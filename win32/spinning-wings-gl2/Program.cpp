@@ -1,9 +1,16 @@
-#include "Program.h"
+#include <Windows.h>
+#include <GL/glew.h>
 
-#include <cstddef>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
+
+#include <cstddef>
+
+#include "Program.h"
+
+#include "FragmentShader.h"
+#include "VertexShader.h"
 
 using namespace std::literals::string_literals;
 

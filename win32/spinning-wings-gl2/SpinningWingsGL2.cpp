@@ -3,16 +3,16 @@
 * mark as DPI-aware
 */
 
-#include <GL/glew.h>
-
 #include <Windows.h>
+#include <GL/glew.h>
 
 #pragma comment (lib, "opengl32.lib")
 #pragma comment (lib, "glu32.lib")
 
-#include <cassert>
 #include <memory>
 #include <stdexcept>
+
+#include <cassert>
 
 #include "WingsPixelFormat.h"
 #include "WingsViewGL2.h"

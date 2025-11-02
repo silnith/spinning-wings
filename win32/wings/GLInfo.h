@@ -10,6 +10,21 @@ namespace silnith::wings::gl
     /// implementation.  This class makes OpenGL queries, so the GL context
     /// must already exist.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Starting with OpenGL 3.0, this can be replaced with calls that query
+    /// the version number directly.
+    /// <code>
+    /// GLint glMajorVersion{ 1 };
+    /// GLint glMinorVersion{ 0 };
+    /// glGetIntegerv(GL_MAJOR_VERSION, &amp;glMajorVersion);
+    /// glGetIntegerv(GL_MINOR_VERSION, &amp;glMinorVersion);
+    /// 
+    /// assert(glMajorVersion == 3);
+    /// assert(glMinorVersion == 0);
+    /// </code>
+    /// </para>
+    /// </remarks>
     class GLInfo
     {
     public:

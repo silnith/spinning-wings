@@ -3,10 +3,10 @@
 #include <Windows.h>
 #include <GL/glew.h>
 
+#include <string>
+
 #include "FragmentShader.h"
 #include "VertexShader.h"
-
-#include <string>
 
 namespace silnith::wings::gl2
 {
