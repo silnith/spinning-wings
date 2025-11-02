@@ -182,7 +182,7 @@ glDeleteLists(displayList, 1);
         <code style="white-space: pre">
 // Initialization
 GLuint wingBufferObject{ 0 };
-glGenBuffers(1, &wingBufferObject);
+glGenBuffers(1, &amp;wingBufferObject);
 glBindBuffer(GL_ARRAY_BUFFER, wingBufferObject);
 std::array&lt;GLfloat, 8&gt; quadVertices{
     1, 1,
@@ -194,7 +194,7 @@ glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 8, quadVertices.data(), GL_STATI
 glVertexPointer(2, GL_FLOAT, 0, 0);
 
 GLuint wingIndicesBufferObject{ 0 };
-glGenBuffers(1, &wingIndicesBufferObject);
+glGenBuffers(1, &amp;wingIndicesBufferObject);
 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBufferObject);
 std::array&lt;GLuint, 4&gt; quadIndices{
     0, 1, 2, 3
@@ -209,8 +209,8 @@ glDrawElements(GL_QUADS, 4, GL_UNSIGNED_INT, 0);
 glDisableClientState(GL_VERTEX_ARRAY);
 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 glBindBuffer(GL_ARRAY_BUFFER, 0);
-glDeleteBuffers(1, &wingIndicesBufferObject);
-glDeleteBuffers(1, &wingBufferObject);
+glDeleteBuffers(1, &amp;wingIndicesBufferObject);
+glDeleteBuffers(1, &amp;wingBufferObject);
         </code>
     </blockquote>
 
@@ -242,7 +242,14 @@ glDeleteBuffers(1, &wingBufferObject);
         <code>GLfloat</code> vertex coordinates but passing <code>GL_DOUBLE</code>
         to the call to <code>glVertexPointer</code>.  Since those two calls can
         often appear in different parts of the program, even different source files,
-        making this mistake is quite easy.  The same problem exists for the array
+        making this mistake is quite easy.  Another potential example is storing two
+        coordinates per vertex in the buffer, but then specifying three coordinates.
+        Suddenly different vertices will have their x, y, and z values interchanged
+        between each other.
+    </p>
+
+    <p>
+        The same problem exists for the array
         of indices into the vertex data.  The call to <code>glDrawElements</code>
         pulls its data from the <code>GL_ELEMENT_ARRAY_BUFFER</code>, but those
         two calls are almost always in radically different places in the code,
@@ -315,7 +322,20 @@ glDeleteBuffers(1, &wingBufferObject);
         how usually involves tracking down where various buffers were modified,
         which GLSL program was active, what attributes that program took as inputs,
         and then correlating that back to the buffers bound at the time of the
-        render call.
+        render call.  Contrast that with the OpenGL&nbsp;1.0 example above.
+    </p>
+
+    <h1>Conclusion</h1>
+
+    <p>
+        I actually do not have a conclusion.  The point of this is not to draw
+        any specific, concrete conclusions.  Instead, it is provocative.  The
+        purpose is to prompt readers to think carefully and critically about the
+        programming APIs we use daily.  Are they actually good, or do we simply
+        call them that without considering potential weaknesses?  When we say
+        that we like a particular API, is it because the API is actually good,
+        or simply because it does what we need when used in a very narrow way?
+        Are there any APIs you do not like?  What about it prompts your dislike?
     </p>
 
 </body>
