@@ -25,8 +25,10 @@ namespace silnith::wings::gl
 		virtual void DrawQuad(void) const override;
 
 	private:
-		GLuint wingBufferObject{ 0 };
-		GLuint wingIndicesBufferObject{ 0 };
+		/// <summary>
+		/// The GL display list for rendering a single quad.
+		/// </summary>
+		GLuint const quadDisplayList{ 0 };
 	};
 
 }

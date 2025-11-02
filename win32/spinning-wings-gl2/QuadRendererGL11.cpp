@@ -8,7 +8,7 @@
 namespace silnith::wings::gl
 {
 
-	QuadRendererGL11::QuadRendererGL11(void)
+	QuadRendererGL11::QuadRendererGL11(void) : quadDisplayList{ glGenLists(1) }
 	{
 		/*
 		 * Specifies vertex data to be used by subsequent calls to
@@ -21,15 +21,8 @@ namespace silnith::wings::gl
 		 * a display list.
 		 */
 		glEnableClientState(GL_VERTEX_ARRAY);
-	}
 
-	QuadRendererGL11::~QuadRendererGL11(void) noexcept
-	{
-		glDisableClientState(GL_VERTEX_ARRAY);
-	}
-	
-	void QuadRendererGL11::DrawQuad(void) const
-	{
+		glNewList(quadDisplayList, GL_COMPILE);
 		/*
 		 * When compiling a display list,
 		 * DrawElements dereferences vertex pointers according to the client
@@ -37,6 +30,19 @@ namespace silnith::wings::gl
 		 * display list.
 		 */
 		glDrawElements(GL_QUADS, numIndices, quadIndexDataType, quadIndices.data());
+		glEndList();
+
+		glDisableClientState(GL_VERTEX_ARRAY);
+	}
+
+	QuadRendererGL11::~QuadRendererGL11(void) noexcept
+	{
+		glDeleteLists(quadDisplayList, 1);
+	}
+	
+	void QuadRendererGL11::DrawQuad(void) const
+	{
+		glCallList(quadDisplayList);
 	}
 
 }

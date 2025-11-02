@@ -8,8 +8,9 @@
 namespace silnith::wings::gl
 {
 
-	QuadRendererGL15::QuadRendererGL15(void)
+	QuadRendererGL15::QuadRendererGL15(void) : quadDisplayList{ glGenLists(1) }
 	{
+		GLuint wingBufferObject{ 0 };
 		glGenBuffers(1, &wingBufferObject);
 		glBindBuffer(GL_ARRAY_BUFFER, wingBufferObject);
 		glBufferData(GL_ARRAY_BUFFER, quadVerticesDataSize, quadVertices.data(), GL_STATIC_DRAW);
@@ -22,26 +23,14 @@ namespace silnith::wings::gl
 		 */
 		glVertexPointer(numCoordinatesPerVertex, vertexCoordinateDataType, quadVertexStride, 0);
 
+		GLuint wingIndicesBufferObject{ 0 };
 		glGenBuffers(1, &wingIndicesBufferObject);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBufferObject);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesDataSize, quadIndices.data(), GL_STATIC_DRAW);
 
 		glEnableClientState(GL_VERTEX_ARRAY);
-	}
 
-	QuadRendererGL15::~QuadRendererGL15(void) noexcept
-	{
-		glDisableClientState(GL_VERTEX_ARRAY);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		glDeleteBuffers(1, &wingIndicesBufferObject);
-		glDeleteBuffers(1, &wingBufferObject);
-	}
-
-	void QuadRendererGL15::DrawQuad(void) const
-	{
+		glNewList(quadDisplayList, GL_COMPILE);
 		/*
 		 * When compiled into a display list,
 		 * DrawElements dereferences vertex pointers according to the client
@@ -56,6 +45,25 @@ namespace silnith::wings::gl
 		 * the current VertexPointer.
 		 */
 		glDrawElements(GL_QUADS, numIndices, quadIndexDataType, 0);
+		glEndList();
+
+		glDisableClientState(GL_VERTEX_ARRAY);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glDeleteBuffers(1, &wingIndicesBufferObject);
+		glDeleteBuffers(1, &wingBufferObject);
+	}
+
+	QuadRendererGL15::~QuadRendererGL15(void) noexcept
+	{
+		glDeleteLists(quadDisplayList, 1);
+	}
+
+	void QuadRendererGL15::DrawQuad(void) const
+	{
+		glCallList(quadDisplayList);
 	}
 
 }

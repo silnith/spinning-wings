@@ -23,6 +23,12 @@ namespace silnith::wings::gl
 
 	public:
 		virtual void DrawQuad(void) const override;
+
+	private:
+		/// <summary>
+		/// The GL display list for rendering a single quad.
+		/// </summary>
+		GLuint const quadDisplayList{ 0 };
 	};
 
 }
