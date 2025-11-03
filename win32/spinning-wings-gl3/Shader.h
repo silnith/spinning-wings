@@ -27,13 +27,26 @@ namespace silnith::wings::gl3
         Shader& operator=(Shader&&) noexcept = delete;
         virtual ~Shader(void) noexcept;
     protected:
+        /// <summary>
+        /// Creates and compiles a shader from the given GLSL sources.
+        /// The source strings are concatenated with newlines appended to each.
+        /// </summary>
+        /// <param name="type">The type of shader.  This should be one of
+        /// <c>GL_VERTEX_SHADER</c>, <c>GL_GEOMETRY_SHADER</c>, or <c>GL_FRAGMENT_SHADER</c>.</param>
+        /// <param name="sources">The source strings to concatenate.</param>
+        /// <exception cref="std::runtime_error">If an error occurs creating the shader object in the OpenGL state machine.</exception>
         explicit Shader(GLenum type, std::initializer_list<std::string> const&);
 
     public:
+        /// <summary>
+        /// Returns the OpenGL name for the shader.
+        /// </summary>
+        /// <returns>The OpenGL identifier of the shader.</returns>
+        [[nodiscard]]
         GLuint getShader(void) const noexcept;
 
     private:
-        GLuint id{ 0 };
+        GLuint const id{ 0 };
         std::string compilationLog{};
     };
 

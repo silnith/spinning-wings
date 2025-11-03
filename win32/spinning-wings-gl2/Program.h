@@ -42,9 +42,20 @@ namespace silnith::wings::gl2
         [[nodiscard]]
         GLuint getProgram(void) const noexcept;
 
+        /// <summary>
+        /// Returns the index of the generic vertex attribute that is bound to the
+        /// specified attribute variable.
+        /// </summary>
+        /// <param name="name">The name of the attribute.</param>
+        /// <returns>The generic attribute index.</returns>
+        /// <exception cref="std::runtime_error">If the attribute name is not bound.</exception>
         [[nodiscard]]
-        GLuint getAttributeLocation(std::string const&) const;
+        GLuint getAttributeLocation(std::string const& name) const;
 
+        /// <summary>
+        /// Installs the GLSL program as part of the current rendering state.
+        /// </summary>
+        /// <exception cref="std::runtime_error">If the program could not be installed.</exception>
         void useProgram(void) const;
 
     private:

@@ -1,21 +1,29 @@
+#include <Windows.h>
+#include <GL/glew.h>
+
+#include <memory>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
+#include <cassert>
+#include <cstddef>
+
 #include "Shader.h"
 
-#include <cstddef>
-#include <memory>
-#include <stdexcept>
-#include <vector>
+using namespace std::literals::string_literals;
 
 namespace silnith::wings::gl3
 {
 
-    Shader::~Shader(void) noexcept
-    {
-        glDeleteShader(id);
-    }
-
     Shader::Shader(GLenum type, std::initializer_list<std::string> const& sources)
         : id{ glCreateShader(type) }, compilationLog{}
     {
+        assert((type == GL_VERTEX_SHADER)
+            || (type == GL_GEOMETRY_SHADER)
+            || (type == GL_FRAGMENT_SHADER));
+
         if (id == 0)
         {
             throw std::runtime_error{ "Failed to allocate shader." };
@@ -44,7 +52,7 @@ namespace silnith::wings::gl3
         GLint logSize{ 0 };
         glGetShaderiv(id, GL_INFO_LOG_LENGTH, &logSize);
         if (logSize > 0) {
-            std::unique_ptr<GLchar[]> log{ std::make_unique<GLchar[]>(logSize) };
+            std::unique_ptr<GLchar[]> log{ std::make_unique<GLchar[]>(static_cast<std::size_t>(logSize)) };
             glGetShaderInfoLog(id, static_cast<GLsizei>(logSize), nullptr, log.get());
             compilationLog = { log.get() };
         }
@@ -63,9 +71,17 @@ namespace silnith::wings::gl3
         default:
         {
             glDeleteShader(id);
-            throw std::runtime_error{ "Unknown compilation status: " + compilationSuccess };
+            std::ostringstream errorMessage{};
+            errorMessage << "Unknown compilation status: "s;
+            errorMessage << compilationSuccess;
+            throw std::runtime_error{ errorMessage.str() };
         }
         }
+    }
+
+    Shader::~Shader(void) noexcept
+    {
+        glDeleteShader(id);
     }
 
     GLuint Shader::getShader(void) const noexcept

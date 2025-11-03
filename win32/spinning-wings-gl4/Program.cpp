@@ -1,9 +1,21 @@
-#include "Program.h"
+#include <Windows.h>
+#include <GL/glew.h>
 
-#include <cstddef>
+#include <initializer_list>
 #include <memory>
+#include <sstream>
+#include <string>
 #include <stdexcept>
 #include <vector>
+
+#include <cstddef>
+
+#include "Program.h"
+
+#include "FragmentShader.h"
+#include "VertexShader.h"
+
+using namespace std::literals::string_literals;
 
 namespace silnith::wings::gl4
 {
@@ -35,7 +47,7 @@ namespace silnith::wings::gl4
         GLint logSize{ 0 };
         glGetProgramiv(id, GL_INFO_LOG_LENGTH, &logSize);
         if (logSize > 0) {
-            std::unique_ptr<GLchar[]> log{ std::make_unique<GLchar[]>(logSize) };
+            std::unique_ptr<GLchar[]> log{ std::make_unique<GLchar[]>(static_cast<std::size_t>(logSize)) };
             glGetProgramInfoLog(id, static_cast<GLsizei>(logSize), nullptr, log.get());
             linkLog = { log.get() };
         }
@@ -54,9 +66,26 @@ namespace silnith::wings::gl4
         default:
         {
             glDeleteProgram(id);
-            throw std::runtime_error{ "Unknown link status: " + linkSuccess };
+            std::ostringstream errorMessage{};
+            errorMessage << "Unknown link status: "s;
+            errorMessage << linkSuccess;
+            throw std::runtime_error{ errorMessage.str() };
         }
         }
+
+        //glGetProgramiv(id, GL_ACTIVE_ATTRIBUTES, nullptr);
+        //glGetActiveAttrib
+        //glGetAttribLocation
+        //glGetUniformLocation
+        //glGetUniformBlockIndex
+        //glGetProgramiv(id, GL_ACTIVE_UNIFORM_BLOCKS, nullptr);
+        //glGetActiveUniformBlockName
+        //glGetActiveUniformBlockiv
+        // - GL_UNIFORM_BLOCK_BINDING, GL_UNIFORM_BLOCK_DATA_SIZE
+        //glGetUniformIndices
+        //glGetActiveUniformName
+        //glGetProgramiv(id, GL_ACTIVE_UNIFORMS, nullptr);
+        //glGetActiveUniform
     }
 
     Program::Program(VertexShader const& vertexShader, FragmentShader const& fragmentShader, std::string const& fragmentData)
@@ -75,7 +104,7 @@ namespace silnith::wings::gl4
         GLint logSize{ 0 };
         glGetProgramiv(id, GL_INFO_LOG_LENGTH, &logSize);
         if (logSize > 0) {
-            std::unique_ptr<GLchar[]> log{ std::make_unique<GLchar[]>(logSize) };
+            std::unique_ptr<GLchar[]> log{ std::make_unique<GLchar[]>(static_cast<std::size_t>(logSize)) };
             glGetProgramInfoLog(id, static_cast<GLsizei>(logSize), nullptr, log.get());
             linkLog = { log.get() };
         }
@@ -94,7 +123,10 @@ namespace silnith::wings::gl4
         default:
         {
             glDeleteProgram(id);
-            throw std::runtime_error{ "Unknown link status: " + linkSuccess };
+            std::ostringstream errorMessage{};
+            errorMessage << "Unknown link status: "s;
+            errorMessage << linkSuccess;
+            throw std::runtime_error{ errorMessage.str() };
         }
         }
     }
@@ -109,7 +141,7 @@ namespace silnith::wings::gl4
         GLint const attributeLocation{ glGetAttribLocation(id, name.c_str()) };
         if (attributeLocation < 0)
         {
-            throw std::runtime_error{ "Attribute " + name + " not bound." };
+            throw std::runtime_error{ "Attribute "s + name + " not bound."s };
         }
         return static_cast<GLuint>(attributeLocation);
     }
@@ -119,12 +151,12 @@ namespace silnith::wings::gl4
         GLint const uniformLocation{ glGetUniformLocation(id, name.c_str()) };
         if (uniformLocation < 0)
         {
-            throw std::runtime_error{ "Uniform " + name + " not bound." };
+            throw std::runtime_error{ "Uniform "s + name + " not bound."s };
         }
         return static_cast<GLint>(uniformLocation);
     }
 
-    void Program::useProgram(void) const noexcept
+    void Program::useProgram(void) const
     {
         glUseProgram(id);
     }
