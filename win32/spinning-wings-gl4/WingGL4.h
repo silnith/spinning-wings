@@ -39,11 +39,11 @@ namespace silnith::wings::gl4
 		/// <summary>
 		/// Creates a new wing with the provided parameters.
 		/// </summary>
-		/// <param name="vertexBuffer">the OpenGL vertex buffer for this wing</param>
-		/// <param name="colorBuffer">the OpenGL color buffer identifier</param>
-		/// <param name="edgeColorBuffer">the OpenGL edge color buffer identifier</param>
-		/// <param name="deltaAngle">the additional angle around the central axis as the wing receds into history</param>
-		/// <param name="deltaZ">the additional height along the central axis as the wing receds into history</param>
+		/// <param name="vertexBuffer">The OpenGL vertex buffer for this wing.</param>
+		/// <param name="colorBuffer">The OpenGL color buffer identifier.</param>
+		/// <param name="edgeColorBuffer">The OpenGL edge color buffer identifier.</param>
+		/// <param name="deltaAngle">The additional angle around the central axis as the wing recedes into history.</param>
+		/// <param name="deltaZ">The additional height along the central axis as the wing recedes into history.</param>
 		Wing(ID vertexBuffer,
 			ID colorBuffer,
 			ID edgeColorBuffer,
@@ -58,7 +58,7 @@ namespace silnith::wings::gl4
 		/// Returns the OpenGL vertex buffer identifier for this wing.
 		/// The vertex buffer will be populated using transform feedback.
 		/// </summary>
-		/// <returns>the OpenGL vertex buffer identifier</returns>
+		/// <returns>The OpenGL vertex buffer identifier.</returns>
 		[[nodiscard]]
 		inline ID getVertexBuffer(void) const noexcept
 		{
@@ -68,7 +68,7 @@ namespace silnith::wings::gl4
 		/// <summary>
 		/// Returns the OpenGL color buffer identifier for this wing.
 		/// </summary>
-		/// <returns>the OpenGL color buffer identifier</returns>
+		/// <returns>The OpenGL color buffer identifier.</returns>
 		[[nodiscard]]
 		inline ID getColorBuffer(void) const noexcept
 		{
@@ -78,7 +78,7 @@ namespace silnith::wings::gl4
 		/// <summary>
 		/// Returns the OpenGL edge color buffer identifier for this wing.
 		/// </summary>
-		/// <returns>the OpenGL edge color buffer identifier</returns>
+		/// <returns>The OpenGL edge color buffer identifier.</returns>
 		[[nodiscard]]
 		inline ID getEdgeColorBuffer(void) const noexcept
 		{
@@ -88,7 +88,7 @@ namespace silnith::wings::gl4
 		/// <summary>
 		/// Returns the OpenGL transform feedback object identifier for this wing.
 		/// </summary>
-		/// <returns>the OpenGL transform feedback object identifier</returns>
+		/// <returns>The OpenGL transform feedback object identifier.</returns>
 		[[nodiscard]]
 		inline ID getTransformFeedbackObject(void) const noexcept
 		{
@@ -98,7 +98,7 @@ namespace silnith::wings::gl4
 		/// <summary>
 		/// Returns the additional angle around the central axis that each subsequent wing should be rendered.
 		/// </summary>
-		/// <returns>the additional angle that the wing gains as it receds into history</returns>
+		/// <returns>The additional angle that the wing gains as it recedes into history.</returns>
 		[[nodiscard]]
 		inline T getDeltaAngle(void) const noexcept
 		{
@@ -108,7 +108,7 @@ namespace silnith::wings::gl4
 		/// <summary>
 		/// Returns the additional distance up the central axis that each subsequent wing should be rendered.
 		/// </summary>
-		/// <returns>the additional hight that the wing gains as it receds into history</returns>
+		/// <returns>The additional hight that the wing gains as it recedes into history.</returns>
 		[[nodiscard]]
 		inline T getDeltaZ(void) const noexcept
 		{

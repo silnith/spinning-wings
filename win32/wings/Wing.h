@@ -41,7 +41,7 @@ namespace silnith::wings
 		/// <summary>
 		/// Creates a new wing with the provided OpenGL display list identifier.
 		/// </summary>
-		/// <param name="displayList">the OpenGL display list identifier used for the rendering list for this wing</param>
+		/// <param name="displayList">The OpenGL display list identifier used for the rendering list for this wing.</param>
 		Wing(ID displayList) noexcept
 			: displayList{ displayList }
 		{}
@@ -49,16 +49,16 @@ namespace silnith::wings
 		/// <summary>
 		/// Creates a new wing with the provided parameters.
 		/// </summary>
-		/// <param name="displayList">the OpenGL display list identifier used for the rendering list for this wing</param>
-		/// <param name="radius">the radius from the central axis</param>
-		/// <param name="angle">the angle around the central axis</param>
-		/// <param name="deltaAngle">the additional angle around the central axis as the wing receds into history</param>
-		/// <param name="deltaZ">the additional height along the central axis as the wing receds into history</param>
-		/// <param name="roll">the roll of the wing</param>
-		/// <param name="pitch">the pitch of the wing</param>
-		/// <param name="yaw">the yaw of the wing</param>
-		/// <param name="color">the color of the wing</param>
-		/// <param name="edgeColor">the color of the edge of the wing</param>
+		/// <param name="displayList">The OpenGL display list identifier used for the rendering list for this wing.</param>
+		/// <param name="radius">The radius from the central axis.</param>
+		/// <param name="angle">The angle around the central axis.</param>
+		/// <param name="deltaAngle">The additional angle around the central axis as the wing recedes into history.</param>
+		/// <param name="deltaZ">The additional height along the central axis as the wing recedes into history.</param>
+		/// <param name="roll">The roll of the wing.</param>
+		/// <param name="pitch">The pitch of the wing.</param>
+		/// <param name="yaw">The yaw of the wing.</param>
+		/// <param name="color">The color of the wing.</param>
+		/// <param name="edgeColor">The color of the edge of the wing.</param>
 		Wing(ID displayList,
 			T radius, T angle,
 			T deltaAngle, T deltaZ,
@@ -74,7 +74,7 @@ namespace silnith::wings
 		/// <summary>
 		/// Returns the OpenGL display list identifier that renders this wing.
 		/// </summary>
-		/// <returns>the OpenGL display list identifier</returns>
+		/// <returns>The OpenGL display list identifier.</returns>
 		[[nodiscard]]
 		inline ID getGLDisplayList(void) const noexcept
 		{
@@ -84,7 +84,7 @@ namespace silnith::wings
 		/// <summary>
 		/// Returns the distance of the wing from the central axis around which they all rotate.
 		/// </summary>
-		/// <returns>the distance of the wing from the central axis</returns>
+		/// <returns>The distance of the wing from the central axis.</returns>
 		[[nodiscard]]
 		inline T getRadius(void) const noexcept
 		{
@@ -99,7 +99,7 @@ namespace silnith::wings
 		/// All angles are in degrees.
 		/// </para>
 		/// </remarks>
-		/// <returns>the angle of the wing in relation to the central axis</returns>
+		/// <returns>The angle of the wing in relation to the central axis.</returns>
 		[[nodiscard]]
 		inline T getAngle(void) const noexcept
 		{
@@ -109,7 +109,7 @@ namespace silnith::wings
 		/// <summary>
 		/// Returns the additional angle around the central axis that each subsequent wing should be rendered.
 		/// </summary>
-		/// <returns>the additional angle that the wing gains as it receds into history</returns>
+		/// <returns>The additional angle that the wing gains as it recedes into history.</returns>
 		[[nodiscard]]
 		inline T getDeltaAngle(void) const noexcept
 		{
@@ -119,7 +119,7 @@ namespace silnith::wings
 		/// <summary>
 		/// Returns the additional distance up the central axis that each subsequent wing should be rendered.
 		/// </summary>
-		/// <returns>the additional hight that the wing gains as it receds into history</returns>
+		/// <returns>The additional hight that the wing gains as it recedes into history.</returns>
 		[[nodiscard]]
 		inline T getDeltaZ(void) const noexcept
 		{
@@ -129,7 +129,7 @@ namespace silnith::wings
 		/// <summary>
 		/// Returns the roll of the wing.  This is specific to the wing itself.
 		/// </summary>
-		/// <returns>the roll of the wing in degrees</returns>
+		/// <returns>The roll of the wing in degrees.</returns>
 		[[nodiscard]]
 		inline T getRoll(void) const noexcept
 		{
@@ -139,7 +139,7 @@ namespace silnith::wings
 		/// <summary>
 		/// Returns the pitch of the wing.
 		/// </summary>
-		/// <returns>the pitch of the wing in degrees</returns>
+		/// <returns>The pitch of the wing in degrees.</returns>
 		[[nodiscard]]
 		inline T getPitch(void) const noexcept
 		{
@@ -149,7 +149,7 @@ namespace silnith::wings
 		/// <summary>
 		/// Returns the yaw of the wing.
 		/// </summary>
-		/// <returns>the yaw of the wing in degrees</returns>
+		/// <returns>The yaw of the wing in degrees.</returns>
 		[[nodiscard]]
 		inline T getYaw(void) const noexcept
 		{
@@ -159,7 +159,7 @@ namespace silnith::wings
 		/// <summary>
 		/// Returns the color of the wing.
 		/// </summary>
-		/// <returns>the color of the wing</returns>
+		/// <returns>The color of the wing.</returns>
 		[[nodiscard]]
 		inline Color<T> const& getColor(void) const noexcept
 		{
@@ -169,7 +169,7 @@ namespace silnith::wings
 		/// <summary>
 		/// Returns the color of the wing edge.
 		/// </summary>
-		/// <returns>the color of the edge of the wing</returns>
+		/// <returns>The color of the edge of the wing.</returns>
 		[[nodiscard]]
 		inline Color<T> const& getEdgeColor(void) const noexcept
 		{
