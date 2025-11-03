@@ -137,19 +137,18 @@
           self, self.glMajorVersion, self.glMinorVersion);
     
     glEnable(GL_DEPTH_TEST);
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
     if ([self hasOpenGLVersionMajor:1 minor:1]) {
         glPolygonOffset(-0.5, -2.0);
+        glEnable(GL_POLYGON_OFFSET_LINE);
+
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glEnable(GL_LINE_SMOOTH);
+        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+        glLineWidth(1.0);
     }
-    
-    glEnable(GL_LINE_SMOOTH);
-    glLineWidth(1.0);
-    
-    glEnable(GL_POLYGON_SMOOTH);
-    
-    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
-    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
     
     glLoadIdentity();
     // GLKMatrix4MakeLookAt
@@ -240,22 +239,6 @@
     
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    if ([self hasOpenGLVersionMajor:1 minor:1]) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        glEnable(GL_POLYGON_OFFSET_LINE);
-        glPushMatrix();
-        for (KSRWing const * wing in self.wingList) {
-            glTranslatef(0, 0, wing.deltaZ);
-            glRotatef(wing.deltaAngle, 0, 0, 1);
-            
-            KSRColor const * color = wing.edgeColor;
-            glColor3f(color.red, color.green, color.blue);
-            glCallList(wing.glDisplayList);
-        }
-        glPopMatrix();
-        glDisable(GL_POLYGON_OFFSET_LINE);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
     glPushMatrix();
     for (KSRWing const * wing in self.wingList) {
         glTranslatef(0, 0, wing.deltaZ);
@@ -267,6 +250,23 @@
     }
     glPopMatrix();
     
+    if ([self hasOpenGLVersionMajor:1 minor:1]) {
+        glEnable(GL_BLEND);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glPushMatrix();
+        for (KSRWing const * wing in self.wingList) {
+            glTranslatef(0, 0, wing.deltaZ);
+            glRotatef(wing.deltaAngle, 0, 0, 1);
+            
+            KSRColor const * color = wing.edgeColor;
+            glColor3f(color.red, color.green, color.blue);
+            glCallList(wing.glDisplayList);
+        }
+        glPopMatrix();
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glDisable(GL_BLEND);
+    }
+
     [self.openGLContext flushBuffer];
 }
 
