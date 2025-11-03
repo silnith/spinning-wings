@@ -53,7 +53,7 @@ HGLRC hglrc{ nullptr };
 /// The object that encapsulates all of the logic for drawing and animating
 /// the spinning wings.
 /// </summary>
-//std::unique_ptr<silnith::wings::gl4::WingsViewGL2> wingsView{ nullptr };
+//std::unique_ptr<silnith::wings::gl4::WingsViewGL4> wingsView{ nullptr };
 
 /// <summary>
 /// The <see cref="TIMERPROC"/> that advances the animation by one frame.
@@ -189,6 +189,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			GLenum const glewInitError{ glewInit() };
 			assert(glewInitError == GLEW_OK);
 
+			/*
+			 * OpenGL 3.2 introduced distinct "core" and "compatibility" profiles.
+			 * The compatibility profile includes deprecated features from previous
+			 * versions.  The core profile removes deprecated functionality and
+			 * only provides the new "approved" functionality.
+			 *
+			 * Since this is intended to serve as a demonstration of idiomatic
+			 * usage of OpenGL 4, this requests the OpenGL 4.1 Core profile.
+			 */
 			int const attribList[] = {
 				WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
 				WGL_CONTEXT_MINOR_VERSION_ARB, 1,
@@ -198,7 +207,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				0,
 			};
 
-			hglrc = wglCreateContextAttribsARB(hdc, tempGLRC, attribList);
+			hglrc = wglCreateContextAttribsARB(hdc, nullptr, attribList);
 			wglMakeCurrent(hdc, hglrc);
 			wglDeleteContext(tempGLRC);
 		}
