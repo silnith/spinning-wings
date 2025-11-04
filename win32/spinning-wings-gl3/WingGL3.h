@@ -1,6 +1,10 @@
 #pragma once
 
+#include <memory>
+
 #include "Color.h"
+#include "TransformedColorBuffer.h"
+#include "TransformedVertexBuffer.h"
 
 namespace silnith::wings::gl3
 {
@@ -25,7 +29,7 @@ namespace silnith::wings::gl3
 	/// All angles are in degrees.
 	/// </para>
 	/// </remarks>
-	template<typename ID, typename T>
+	template<typename T>
 	class Wing
 	{
 	public:
@@ -39,17 +43,10 @@ namespace silnith::wings::gl3
 		/// <summary>
 		/// Creates a new wing with the provided parameters.
 		/// </summary>
-		/// <param name="vertexBuffer">The OpenGL vertex buffer for this wing.</param>
-		/// <param name="colorBuffer">The OpenGL color buffer identifier.</param>
-		/// <param name="edgeColorBuffer">The OpenGL edge color buffer identifier.</param>
 		/// <param name="deltaAngle">The additional angle around the central axis as the wing recedes into history.</param>
 		/// <param name="deltaZ">The additional height along the central axis as the wing recedes into history.</param>
-		Wing(ID vertexBuffer,
-			ID colorBuffer,
-			ID edgeColorBuffer,
-			T deltaAngle, T deltaZ) noexcept
-			: vertexBuffer{ vertexBuffer }, colorBuffer{ colorBuffer }, edgeColorBuffer{ edgeColorBuffer },
-			deltaAngle{ deltaAngle }, deltaZ{ deltaZ }
+		Wing(T deltaAngle, T deltaZ) noexcept
+			: deltaAngle{ deltaAngle }, deltaZ{ deltaZ }
 		{}
 
 		/// <summary>
@@ -58,9 +55,9 @@ namespace silnith::wings::gl3
 		/// </summary>
 		/// <returns>The OpenGL vertex buffer identifier.</returns>
 		[[nodiscard]]
-		inline ID getVertexBuffer(void) const noexcept
+		inline GLuint getVertexBuffer(void) const noexcept
 		{
-			return vertexBuffer;
+			return vertexBuffer->getId();
 		}
 
 		/// <summary>
@@ -68,9 +65,9 @@ namespace silnith::wings::gl3
 		/// </summary>
 		/// <returns>The OpenGL color buffer identifier.</returns>
 		[[nodiscard]]
-		inline ID getColorBuffer(void) const noexcept
+		inline GLuint getColorBuffer(void) const noexcept
 		{
-			return colorBuffer;
+			return colorBuffer->getId();
 		}
 
 		/// <summary>
@@ -78,9 +75,9 @@ namespace silnith::wings::gl3
 		/// </summary>
 		/// <returns>The OpenGL edge color buffer identifier.</returns>
 		[[nodiscard]]
-		inline ID getEdgeColorBuffer(void) const noexcept
+		inline GLuint getEdgeColorBuffer(void) const noexcept
 		{
-			return edgeColorBuffer;
+			return edgeColorBuffer->getId();
 		}
 
 		/// <summary>
@@ -104,9 +101,9 @@ namespace silnith::wings::gl3
 		}
 
 	private:
-		ID const vertexBuffer{ 0 };
-		ID const colorBuffer{ 0 };
-		ID const edgeColorBuffer{ 0 };
+		std::unique_ptr<TransformedVertexBuffer> vertexBuffer{ std::make_unique<TransformedVertexBuffer>() };
+		std::unique_ptr<TransformedColorBuffer> colorBuffer{ std::make_unique<TransformedColorBuffer>() };
+		std::unique_ptr<TransformedColorBuffer> edgeColorBuffer{ std::make_unique<TransformedColorBuffer>() };
 		T const deltaAngle{ 15 };
 		T const deltaZ{ 0.5 };
 	};

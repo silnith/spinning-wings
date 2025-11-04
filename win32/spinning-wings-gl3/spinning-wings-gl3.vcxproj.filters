@@ -55,6 +55,12 @@
     <ClInclude Include="IndexDataBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TransformedVertexBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformedColorBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FragmentShader.cpp">

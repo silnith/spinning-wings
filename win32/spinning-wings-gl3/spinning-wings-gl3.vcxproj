@@ -172,6 +172,8 @@
     <ClInclude Include="Program.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="TransformedColorBuffer.h" />
+    <ClInclude Include="TransformedVertexBuffer.h" />
     <ClInclude Include="VertexShader.h" />
     <ClInclude Include="WingGL3.h" />
     <ClInclude Include="WingsViewGL3.h" />

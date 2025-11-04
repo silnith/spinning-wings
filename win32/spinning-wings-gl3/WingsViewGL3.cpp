@@ -25,13 +25,15 @@
 
 #include "IndexDataBuffer.h"
 #include "OriginalVertexBuffer.h"
+#include "TransformedVertexBuffer.h"
+#include "TransformedColorBuffer.h"
 
 using namespace std::literals::string_literals;
 
 namespace silnith::wings::gl3
 {
 
-	typedef std::deque<Wing<GLuint, GLfloat> > wing_list;
+	typedef std::deque<Wing<GLfloat> > wing_list;
 
 	size_t constexpr numWings{ 40 };
 
@@ -421,42 +423,18 @@ void main() {
 		GLfloat const green{ greenCurve.getNextValue() };
 		GLfloat const blue{ blueCurve.getNextValue() };
 
-		GLuint wingVertexBuffer{ 0 };
-		GLuint wingColorBuffer{ 0 };
-		GLuint wingEdgeColorBuffer{ 0 };
 		if (wings.empty() || wings.size() < numWings)
-		{
-			glGenBuffers(1, &wingVertexBuffer);
-			glBindBuffer(GL_ARRAY_BUFFER, wingVertexBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * OriginalVertexBuffer::numVertices, nullptr, GL_DYNAMIC_COPY);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-			glGenBuffers(1, &wingColorBuffer);
-			glBindBuffer(GL_ARRAY_BUFFER, wingColorBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * OriginalVertexBuffer::numVertices, nullptr, GL_DYNAMIC_COPY);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-			glGenBuffers(1, &wingEdgeColorBuffer);
-			glBindBuffer(GL_ARRAY_BUFFER, wingEdgeColorBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * OriginalVertexBuffer::numVertices, nullptr, GL_DYNAMIC_COPY);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-		}
+		{}
 		else
 		{
-			// This block is simply so lastWing goes out of scope before the pop_back.
-			{
-				wing_list::const_reference lastWing{ wings.back() };
-				wingVertexBuffer = lastWing.getVertexBuffer();
-				wingColorBuffer = lastWing.getColorBuffer();
-				wingEdgeColorBuffer = lastWing.getEdgeColorBuffer();
-			}
 			wings.pop_back();
 		}
 
-		wings.emplace_front(wingVertexBuffer,
-			wingColorBuffer,
-			wingEdgeColorBuffer,
-			deltaAngle, deltaZ);
+		Wing<GLfloat> const& newWing{ wings.emplace_front(deltaAngle, deltaZ) };
+
+		GLuint const wingVertexBuffer{ newWing.getVertexBuffer() };
+		GLuint const wingColorBuffer{ newWing.getColorBuffer() };
+		GLuint const wingEdgeColorBuffer{ newWing.getEdgeColorBuffer() };
 
 		wingTransformProgram->useProgram();
 		glUniform2f(wingTransformProgram->getUniformLocation("radiusAngle"), radius, angle);
@@ -474,6 +452,9 @@ void main() {
 			OriginalVertexBuffer::vertexStride,
 			0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		static_assert(TransformedVertexBuffer::numVertices == OriginalVertexBuffer::numVertices);
+		static_assert(TransformedColorBuffer::numVertices == OriginalVertexBuffer::numVertices);
 
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, wingVertexBuffer);
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, wingColorBuffer);
@@ -503,17 +484,32 @@ void main() {
 			glUniform2f(renderProgram->getUniformLocation("deltaZ"), deltaAngle, deltaZ);
 
 			glBindBuffer(GL_ARRAY_BUFFER, wing.getVertexBuffer());
-			glVertexAttribPointer(vertexAttribLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
+			glVertexAttribPointer(vertexAttribLocation,
+				TransformedVertexBuffer::numCoordinatesPerVertex,
+				TransformedVertexBuffer::vertexCoordinateDataType,
+				GL_FALSE,
+				TransformedVertexBuffer::vertexStride,
+				0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glBindBuffer(GL_ARRAY_BUFFER, wing.getColorBuffer());
-			glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			glVertexAttribPointer(colorAttribLocation,
+				TransformedColorBuffer::numCoordinatesPerVertex,
+				TransformedColorBuffer::vertexCoordinateDataType,
+				GL_FALSE,
+				TransformedColorBuffer::vertexStride,
+				0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glDrawElements(GL_TRIANGLE_FAN, IndexDataBuffer::numIndices, IndexDataBuffer::quadIndexDataType, 0);
 
 			glBindBuffer(GL_ARRAY_BUFFER, wing.getEdgeColorBuffer());
-			glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			glVertexAttribPointer(colorAttribLocation,
+				TransformedColorBuffer::numCoordinatesPerVertex,
+				TransformedColorBuffer::vertexCoordinateDataType,
+				GL_FALSE,
+				TransformedColorBuffer::vertexStride,
+				0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glEnable(GL_BLEND);
