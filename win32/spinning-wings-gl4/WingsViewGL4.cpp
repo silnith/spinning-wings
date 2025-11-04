@@ -115,14 +115,23 @@ namespace silnith::wings::gl4
 		 */
 		glEnable(GL_DEPTH_TEST);
 
+		/*
+		 * The body of each wing is rendered using polygon offset to prevent
+		 * Z-fighting.
+		 */
 		glPolygonOffset(0.5, 2);
 		glEnable(GL_POLYGON_OFFSET_FILL);
 
+		/*
+		 * The wing edges are rendered with smoothing enabled (antialiasing).
+		 * This generates multiple fragments per line step with alpha values
+		 * less than one, so blending is required for it to look correct.
+		 */
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 		glEnable(GL_LINE_SMOOTH);
 		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-
-		glEnable(GL_POLYGON_SMOOTH);
-		glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+		glLineWidth(1.0);
 
 		/*
 		 * Set up the initial camera position.
@@ -524,17 +533,19 @@ void main() {
 			glVertexAttribPointer(vertexAttribLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glBindBuffer(GL_ARRAY_BUFFER, wing.getEdgeColorBuffer());
-			glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-			glDrawElements(GL_LINE_LOOP, numIndices, GL_UNSIGNED_INT, 0);
-
 			glBindBuffer(GL_ARRAY_BUFFER, wing.getColorBuffer());
 			glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glDrawElements(GL_TRIANGLE_FAN, numIndices, GL_UNSIGNED_INT, 0);
+
+			glBindBuffer(GL_ARRAY_BUFFER, wing.getEdgeColorBuffer());
+			glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			glEnable(GL_BLEND);
+			glDrawElements(GL_LINE_LOOP, numIndices, GL_UNSIGNED_INT, 0);
+			glDisable(GL_BLEND);
 		}
 
 		glBindVertexArray(0);
