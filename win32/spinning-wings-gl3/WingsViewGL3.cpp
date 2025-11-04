@@ -54,8 +54,6 @@ namespace silnith::wings::gl3
 	std::unique_ptr<Program> wingTransformProgram{ nullptr };
 	std::unique_ptr<Program> renderProgram{ nullptr };
 
-	GLsizei constexpr numVertices{ 4 };
-	GLsizei constexpr numIndices{ 4 };
 	/// <summary>
 	/// The initial untransformed vertices for a single quad.
 	/// After binding, enable using <c>glVertexAttribPointer(..., 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0)</c>.
@@ -430,17 +428,17 @@ void main() {
 		{
 			glGenBuffers(1, &wingVertexBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, wingVertexBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * numVertices, nullptr, GL_STREAM_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * OriginalVertexBuffer::numVertices, nullptr, GL_DYNAMIC_COPY);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glGenBuffers(1, &wingColorBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, wingColorBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * numVertices, nullptr, GL_STREAM_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * OriginalVertexBuffer::numVertices, nullptr, GL_DYNAMIC_COPY);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glGenBuffers(1, &wingEdgeColorBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, wingEdgeColorBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * numVertices, nullptr, GL_STREAM_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * OriginalVertexBuffer::numVertices, nullptr, GL_DYNAMIC_COPY);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 		else
