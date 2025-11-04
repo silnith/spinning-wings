@@ -459,17 +459,17 @@ void main() {
 		{
 			glGenBuffers(1, &wingVertexBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, wingVertexBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * numVertices, nullptr, GL_STREAM_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * numVertices, nullptr, GL_DYNAMIC_COPY);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glGenBuffers(1, &wingColorBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, wingColorBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * numVertices, nullptr, GL_STREAM_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * numVertices, nullptr, GL_DYNAMIC_COPY);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glGenBuffers(1, &wingEdgeColorBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, wingEdgeColorBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * numVertices, nullptr, GL_STREAM_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * numVertices, nullptr, GL_DYNAMIC_COPY);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glGenTransformFeedbacks(1, &wingTransformFeedbackObject);
