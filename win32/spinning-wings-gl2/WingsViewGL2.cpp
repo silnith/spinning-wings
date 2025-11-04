@@ -198,9 +198,9 @@ void main() {
 			glDeleteLists(displayList, 1);
 		}
 
-		quadRenderer.release();
+		quadRenderer.reset();
 
-		glslProgram.release();
+		glslProgram.reset();
 	}
 
 	void WingsViewGL2::AdvanceAnimation(void)

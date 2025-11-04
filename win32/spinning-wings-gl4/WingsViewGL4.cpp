@@ -429,8 +429,8 @@ void main() {
 		glDeleteBuffers(1, &wingIndexBuffer);
 		glDeleteBuffers(1, &originalVertexBuffer);
 
-		wingTransformProgram.release();
-		renderProgram.release();
+		wingTransformProgram.reset();
+		renderProgram.reset();
 	}
 
 	void AdvanceAnimation(void)

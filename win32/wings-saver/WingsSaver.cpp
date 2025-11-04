@@ -326,7 +326,7 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 	}
 	case WM_DESTROY:
 	{
-		wingsView.release();
+		wingsView.reset();
 
 		// window about to be destroyed
 		HDC const hdc{ GetDC(hWnd) };

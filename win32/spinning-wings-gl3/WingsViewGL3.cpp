@@ -393,11 +393,11 @@ void main() {
 		glDeleteVertexArrays(1, &renderVertexArray);
 		glDeleteVertexArrays(1, &wingTransformVertexArray);
 
-		wingIndexBuffer.release();
-		originalVertexBuffer.release();
+		wingIndexBuffer.reset();
+		originalVertexBuffer.reset();
 
-		wingTransformProgram.release();
-		renderProgram.release();
+		wingTransformProgram.reset();
+		renderProgram.reset();
 	}
 
 	void AdvanceAnimation(void)
