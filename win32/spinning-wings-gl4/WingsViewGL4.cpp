@@ -206,7 +206,7 @@ mat4 scale(in vec3 factor) {
 )shaderText"s
 		};
 
-		wingTransformProgram.reset(new Program{
+		wingTransformProgram = std::make_unique<Program>(
 			VertexShader{
 				R"shaderText(#version 410
 
@@ -248,12 +248,12 @@ void main() {
 				rotateMatrixFunctionDeclaration,
 				translateMatrixFunctionDeclaration,
 			},
-			{
+			std::initializer_list<std::string>{
 				"gl_Position"s,
 				"varyingWingColor"s,
 				"varyingEdgeColor"s,
 			}
-		});
+		);
 		GLuint const vertexAttributeLocation{ wingTransformProgram->getAttributeLocation("vertex") };
 		glGenVertexArrays(1, &wingTransformVertexArray);
 		glBindVertexArray(wingTransformVertexArray);
@@ -263,7 +263,7 @@ void main() {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 
-		renderProgram.reset(new Program{
+		renderProgram = std::make_unique<Program>(
 			VertexShader{
 				R"shaderText(#version 410
 
@@ -316,7 +316,7 @@ void main() {
 )shaderText"s,
 			},
 			"fragmentColor"
-		});
+		);
 		glGenVertexArrays(1, &renderVertexArray);
 		glBindVertexArray(renderVertexArray);
 		glEnableVertexAttribArray(renderProgram->getAttributeLocation("vertex"s));
@@ -420,8 +420,8 @@ void main() {
 		glDeleteBuffers(1, &wingIndexBuffer);
 		glDeleteBuffers(1, &originalVertexBuffer);
 
-		wingTransformProgram.reset(nullptr);
-		renderProgram.reset(nullptr);
+		wingTransformProgram.release();
+		renderProgram.release();
 	}
 
 	void AdvanceAnimation(void)
