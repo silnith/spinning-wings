@@ -1,0 +1,436 @@
+<html>
+<head>
+<title>Analysis of OpenGL 1.1 versus OpenGL 3.2</title>
+</head>
+<body>
+
+    <p>
+        I would like to analyze what makes a programming API good versus bad.  I feel like a lot of new APIs lack wisdom and
+        foresight.  A good programming API should guide the programmer away from making mistakes and towards using the API correctly
+        and efficiently.  But it seems that a lot of APIs are designed by people who only think of how they personally would use the
+        API, while neglecting to consider how others may perceive it.  Towards this end I have spent the past couple months getting
+        back into my graduate school studies of computer graphics, in order to compare an API I consider to be one of the finest ever
+        created, namely OpenGL 1.x, against an API I consider to be truly terrible, namely OpenGL 3.x.
+    </p>
+
+    <p>
+        I have implemented a simple screensaver using different versions of the OpenGL API.  It consists of a bunch of solid-color
+        squares that spin around an invisible axis.  The point is not to make anything fancy, it is simply to exercise a theoretical 3D
+        graphics pipeline in its purest form.
+    </p>
+
+    <p>
+        First, a few ground rules.  The rendered output for all versions is absolutely identical.  There is no variation in where or
+        how computations are performed except where forced by fundamental changes in the OpenGL API itself.  The most important
+        consequence of this is that I purposely ignore the pervasive online advice and tutorials that all urge programmers to perform
+        vertex transformations on the CPU; the original version 1.0 of the OpenGL API was designed to facilitate handling all vertex
+        transformations by any available hardware, so I have maintained that discipline when rewriting my program to work on the newer
+        versions of the API.
+    </p>
+
+    <p>
+        Second, because the original version 1.0 of the OpenGL API included a highly versatile "call list" feature that allowed
+        pre-compiling sequences of state changes, transformations, and rendering commands and storing the result directly in the
+        "server" high-speed graphics memory, I have used the transform feedback mechanism to emulate what a high-quality implementation
+        of the original API would have been able to achieve.  Not all implementations provided such sophisticated support, but the API
+        was designed with the intention that such offerings could and would appear and so my rewrite stays consistent with that capability.
+    </p>
+
+    <p>Here are the two versions of the screensaver, with all extraneous code removed to leave only the direct uses of OpenGL itself.</p>
+
+    <h1>OpenGL 1.1 version</h1>
+
+    <p>Global initialization.</p>
+
+<pre><code>glGetString(GL_VERSION);
+glEnable(GL_DEPTH_TEST);
+glPolygonOffset(-0.5, -2);
+glEnable(GL_POLYGON_OFFSET_LINE);
+glLoadIdentity();
+gluLookAt(0, 50, 50,
+    0, 0, 13,
+    0, 0, 1);
+wingDisplayList = glGenLists(1);
+glNewList(wingDisplayList, GL_COMPILE);
+glBegin(GL_QUADS);
+glVertex2f(1, 1);
+glVertex2f(-1, 1);
+glVertex2f(-1, -1);
+glVertex2f(1, -1);
+glEnd();
+glEndList();
+rotatingWingDisplayLists = glGenLists(numWings);
+
+// Executed when the window changes size.
+glViewport(0, 0, width, height);
+glMatrixMode(GL_PROJECTION);
+glLoadIdentity();
+glOrtho(-26.6, 26.6, -20, 20, 35, 105);
+glMatrixMode(GL_MODELVIEW);
+</code></pre>
+
+    <p>Per-frame changes.</p>
+
+<pre><code>glNewList(displayList, GL_COMPILE);
+glPushMatrix();
+glRotatef(angle, 0, 0, 1);
+glTranslatef(radius, 0, 0);
+glRotatef(-yaw, 0, 0, 1);
+glRotatef(-pitch, 0, 1, 0);
+glRotatef(roll, 1, 0, 0);
+glCallList(wingDisplayList);
+glPopMatrix();
+glEndList();
+</code></pre>
+
+    <p>Drawing code.</p>
+
+<pre><code>glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+glPushMatrix();
+for (auto wing : wings) {
+    glTranslatef(0, 0, deltaZ);
+    glRotatef(deltaAngle, 0, 0, 1);
+    glColor3f(red, green, blue);
+    glCallList(displayList);
+}
+glPopMatrix();
+glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+glPushMatrix();
+for (auto wing : wings) {
+    glTranslatef(0, 0, deltaZ);
+    glRotatef(deltaAngle, 0, 0, 1);
+    glColor3f(red, green, blue);
+    glCallList(displayList);
+}
+glPopMatrix();
+glFlush();
+</code></pre>
+
+    <h2>Analysis</h2>
+
+    <p>
+        I believe the most prominent feature of this code is how virtually every API call is a direct expression of a concept that
+        is well-known to people who have studied 3D graphics.  All graphics programmers understand what a depth test is, because it is
+        an intrinsic part of a 3D pipeline.  No matter what programming API or hardware one decides to use, the 3D graphics code will
+        still make use of linear algebra to accomplish rotations and translations expressed as matrices.  The data to render will
+        always be represented as polygons specified by vertices.  Really the only concept that might be foreign to some would be the
+        concept of a "call list", but even that is a simple abstraction of "achieve the same result as if this sequence of other API
+        calls had been made."  (Some make the mistake of assuming that means the implementation must issue an exact duplicate of the
+        sequences of API calls, but the OpenGL implementation is only required to produce the same <em>result</em> as if that sequence
+        had been called.  Hence why creating a call list uses the term "compilation".)
+    </p>
+
+    <p>
+        Some may look at the drawing code and complain that all of the transformations are "slow" because they change the state of
+        the modelview matrix.  This would be a misunderstanding of the concept of a 3D graphics <strong>pipeline</strong>.  The 3D
+        pipeline was so-named because state changes like vertex colors and modelview transformations are designed to be pipelined.  The
+        reason that the drawing code iterates the list of wings twice is that changing the rendering mode from polygon fill to outline
+        and back is much more likely to trigger a pipeline flush than simply modifying the transformation matrices, because that
+        replaced one rasterization algorithm with another.  At least, that is how 3D hardware worked before it was all scrapped and
+        replaced with generic stream processors.  Which leads us to the next version of the code.
+    </p>
+
+    <h1>OpenGL 3.2 version</h1>
+
+    <p>Global initialization.</p>
+
+<pre><code>GLfloat const quadVertices[16]{ 1,1,-1,1,-1,-1,1,-1, };
+GLuint const quadIndices[4]{ 0,1,2,3 };
+GLfloat const identity[16]{ 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1, };
+
+glGetIntegerv(GL_MAJOR_VERSION, &glMajorVersion);
+glGetIntegerv(GL_MINOR_VERSION, &glMinorVersion);
+glEnable(GL_DEPTH_TEST);
+glPolygonOffset(0.5, 2);
+glEnable(GL_POLYGON_OFFSET_FILL);
+glGenBuffers(3 + 3 * numWings, bufferNames);
+glGenVertexArrays(2, vertexArrayNames);
+glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
+glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
+glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), quadIndices, GL_STATIC_DRAW);
+GLuint feedbackVertexShader = glCreateShader(GL_VERTEX_SHADER);
+glShaderSource(feedbackVertexShader, 1, source, nullptr);
+glCompileShader(feedbackVertexShader);
+glGetShaderiv(feedbackVertexShader, GL_INFO_LOG_LENGTH, &logSize);
+glGetShaderInfoLog(feedbackVertexShader, logSize, nullptr, log);
+glGetShaderiv(feedbackVertexShader, GL_COMPILE_STATUS, &compilationSuccess);
+GLuint feedbackProgram = glCreateProgram();
+GLchar const* varyings[3]{ "gl_Position","varyingWingColor","varyingEdgeColor", };
+glTransformFeedbackVaryings(feedbackProgram, 3, varyings, GL_SEPARATE_ATTRIBS);
+glAttachShader(feedbackProgram, feedbackVertexShader);
+glLinkProgram(feedbackProgram);
+glDetachShader(feedbackProgram, feedbackVertexShader);
+glGetProgramiv(feedbackProgram, GL_INFO_LOG_LENGTH, &logSize);
+glGetProgramInfoLog(feedbackProgram, logSize, nullptr, log);
+glGetProgramiv(feedbackProgram, GL_LINK_STATUS, &linkSuccess);
+glDeleteShader(feedbackVertexShader);
+glBindVertexArray(wingTransformVertexArray);
+vertexAttribLocation = glGetAttribLocation(feedbackProgram, "vertex");
+glEnableVertexAttribArray(vertexAttribLocation);
+GLuint renderVertexShader = glCreateShader(GL_VERTEX_SHADER);
+glShaderSource(renderVertexShader, 1, source, nullptr);
+glCompileShader(renderVertexShader);
+glGetShaderiv(renderVertexShader, GL_INFO_LOG_LENGTH, &logSize);
+glGetShaderInfoLog(renderVertexShader, logSize, nullptr, log);
+glGetShaderiv(renderVertexShader, GL_COMPILE_STATUS, &compilationSuccess);
+GLuint renderFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+glShaderSource(renderFragmentShader, 1, source, nullptr);
+glCompileShader(renderFragmentShader);
+glGetShaderiv(renderFragmentShader, GL_INFO_LOG_LENGTH, &logSize);
+glGetShaderInfoLog(renderFragmentShader, logSize, nullptr, log);
+glGetShaderiv(renderFragmentShader, GL_COMPILE_STATUS, &compilationSuccess);
+GLuint renderProgram = glCreateProgram();
+glBindFragDataLocation(renderProgram, 0, "fragmentColor");
+glAttachShader(renderProgram, renderVertexShader);
+glAttachShader(renderProgram, renderFragmentShader);
+glLinkProgram(renderProgram);
+glDetachShader(renderProgram, renderFragmentShader);
+glDetachShader(renderProgram, renderVertexShader);
+glGetProgramiv(renderProgram, GL_INFO_LOG_LENGTH, &logSize);
+glGetProgramInfoLog(renderProgram, logSize, nullptr, log);
+glGetProgramiv(renderProgram, GL_LINK_STATUS, &linkSuccess);
+glDeleteShader(renderVertexShader);
+glDeleteShader(renderFragmentShader);
+glBindVertexArray(renderVertexArray);
+vertexAttribLocation = glGetAttribLocation(renderProgram, "vertex");
+colorAttribLocation = glGetAttribLocation(renderProgram, "color");
+glEnableVertexAttribArray(vertexAttribLocation);
+glEnableVertexAttribArray(colorAttribLocation);
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
+GLuint blockIndex = glGetUniformBlockIndex(renderProgram, "ModelViewProjection");
+glUniformBlockBinding(renderProgram, blockIndex, modelViewProjectionBindingIndex);
+GLchar const* names[3]{ "model", "view", "projection" };
+glGetUniformIndices(renderProgram, 3, names, uniformIndices);
+glGetActiveUniformsiv(renderProgram, 3, uniformIndices, GL_UNIFORM_OFFSET, uniformOffsets);
+glGetActiveUniformBlockiv(renderProgram, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &modelViewProjectionUniformDataSize);
+glBindBufferBase(GL_UNIFORM_BUFFER, modelViewProjectionBindingIndex, modelViewProjectionUniformBuffer);
+glBindBuffer(GL_UNIFORM_BUFFER, modelViewProjectionUniformBuffer);
+glBufferData(GL_UNIFORM_BUFFER, modelViewProjectionUniformDataSize, nullptr, GL_STATIC_DRAW);
+glBufferSubData(GL_UNIFORM_BUFFER, uniformOffsets[0], sizeof(identity), identity);
+GLfloat const view[16]{ /* implement your own gluLookAt */ };
+glBufferSubData(GL_UNIFORM_BUFFER, uniformOffsets[1], sizeof(view), view);
+for (auto wing : wings) {
+    glBindBuffer(GL_ARRAY_BUFFER, wingVertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * numVertices, nullptr, GL_STREAM_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, wingColorBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * numVertices, nullptr, GL_STREAM_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, wingEdgeColorBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * numVertices, nullptr, GL_STREAM_DRAW);
+}
+
+// Executed when the window changes size.
+glViewport(0, 0, width, height);
+GLfloat const projection[16]{ /* implement your own glOrtho */ };
+glBindBuffer(GL_UNIFORM_BUFFER, modelViewProjectionUniformBuffer);
+glBufferSubData(GL_UNIFORM_BUFFER, uniformOffsets[2], sizeof(projection), projection);
+</code></pre>
+
+    <p>Per-frame vertex shader for transform feedback.</p>
+
+<pre><code>#version 150
+
+uniform vec2 radiusAngle;
+uniform vec3 rollPitchYaw;
+uniform vec3 color;
+uniform vec3 edgeColor = vec3(1, 1, 1);
+
+in vec4 vertex;
+
+smooth out vec3 varyingWingColor;
+smooth out vec3 varyingEdgeColor;
+
+mat4 rotate(in float angle, in vec3 axis) {
+    float c = cos(radians(angle));
+    float s = sin(radians(angle));
+    mat3 initial = outerProduct(axis, axis)
+                   * (1 - c);
+    mat3 c_part = mat3(c);
+    mat3 s_part = mat3(0, axis.z, -axis.y,
+                       -axis.z, 0, axis.x,
+                       axis.y, -axis.x, 0)
+                  * s;
+    mat3 temp = initial + c_part + s_part;
+    mat4 rotation = mat4(1.0);
+    rotation[0].xyz = temp[0];
+    rotation[1].xyz = temp[1];
+    rotation[2].xyz = temp[2];
+    return rotation;
+}
+
+mat4 translate(in vec3 move) {
+    mat4 trans = mat4(1.0);
+    trans[3].xyz = move;
+    return trans;
+}
+
+const vec3 xAxis = vec3(1, 0, 0);
+const vec3 yAxis = vec3(0, 1, 0);
+const vec3 zAxis = vec3(0, 0, 1);
+
+void main() {
+    float radius = radiusAngle[0];
+    float angle = radiusAngle[1];
+    float roll = rollPitchYaw[0];
+    float pitch = rollPitchYaw[1];
+    float yaw = rollPitchYaw[2];
+
+    varyingWingColor = color;
+    varyingEdgeColor = edgeColor;
+
+    mat4 wingTransformation = rotate(angle, zAxis)
+                              * translate(vec3(radius, 0, 0))
+                              * rotate(-yaw, zAxis)
+                              * rotate(-pitch, yAxis)
+                              * rotate(roll, xAxis);
+    gl_Position = wingTransformation * vertex;
+}
+</code></pre>
+
+    <p>Per-frame changes.</p>
+
+<pre><code>GLint radiusAngleUniformLocation = glGetUniformLocation(transformProgram, "radiusAngle");
+GLint rollPitchYawUniformLocation = glGetUniformLocation(transformProgram, "rollPitchYaw");
+GLint colorUniformLocation = glGetUniformLocation(transformProgram, "color");
+GLint edgeColorUniformLocation = glGetUniformLocation(transformProgram, "edgeColor");
+GLuint vertexAttributeLocation = glGetAttribLocation(transformProgram, "vertex");
+
+glUseProgram(transformProgram);
+glUniform2f(radiusAngleUniformLocation, radius, angle);
+glUniform3f(rollPitchYawUniformLocation, roll, pitch, yaw);
+glUniform3f(colorUniformLocation, red, green, blue);
+glUniform3f(edgeColorUniformLocation, edgeRed, edgeGreen, edgeBlue);
+glBindVertexArray(wingTransformVertexArray);
+glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
+glVertexAttribPointer(vertexAttributeLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
+glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, wingVertexBuffer);
+glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, wingColorBuffer);
+glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 2, wingEdgeColorBuffer);
+glBeginTransformFeedback(GL_POINTS);
+glDrawArrays(GL_POINTS, 0, numVertices);
+glEndTransformFeedback();
+</code></pre>
+
+    <p>Drawing vertex shader.</p>
+
+<pre><code>#version 150
+
+uniform ModelViewProjection {
+    mat4 model;
+    mat4 view;
+    mat4 projection;
+};
+
+uniform vec2 deltaZ = vec2(15, 0.5);
+
+in vec4 vertex;
+in vec4 color;
+
+smooth out vec4 varyingColor;
+
+mat4 rotate(in float angle, in vec3 axis) {
+    float c = cos(radians(angle));
+    float s = sin(radians(angle));
+    mat3 initial = outerProduct(axis, axis)
+                   * (1 - c);
+    mat3 c_part = mat3(c);
+    mat3 s_part = mat3(0, axis.z, -axis.y,
+                       -axis.z, 0, axis.x,
+                       axis.y, -axis.x, 0)
+                  * s;
+    mat3 temp = initial + c_part + s_part;
+    mat4 rotation = mat4(1.0);
+    rotation[0].xyz = temp[0];
+    rotation[1].xyz = temp[1];
+    rotation[2].xyz = temp[2];
+    return rotation;
+}
+
+mat4 translate(in vec3 move) {
+    mat4 trans = mat4(1.0);
+    trans[3].xyz = move;
+    return trans;
+}
+
+const vec3 xAxis = vec3(1, 0, 0);
+const vec3 yAxis = vec3(0, 1, 0);
+const vec3 zAxis = vec3(0, 0, 1);
+
+void main() {
+    float deltaAngle = deltaZ[0];
+    float deltaZ = deltaZ[1];
+
+    mat4 modelViewProjection = projection * view * model;
+
+    varyingColor = color;
+    gl_Position = modelViewProjection
+                  * translate(vec3(0, 0, deltaZ))
+                  * rotate(deltaAngle, zAxis)
+                  * vertex;
+}
+</code></pre>
+
+    <p>Drawing fragment shader.</p>
+
+<pre><code>#version 150
+
+smooth in vec4 varyingColor;
+
+out vec4 fragmentColor;
+
+void main() {
+    fragmentColor = varyingColor;
+}
+</code></pre>
+
+    <p>Drawing code.</p>
+
+<pre><code>GLint deltaZUniformLocation = glGetUniformLocation(renderProgram, "deltaZ");
+GLuint vertexAttribLocation = glGetAttribLocation(renderProgram, "vertex");
+GLuint colorAttribLocation = glGetAttribLocation(renderProgram, "color");
+
+glUseProgram(renderProgram);
+glBindVertexArray(renderVertexArray);
+glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+for (auto wing : wings) {
+    glUniform2f(deltaZUniformLocation, deltaAngle, deltaZ);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glVertexAttribPointer(vertexAttribLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, edgeColorBuffer);
+    glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glDrawElements(GL_LINE_LOOP, numIndices, GL_UNSIGNED_INT, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+    glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glDrawElements(GL_TRIANGLE_FAN, numIndices, GL_UNSIGNED_INT, 0);
+}
+glFlush();
+</code></pre>
+
+    <h2>Analysis</h2>
+
+    <p>
+        What strikes me the most about this code is how little of it actually has to do with rendering 3D graphics.  Instead, it is
+        almost entirely devoted to allocating and managing memory buffers.  What little remains in it of actual 3D graphics and linear
+        algebra is mostly places where standard functionality that used to be provided by the API is instead forced back onto the
+        programmer.  All of the matrix transformations must be re-implemented in every program instead of one single, shared, optimized
+        implementation being provided.  And as I had previously indicated, this has resulted in the overwhelming majority of
+        educational material repeating the terrible mistake of moving these calculations away from the specialized hardware designed
+        for efficient matrix computations and instead dumping them back on the general-purpose CPU with its slow shared memory.
+    </p>
+
+    <p>
+        But in my mind this is not actually the primary sin of version 3.2 of the OpenGL API.  No, that sin is the sheer number of
+        opportunities that the "updated" version of the API provides for the programmer to make terrible mistakes.  As I pointed out,
+        the majority of the API calls in this "newer" version of the API are for managing memory buffers.  That means we now have to
+        deal with all of the potential problems and pitfalls inherent in memory management.  We have uninitialized memory, we have
+        buffer overruns, we have data format mismatches, and we have to deal with all of these problems in an environment where we
+        (by design) cannot even guarantee we can view the memory we are managing in order to debug our mistakes!  Meanwhile, back in
+        OpenGL 1.0 land, the API rigidly constrained the structure and format of data that we could pass in.  When writing the
+        OpenGL 1.1 version of the screensaver, the worst problem I had to deal with was polygons appearing in the wrong position on
+        screen or possibly not at all.  When writing the OpenGL 3.2 version, I had nasty crashes where the video driver would segfault,
+        not even giving me a stack trace into my own program.
+    </p>
+
+</body>
+</html>

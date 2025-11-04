@@ -159,7 +159,11 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="Analysis.html" />
+    <None Include="feedback.glsl" />
     <None Include="packages.config" />
+    <None Include="render.fragment.glsl" />
+    <None Include="render.vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FragmentShader.h" />

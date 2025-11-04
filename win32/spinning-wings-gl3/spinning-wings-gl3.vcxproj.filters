@@ -16,6 +16,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Analysis.html" />
+    <None Include="feedback.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="render.fragment.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="render.vertex.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FragmentShader.h">
