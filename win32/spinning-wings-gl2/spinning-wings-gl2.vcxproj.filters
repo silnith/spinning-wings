@@ -44,14 +44,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="vertex.glsl">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="fragment.glsl">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="packages.config" />
     <None Include="Comparison.html" />
+    <None Include="fragment.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="vertex.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WingsViewGL2.h">
