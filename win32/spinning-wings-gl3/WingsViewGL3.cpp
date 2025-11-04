@@ -388,16 +388,6 @@ void main() {
 
 	void CleanupOpenGLState(void)
 	{
-		for (wing_list::const_reference wing : wings)
-		{
-			GLuint const vertexBuffer{ wing.getVertexBuffer() };
-			GLuint const colorBuffer{ wing.getColorBuffer() };
-			GLuint const edgeColorBuffer{ wing.getEdgeColorBuffer() };
-			glDeleteBuffers(1, &vertexBuffer);
-			glDeleteBuffers(1, &colorBuffer);
-			glDeleteBuffers(1, &edgeColorBuffer);
-		}
-
 		glDeleteBuffers(1, &modelViewProjectionUniformBuffer);
 
 		glDeleteVertexArrays(1, &renderVertexArray);
