@@ -23,6 +23,9 @@
 #include "Program.h"
 #include "VertexShader.h"
 
+#include "IndexDataBuffer.h"
+#include "OriginalVertexBuffer.h"
+
 using namespace std::literals::string_literals;
 
 namespace silnith::wings::gl3
@@ -57,11 +60,11 @@ namespace silnith::wings::gl3
 	/// The initial untransformed vertices for a single quad.
 	/// After binding, enable using <c>glVertexAttribPointer(..., 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0)</c>.
 	/// </summary>
-	GLuint originalVertexBuffer{ 0 };
+	std::unique_ptr<OriginalVertexBuffer> originalVertexBuffer{ nullptr };
 	/// <summary>
 	/// The indices into <c>originalVertexBuffer</c>.
 	/// </summary>
-	GLuint wingIndexBuffer{ 0 };
+	std::unique_ptr<IndexDataBuffer> wingIndexBuffer{ nullptr };
 	/// <summary>
 	/// The vertex array used for transform feedback.
 	/// This maintains the state of the enabled vertex attributes.
@@ -151,33 +154,8 @@ namespace silnith::wings::gl3
 		 * Set up the pieces needed to render one single
 		 * (untransformed, uncolored) wing.
 		 */
-		{
-			std::array<GLfloat, 2 * numVertices> constexpr quadVertices{
-				1, 1,
-				-1, 1,
-				-1, -1,
-				1, -1,
-			};
-			GLsizeiptr constexpr quadVerticesDataSize{ sizeof(GLfloat) * quadVertices.size() };
-
-			glGenBuffers(1, &originalVertexBuffer);
-			glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
-			glBufferData(GL_ARRAY_BUFFER, quadVerticesDataSize, quadVertices.data(), GL_STATIC_DRAW);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-		}
-
-		{
-			std::array<GLuint, numIndices> constexpr quadIndices{
-				0, 1, 2, 3,
-			};
-			GLsizeiptr constexpr quadIndicesDataSize{ sizeof(GLuint) * quadIndices.size() };
-			// TODO: static_assert that each index is less than numVertices
-
-			glGenBuffers(1, &wingIndexBuffer);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesDataSize, quadIndices.data(), GL_STATIC_DRAW);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		}
+		originalVertexBuffer = std::make_unique<OriginalVertexBuffer>();
+		wingIndexBuffer = std::make_unique<IndexDataBuffer>();
 
 		std::string const rotateMatrixFunctionDeclaration{
 			R"shaderText(
@@ -333,7 +311,7 @@ void main() {
 		glBindVertexArray(renderVertexArray);
 		glEnableVertexAttribArray(renderProgram->getAttributeLocation("vertex"));
 		glEnableVertexAttribArray(renderProgram->getAttributeLocation("color"));
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer->getId());
 		glBindVertexArray(0);
 
 		GLsizei dataSize{ 0 };
@@ -425,8 +403,8 @@ void main() {
 		glDeleteVertexArrays(1, &renderVertexArray);
 		glDeleteVertexArrays(1, &wingTransformVertexArray);
 
-		glDeleteBuffers(1, &wingIndexBuffer);
-		glDeleteBuffers(1, &originalVertexBuffer);
+		wingIndexBuffer.release();
+		originalVertexBuffer.release();
 
 		wingTransformProgram.release();
 		renderProgram.release();
@@ -490,8 +468,13 @@ void main() {
 
 		glBindVertexArray(wingTransformVertexArray);
 
-		glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
-		glVertexAttribPointer(wingTransformProgram->getAttributeLocation("vertex"), 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer->getId());
+		glVertexAttribPointer(wingTransformProgram->getAttributeLocation("vertex"),
+			OriginalVertexBuffer::numCoordinatesPerVertex,
+			OriginalVertexBuffer::vertexCoordinateDataType,
+			GL_FALSE,
+			OriginalVertexBuffer::vertexStride,
+			0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, wingVertexBuffer);
@@ -499,7 +482,7 @@ void main() {
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 2, wingEdgeColorBuffer);
 
 		glBeginTransformFeedback(GL_POINTS);
-		glDrawArrays(GL_POINTS, 0, numVertices);
+		glDrawArrays(GL_POINTS, 0, OriginalVertexBuffer::numVertices);
 		glEndTransformFeedback();
 
 		glBindVertexArray(0);
@@ -529,14 +512,14 @@ void main() {
 			glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glDrawElements(GL_TRIANGLE_FAN, numIndices, GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLE_FAN, IndexDataBuffer::numIndices, IndexDataBuffer::quadIndexDataType, 0);
 
 			glBindBuffer(GL_ARRAY_BUFFER, wing.getEdgeColorBuffer());
 			glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glEnable(GL_BLEND);
-			glDrawElements(GL_LINE_LOOP, numIndices, GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_LINE_LOOP, IndexDataBuffer::numIndices, IndexDataBuffer::quadIndexDataType, 0);
 			glDisable(GL_BLEND);
 		}
 

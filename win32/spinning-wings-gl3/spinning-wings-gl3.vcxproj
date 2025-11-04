@@ -167,6 +167,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FragmentShader.h" />
+    <ClInclude Include="IndexDataBuffer.h" />
+    <ClInclude Include="OriginalVertexBuffer.h" />
     <ClInclude Include="Program.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />
