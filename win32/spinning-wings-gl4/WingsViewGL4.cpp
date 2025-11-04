@@ -108,6 +108,9 @@ namespace silnith::wings::gl4
 		glGetIntegerv(GL_MAJOR_VERSION, &glMajorVersion);
 		glGetIntegerv(GL_MINOR_VERSION, &glMinorVersion);
 
+		/*
+		 * Depth testing is a basic requirement when using a depth buffer.
+		 */
 		glEnable(GL_DEPTH_TEST);
 
 		glPolygonOffset(0.5, 2);
@@ -119,11 +122,18 @@ namespace silnith::wings::gl4
 		glEnable(GL_POLYGON_SMOOTH);
 		glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
+		/*
+		 * Set up the initial camera position.
+		 */
 		glm::mat4 const view2{ glm::lookAt(
 			glm::vec3{ 0, 50, 50 },
 			glm::vec3{ 0, 0, 13 },
 			glm::vec3{ 0, 0, 1 }) };
 
+		/*
+		 * Set up the pieces needed to render one single
+		 * (untransformed, uncolored) wing.
+		 */
 		{
 			std::array<GLfloat, 2 * numVertices> constexpr quadVertices{
 				1, 1,
@@ -530,8 +540,22 @@ void main() {
 		glFlush();
 	}
 
+	/// <summary>
+	/// Sets up the orthographic projection that transforms modelview coordinates
+	/// into normalized device coordinates.
+	/// This takes into account the aspect ratio of the viewport.
+	/// </summary>
+	/// <param name="width">The viewport width.</param>
+	/// <param name="height">The viewport height.</param>
 	void Ortho(GLfloat const width, GLfloat const height)
 	{
+		/*
+		 * These multipliers account for the aspect ratio of the window, so that
+		 * the rendering does not distort.  The conditional is so that the larger
+		 * number is always divided by the smaller, resulting in a multiplier no
+		 * less than one.  This way, the viewing area is always expanded rather than
+		 * contracted, and the expected viewing frustum is never clipped.
+		 */
 		GLfloat xmult{ 1.0 };
 		GLfloat ymult{ 1.0 };
 		if (width > height)
@@ -543,6 +567,10 @@ void main() {
 			ymult = height / width;
 		}
 
+		/*
+		 * The view frustum was hand-selected to match the parameters to the
+		 * curve generators and the initial camera position.
+		 */
 		GLfloat constexpr defaultLeft{ -20 };
 		GLfloat constexpr defaultRight{ 20 };
 		GLfloat constexpr defaultBottom{ -20 };
@@ -565,6 +593,11 @@ void main() {
 		assert(viewHeight > 0);
 		assert(viewDepth > 0);
 
+		/*
+		 * Set up the projection matrix.
+		 * The projection matrix is only used for the viewing frustum.
+		 * Things like camera position belong in the modelview matrix.
+		 */
 		std::array<GLfloat, 16> const projection{
 			// column 0
 			static_cast<GLfloat>(2) / viewWidth,
@@ -604,6 +637,12 @@ void main() {
 
 	void Resize(GLint x, GLint y, GLsizei width, GLsizei height)
 	{
+		/*
+		 * The projection matrix transforms the fragment coordinates to the
+		 * scale of [-1, 1], called "normalized device coordinates".
+		 * The viewport transforms those into the coordinates expected by the
+		 * windowing system.
+		 */
 		glViewport(x, y, width, height);
 
 		Ortho(static_cast<GLfloat>(width), static_cast<GLfloat>(height));

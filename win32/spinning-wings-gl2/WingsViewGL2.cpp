@@ -28,14 +28,26 @@ namespace silnith::wings::gl2
 	WingsViewGL2::WingsViewGL2(silnith::wings::gl::GLInfo const & glInfo) :
 		enablePolygonOffset{ glInfo.isAtLeastVersion(1, 1) }
 	{
+		/*
+		 * Depth testing is a basic requirement when using a depth buffer.
+		 */
 		glEnable(GL_DEPTH_TEST);
 		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
 		if (enablePolygonOffset)
 		{
+			/*
+			 * The edge of each wing is rendered using polygon offset to prevent
+			 * Z-fighting.
+			 */
 			glPolygonOffset(-0.5, -2);
 			glEnable(GL_POLYGON_OFFSET_LINE);
 
+			/*
+			 * The wing edges are rendered with smoothing enabled (antialiasing).
+			 * This generates multiple fragments per line step with alpha values
+			 * less than one, so blending is required for it to look correct.
+			 */
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			glEnable(GL_LINE_SMOOTH);
@@ -43,11 +55,18 @@ namespace silnith::wings::gl2
 			glLineWidth(1.0);
 		}
 
+		/*
+		 * Set up the initial camera position.
+		 */
 		glLoadIdentity();
 		gluLookAt(0, 50, 50,
 			0, 0, 13,
 			0, 0, 1);
 
+		/*
+		 * Set up the pieces needed to render one single
+		 * (untransformed, uncolored) wing.
+		 */
 		if (glInfo.isAtLeastVersion(1, 5))
 		{
 			quadRenderer = std::make_unique<silnith::wings::gl::QuadRendererGL15>();
@@ -325,6 +344,11 @@ void main() {
 			ymult = static_cast<GLdouble>(height) / static_cast<GLdouble>(width);
 		}
 
+		/*
+		 * Set up the projection matrix.
+		 * The projection matrix is only used for the viewing frustum.
+		 * Things like camera position belong in the modelview matrix.
+		 */
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		glOrtho(defaultLeft * xmult, defaultRight * xmult,
