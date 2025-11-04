@@ -50,12 +50,82 @@ namespace silnith::wings::gl3
 		{}
 
 		/// <summary>
+		/// Creates a new wing with the provided parameters.
+		/// </summary>
+		/// <param name="vertexBuffer">The vertex buffer to reuse for this wing.</param>
+		/// <param name="colorBuffer">The color buffer to reuse.</param>
+		/// <param name="edgeColorBuffer">The edge color buffer to reuse.</param>
+		/// <param name="deltaAngle">The additional angle around the central axis as the wing recedes into history.</param>
+		/// <param name="deltaZ">The additional height along the central axis as the wing recedes into history.</param>
+		Wing(std::shared_ptr<TransformedVertexBuffer> const& vertexBuffer,
+			std::shared_ptr<TransformedColorBuffer> const& colorBuffer,
+			std::shared_ptr<TransformedColorBuffer> const& edgeColorBuffer,
+			T deltaAngle, T deltaZ) noexcept
+			: vertexBuffer{ vertexBuffer },
+			colorBuffer{ colorBuffer },
+			edgeColorBuffer{ edgeColorBuffer },
+			deltaAngle{ deltaAngle },
+			deltaZ{ deltaZ }
+		{}
+
+		/// <summary>
+		/// Returns the vertex buffer.  This is only used to hand off ownership
+		/// to a new wing before this one is destroyed.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// This should be removed once I become comfortable with how to use
+		/// unique pointers to transfer ownership out of an object.
+		/// </para>
+		/// </remarks>
+		/// <returns>A shared pointer to the buffer.</returns>
+		[[nodiscard]]
+		inline std::shared_ptr<TransformedVertexBuffer> getVertexBuffer(void) const noexcept
+		{
+			return vertexBuffer;
+		}
+
+		/// <summary>
+		/// Returns the color buffer.  This is only used to hand off ownership
+		/// to a new wing before this one is destroyed.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// This should be removed once I become comfortable with how to use
+		/// unique pointers to transfer ownership out of an object.
+		/// </para>
+		/// </remarks>
+		/// <returns>A shared pointer to the buffer.</returns>
+		[[nodiscard]]
+		inline std::shared_ptr<TransformedColorBuffer> getColorBuffer(void) const noexcept
+		{
+			return colorBuffer;
+		}
+
+		/// <summary>
+		/// Returns the edge color buffer.  This is only used to hand off ownership
+		/// to a new wing before this one is destroyed.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// This should be removed once I become comfortable with how to use
+		/// unique pointers to transfer ownership out of an object.
+		/// </para>
+		/// </remarks>
+		/// <returns>A shared pointer to the buffer.</returns>
+		[[nodiscard]]
+		inline std::shared_ptr<TransformedColorBuffer> getEdgeColorBuffer(void) const noexcept
+		{
+			return edgeColorBuffer;
+		}
+
+		/// <summary>
 		/// Returns the OpenGL vertex buffer identifier for this wing.
 		/// The vertex buffer will be populated using transform feedback.
 		/// </summary>
 		/// <returns>The OpenGL vertex buffer identifier.</returns>
 		[[nodiscard]]
-		inline GLuint getVertexBuffer(void) const noexcept
+		inline GLuint getVertexBufferId(void) const noexcept
 		{
 			return vertexBuffer->getId();
 		}
@@ -65,7 +135,7 @@ namespace silnith::wings::gl3
 		/// </summary>
 		/// <returns>The OpenGL color buffer identifier.</returns>
 		[[nodiscard]]
-		inline GLuint getColorBuffer(void) const noexcept
+		inline GLuint getColorBufferId(void) const noexcept
 		{
 			return colorBuffer->getId();
 		}
@@ -75,7 +145,7 @@ namespace silnith::wings::gl3
 		/// </summary>
 		/// <returns>The OpenGL edge color buffer identifier.</returns>
 		[[nodiscard]]
-		inline GLuint getEdgeColorBuffer(void) const noexcept
+		inline GLuint getEdgeColorBufferId(void) const noexcept
 		{
 			return edgeColorBuffer->getId();
 		}
@@ -101,9 +171,9 @@ namespace silnith::wings::gl3
 		}
 
 	private:
-		std::unique_ptr<TransformedVertexBuffer> vertexBuffer{ std::make_unique<TransformedVertexBuffer>() };
-		std::unique_ptr<TransformedColorBuffer> colorBuffer{ std::make_unique<TransformedColorBuffer>() };
-		std::unique_ptr<TransformedColorBuffer> edgeColorBuffer{ std::make_unique<TransformedColorBuffer>() };
+		std::shared_ptr<TransformedVertexBuffer> vertexBuffer{ std::make_shared<TransformedVertexBuffer>() };
+		std::shared_ptr<TransformedColorBuffer> colorBuffer{ std::make_shared<TransformedColorBuffer>() };
+		std::shared_ptr<TransformedColorBuffer> edgeColorBuffer{ std::make_shared<TransformedColorBuffer>() };
 		T const deltaAngle{ 15 };
 		T const deltaZ{ 0.5 };
 	};

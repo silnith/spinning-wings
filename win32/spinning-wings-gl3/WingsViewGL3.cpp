@@ -414,17 +414,28 @@ void main() {
 		GLfloat const blue{ blueCurve.getNextValue() };
 
 		if (wings.empty() || wings.size() < numWings)
-		{}
+		{
+			wings.emplace_front(deltaAngle, deltaZ);
+		}
 		else
 		{
+			std::shared_ptr<TransformedVertexBuffer> vertexBuffer{ nullptr };
+			std::shared_ptr<TransformedColorBuffer> colorBuffer{ nullptr };
+			std::shared_ptr<TransformedColorBuffer> edgeColorBuffer{ nullptr };
+			// This block is simply so lastWing goes out of scope before the pop_back.
+			{
+				wing_list::const_reference lastWing{ wings.back() };
+				vertexBuffer = lastWing.getVertexBuffer();
+				colorBuffer = lastWing.getColorBuffer();
+				edgeColorBuffer = lastWing.getEdgeColorBuffer();
+			}
 			wings.pop_back();
+			wings.emplace_front(vertexBuffer, colorBuffer, edgeColorBuffer, deltaAngle, deltaZ);
 		}
 
-		Wing<GLfloat> const& newWing{ wings.emplace_front(deltaAngle, deltaZ) };
-
-		GLuint const wingVertexBuffer{ newWing.getVertexBuffer() };
-		GLuint const wingColorBuffer{ newWing.getColorBuffer() };
-		GLuint const wingEdgeColorBuffer{ newWing.getEdgeColorBuffer() };
+		GLuint const wingVertexBufferId{ wings.front().getVertexBufferId() };
+		GLuint const wingColorBufferId{ wings.front().getColorBufferId() };
+		GLuint const wingEdgeColorBufferId{ wings.front().getEdgeColorBufferId() };
 
 		wingTransformProgram->useProgram();
 		glUniform2f(wingTransformProgram->getUniformLocation("radiusAngle"), radius, angle);
@@ -446,9 +457,9 @@ void main() {
 		static_assert(TransformedVertexBuffer::numVertices == OriginalVertexBuffer::numVertices);
 		static_assert(TransformedColorBuffer::numVertices == OriginalVertexBuffer::numVertices);
 
-		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, wingVertexBuffer);
-		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, wingColorBuffer);
-		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 2, wingEdgeColorBuffer);
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, wingVertexBufferId);
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, wingColorBufferId);
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 2, wingEdgeColorBufferId);
 
 		glBeginTransformFeedback(GL_POINTS);
 		glDrawArrays(GL_POINTS, 0, OriginalVertexBuffer::numVertices);
@@ -473,7 +484,7 @@ void main() {
 
 			glUniform2f(renderProgram->getUniformLocation("deltaZ"), deltaAngle, deltaZ);
 
-			glBindBuffer(GL_ARRAY_BUFFER, wing.getVertexBuffer());
+			glBindBuffer(GL_ARRAY_BUFFER, wing.getVertexBufferId());
 			glVertexAttribPointer(vertexAttribLocation,
 				TransformedVertexBuffer::numCoordinatesPerVertex,
 				TransformedVertexBuffer::vertexCoordinateDataType,
@@ -482,7 +493,7 @@ void main() {
 				0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glBindBuffer(GL_ARRAY_BUFFER, wing.getColorBuffer());
+			glBindBuffer(GL_ARRAY_BUFFER, wing.getColorBufferId());
 			glVertexAttribPointer(colorAttribLocation,
 				TransformedColorBuffer::numCoordinatesPerVertex,
 				TransformedColorBuffer::vertexCoordinateDataType,
@@ -493,7 +504,7 @@ void main() {
 
 			glDrawElements(GL_TRIANGLE_FAN, IndexDataBuffer::numIndices, IndexDataBuffer::quadIndexDataType, 0);
 
-			glBindBuffer(GL_ARRAY_BUFFER, wing.getEdgeColorBuffer());
+			glBindBuffer(GL_ARRAY_BUFFER, wing.getEdgeColorBufferId());
 			glVertexAttribPointer(colorAttribLocation,
 				TransformedColorBuffer::numCoordinatesPerVertex,
 				TransformedColorBuffer::vertexCoordinateDataType,
