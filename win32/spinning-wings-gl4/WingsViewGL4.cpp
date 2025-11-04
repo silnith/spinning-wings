@@ -17,6 +17,8 @@
 #include "Program.h"
 #include "VertexShader.h"
 
+using namespace std::literals::string_literals;
+
 namespace silnith::wings::gl4
 {
 
@@ -185,7 +187,7 @@ mat4 rotate(in float angle, in vec3 axis) {
 
     return rotation;
 }
-)shaderText"
+)shaderText"s
 		};
 		std::string const translateMatrixFunctionDeclaration{
 			R"shaderText(
@@ -194,14 +196,14 @@ mat4 translate(in vec3 move) {
     trans[3].xyz = move;
     return trans;
 }
-)shaderText"
+)shaderText"s
 		};
 		std::string const scaleMatrixFunctionDeclaration{
 			R"shaderText(
 mat4 scale(in vec3 factor) {
     return mat4(vec4(factor, 1));
 }
-)shaderText"
+)shaderText"s
 		};
 
 		wingTransformProgram.reset(new Program{
@@ -242,14 +244,14 @@ void main() {
                               * rotate(roll, xAxis);
     gl_Position = wingTransformation * vertex;
 }
-)shaderText",
+)shaderText"s,
 				rotateMatrixFunctionDeclaration,
 				translateMatrixFunctionDeclaration,
 			},
 			{
-				"gl_Position",
-				"varyingWingColor",
-				"varyingEdgeColor",
+				"gl_Position"s,
+				"varyingWingColor"s,
+				"varyingEdgeColor"s,
 			}
 		});
 		GLuint const vertexAttributeLocation{ wingTransformProgram->getAttributeLocation("vertex") };
@@ -297,7 +299,7 @@ void main() {
                   * rotate(deltaAngle, zAxis)
                   * vertex;
 }
-)shaderText",
+)shaderText"s,
 				rotateMatrixFunctionDeclaration,
 				translateMatrixFunctionDeclaration,
 			},
@@ -311,14 +313,14 @@ out vec4 fragmentColor;
 void main() {
     fragmentColor = varyingColor;
 }
-)shaderText",
+)shaderText"s,
 			},
 			"fragmentColor"
 		});
 		glGenVertexArrays(1, &renderVertexArray);
 		glBindVertexArray(renderVertexArray);
-		glEnableVertexAttribArray(renderProgram->getAttributeLocation("vertex"));
-		glEnableVertexAttribArray(renderProgram->getAttributeLocation("color"));
+		glEnableVertexAttribArray(renderProgram->getAttributeLocation("vertex"s));
+		glEnableVertexAttribArray(renderProgram->getAttributeLocation("color"s));
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
 		glBindVertexArray(0);
 
@@ -435,10 +437,10 @@ void main() {
 		GLfloat const green{ greenCurve.getNextValue() };
 		GLfloat const blue{ blueCurve.getNextValue() };
 
-		glProgramUniform2f(wingTransformProgram->getProgram(), wingTransformProgram->getUniformLocation("radiusAngle"), radius, angle);
-		glProgramUniform3f(wingTransformProgram->getProgram(), wingTransformProgram->getUniformLocation("rollPitchYaw"), roll, pitch, yaw);
-		glProgramUniform3f(wingTransformProgram->getProgram(), wingTransformProgram->getUniformLocation("color"), red, green, blue);
-		//glProgramUniform3f(wingTransformProgram->getProgram(), wingTransformProgram->getUniformLocation("edgeColor"), 1, 1, 1);
+		glProgramUniform2f(wingTransformProgram->getProgram(), wingTransformProgram->getUniformLocation("radiusAngle"s), radius, angle);
+		glProgramUniform3f(wingTransformProgram->getProgram(), wingTransformProgram->getUniformLocation("rollPitchYaw"s), roll, pitch, yaw);
+		glProgramUniform3f(wingTransformProgram->getProgram(), wingTransformProgram->getUniformLocation("color"s), red, green, blue);
+		//glProgramUniform3f(wingTransformProgram->getProgram(), wingTransformProgram->getUniformLocation("edgeColor"s), 1, 1, 1);
 
 		GLuint wingVertexBuffer{ 0 };
 		GLuint wingColorBuffer{ 0 };
@@ -505,8 +507,8 @@ void main() {
 	void DrawFrame(void)
 	{
 		renderProgram->useProgram();
-		GLuint const vertexAttribLocation{ renderProgram->getAttributeLocation("vertex") };
-		GLuint const colorAttribLocation{ renderProgram->getAttributeLocation("color") };
+		GLuint const vertexAttribLocation{ renderProgram->getAttributeLocation("vertex"s) };
+		GLuint const colorAttribLocation{ renderProgram->getAttributeLocation("color"s) };
 
 		glBindVertexArray(renderVertexArray);
 
@@ -516,7 +518,7 @@ void main() {
 			deltaZ += wing.getDeltaZ();
 			deltaAngle += wing.getDeltaAngle();
 
-			glUniform2f(renderProgram->getUniformLocation("deltaZ"), deltaAngle, deltaZ);
+			glUniform2f(renderProgram->getUniformLocation("deltaZ"s), deltaAngle, deltaZ);
 
 			glBindBuffer(GL_ARRAY_BUFFER, wing.getVertexBuffer());
 			glVertexAttribPointer(vertexAttribLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
