@@ -23,6 +23,8 @@
 #include "Program.h"
 #include "VertexShader.h"
 
+using namespace std::literals::string_literals;
+
 namespace silnith::wings::gl3
 {
 
