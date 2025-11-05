@@ -49,7 +49,7 @@ namespace silnith::wings::gl3
             static_assert(vertexCoordinateDataType == GL_FLOAT);
 
             glBindBuffer(GL_ARRAY_BUFFER, id);
-            glBufferData(GL_ARRAY_BUFFER, transformedVerticesDataSize, nullptr, GL_STREAM_COPY);
+            glBufferData(GL_ARRAY_BUFFER, transformedVerticesDataSize, nullptr, GL_DYNAMIC_COPY);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
         TransformedVertexBuffer(TransformedVertexBuffer const&) = delete;
