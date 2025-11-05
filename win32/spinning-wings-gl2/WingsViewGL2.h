@@ -211,9 +211,71 @@ namespace silnith::wings::gl2
         /// </summary>
         CurveGenerator<GLfloat> blueCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
 
+        /// <summary>
+        /// The GLSL program for rendering.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// This has three attributes that should be populated using <c>glGetAttribLocation</c>:
+        /// </para>
+        /// <list>
+        /// <listheader>
+        /// <term>Attribute</term>
+        /// <description>Data Type</description>
+        /// </listheader>
+        /// <item>
+        /// <term>deltaZ</term>
+        /// <description>vec2</description>
+        /// </item>
+        /// <item>
+        /// <term>radiusAngle</term>
+        /// <description>vec2</description>
+        /// </item>
+        /// <item>
+        /// <term>rollPitchYaw</term>
+        /// <description>vec3</description>
+        /// </item>
+        /// </list>
+        /// </remarks>
+        /// <seealso cref="deltaZAttribLocation"/>
+        /// <seealso cref="radiusAngleAttribLocation"/>
+        /// <seealso cref="rollPitchYawAttribLocation"/>
         std::unique_ptr<Program> glslProgram{ nullptr };
+
+        /// <summary>
+        /// The attribute location for the <c>deltaZ</c> attribute.
+        /// This is of type <c>vec2</c>.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// glVertexAttrib2f(deltaZAttribLocation, deltaAngle, deltaZ);
+        /// </code>
+        /// </example>
+        /// <seealso cref="glslProgram"/>
         GLuint deltaZAttribLocation{ 0 };
+
+        /// <summary>
+        /// The attribute location for the <c>radiusAngle</c> attribute.
+        /// This is of type <c>vec2</c>.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// glVertexAttrib2f(radiusAngleAttribLocation, radius, angle);
+        /// </code>
+        /// </example>
+        /// <seealso cref="glslProgram"/>
         GLuint radiusAngleAttribLocation{ 0 };
+
+        /// <summary>
+        /// The attribute location for the <c>rollPitchYaw</c> attribute.
+        /// This is of type <c>vec3</c>.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// glVertexAttrib3f(rollPitchYawAttribLocation, roll, pitch, yaw);
+        /// </code>
+        /// </example>
+        /// <seealso cref="glslProgram"/>
         GLuint rollPitchYawAttribLocation{ 0 };
     };
 }
