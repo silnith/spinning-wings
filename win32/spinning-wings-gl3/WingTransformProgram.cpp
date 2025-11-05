@@ -101,6 +101,14 @@ void main() {
         glGenVertexArrays(1, &vertexArray);
         glBindVertexArray(vertexArray);
         glEnableVertexAttribArray(vertexAttributeLocation);
+        glBindBuffer(GL_ARRAY_BUFFER, originalVertices.getId());
+        glVertexAttribPointer(vertexAttributeLocation,
+            OriginalVertexBuffer::numCoordinatesPerVertex,
+            OriginalVertexBuffer::vertexCoordinateDataType,
+            GL_FALSE,
+            OriginalVertexBuffer::vertexStride,
+            0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
     }
 
@@ -123,15 +131,6 @@ void main() {
         glUniform3f(edgeColorUniformLocation, 1, 1, 1);
 
         glBindVertexArray(vertexArray);
-
-        glBindBuffer(GL_ARRAY_BUFFER, originalVertices.getId());
-        glVertexAttribPointer(vertexAttributeLocation,
-            OriginalVertexBuffer::numCoordinatesPerVertex,
-            OriginalVertexBuffer::vertexCoordinateDataType,
-            GL_FALSE,
-            OriginalVertexBuffer::vertexStride,
-            0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         static_assert(TransformedVertexBuffer::numVertices == OriginalVertexBuffer::numVertices);
         static_assert(TransformedColorBuffer::numVertices == OriginalVertexBuffer::numVertices);
