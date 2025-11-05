@@ -1,4 +1,5 @@
 #version 120
+// Shader version 1.20 corresponds to OpenGL 2.1
 
 attribute vec2 deltaZ;
 attribute vec2 radiusAngle;
@@ -37,6 +38,15 @@ const vec3 xAxis = vec3(1, 0, 0);
 const vec3 yAxis = vec3(0, 1, 0);
 const vec3 zAxis = vec3(0, 0, 1);
 
+/*
+ * The shader entry point.
+ * Vertex shaders may read gl_Color, gl_SecondaryColor,
+ * gl_Normal, gl_Vertex, gl_FogCoord,
+ * and a bunch of texture coordinate stuff.
+ * 
+ * A vertex shader must write to gl_Position.
+ * It may write to gl_PointSize and gl_ClipVertex.
+ */
 void main() {
     float radius = radiusAngle[0];
     float angle = radiusAngle[1];
@@ -46,15 +56,45 @@ void main() {
     float pitch = rollPitchYaw[1];
     float yaw = rollPitchYaw[2];
 
+    /*
+     * This implements the additional transformations
+     * that were applied in the wing-rendering loop.
+     * These are relative to the position of the wing in the list.
+     * Specifically:
+     * glTranslatef(0, 0, wing.getDeltaZ());
+     * glRotatef(wing.getDeltaAngle(), 0, 0, 1);
+     */
     mat4 deltaTransformation = translate(vec3(0, 0, deltaZ))
                                * rotate(deltaAngle, zAxis);
+    /*
+     * This implements the transformations that were handled by the
+     * wing-specific display list in the OpenGL 1.0 version.
+     * These are consistent for the lifetime of a wing.
+     * Specifically:
+     * glRotatef(angle, 0, 0, 1);
+     * glTranslatef(radius, 0, 0);
+     * glRotatef(-yaw, 0, 0, 1);
+     * glRotatef(-pitch, 0, 1, 0);
+     * glRotatef(roll, 1, 0, 0);
+     */
     mat4 wingTransformation = rotate(angle, zAxis)
                               * translate(vec3(radius, 0, 0))
                               * rotate(-yaw, zAxis)
                               * rotate(-pitch, yAxis)
                               * rotate(roll, xAxis);
 
+    /*
+     * The OpenGL 1.0 version did not use face culling.
+     * 
+     * gl_Color is a built-in attribute.
+     * gl_FrontColor and gl_BackColor are built-in varying variables.
+     */
     gl_FrontColor = gl_Color;
     gl_BackColor = gl_Color;
+    /*
+     * A vertex shader must set the gl_Position variable.
+     * gl_ModelViewProjectionMatrix is a built-in uniform.
+     * gl_Vertex is a built-in attribute.
+     */
     gl_Position = gl_ModelViewProjectionMatrix * deltaTransformation * wingTransformation * gl_Vertex;
 }
