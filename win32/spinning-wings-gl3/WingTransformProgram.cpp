@@ -95,9 +95,9 @@ void main() {
         radiusAngleUniformLocation{ getUniformLocation("radiusAngle"s) },
         rollPitchYawUniformLocation{ getUniformLocation("rollPitchYaw"s) },
         colorUniformLocation{ getUniformLocation("color"s) },
-        edgeColorUniformLocation{ getUniformLocation("edgeColor"s) },
-        vertexAttributeLocation{ getAttributeLocation("vertex"s) }
+        edgeColorUniformLocation{ getUniformLocation("edgeColor"s) }
     {
+        GLuint const vertexAttributeLocation{ getAttributeLocation("vertex"s) };
         glGenVertexArrays(1, &vertexArray);
         glBindVertexArray(vertexArray);
         glEnableVertexAttribArray(vertexAttributeLocation);

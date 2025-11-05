@@ -45,6 +45,11 @@ namespace silnith::wings::gl3
         /// </summary>
         OriginalVertexBuffer const originalVertices{};
 
+        /// <summary>
+        /// The vertex array object that captures the <see cref="GL_ARRAY_BUFFER"/>
+        /// that contains the source vertices to transform.
+        /// </summary>
+        /// <see cref="originalVertices"/>
         GLuint vertexArray{ 0 };
 
         /// <summary>
@@ -70,11 +75,6 @@ namespace silnith::wings::gl3
         /// </summary>
         /// <seealso cref="glUniform3f"/>
         GLint edgeColorUniformLocation{ 0 };
-
-        /// <summary>
-        /// The location for the attribute variable <c>vertex</c>.
-        /// </summary>
-        GLuint vertexAttributeLocation{ 0 };
     };
 
 }
