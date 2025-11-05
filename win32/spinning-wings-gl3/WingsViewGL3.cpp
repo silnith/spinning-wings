@@ -28,6 +28,8 @@
 #include "TransformedVertexBuffer.h"
 #include "TransformedColorBuffer.h"
 
+#include "WingTransformProgram.h"
+
 using namespace std::literals::string_literals;
 
 namespace silnith::wings::gl3
@@ -53,23 +55,13 @@ namespace silnith::wings::gl3
 	CurveGenerator<GLfloat> greenCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 40) };
 	CurveGenerator<GLfloat> blueCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
 
-	std::unique_ptr<Program> wingTransformProgram{ nullptr };
+	std::unique_ptr<WingTransformProgram> wingTransformProgram{ nullptr };
 	std::unique_ptr<Program> renderProgram{ nullptr };
 
-	/// <summary>
-	/// The initial untransformed vertices for a single quad.
-	/// After binding, enable using <c>glVertexAttribPointer(..., 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0)</c>.
-	/// </summary>
-	std::unique_ptr<OriginalVertexBuffer> originalVertexBuffer{ nullptr };
 	/// <summary>
 	/// The indices into <c>originalVertexBuffer</c>.
 	/// </summary>
 	std::unique_ptr<IndexDataBuffer> wingIndexBuffer{ nullptr };
-	/// <summary>
-	/// The vertex array used for transform feedback.
-	/// This maintains the state of the enabled vertex attributes.
-	/// </summary>
-	GLuint wingTransformVertexArray{ 0 };
 	/// <summary>
 	/// The vertex array used for rendering.
 	/// This maintains the state of the enabled vertex attributes,
@@ -154,7 +146,6 @@ namespace silnith::wings::gl3
 		 * Set up the pieces needed to render one single
 		 * (untransformed, uncolored) wing.
 		 */
-		originalVertexBuffer = std::make_unique<OriginalVertexBuffer>();
 		wingIndexBuffer = std::make_unique<IndexDataBuffer>();
 
 		std::string const rotateMatrixFunctionDeclaration{
@@ -200,58 +191,7 @@ mat4 scale(in vec3 factor) {
 )shaderText"
 		};
 
-		wingTransformProgram = std::make_unique<Program>(
-			VertexShader{
-				R"shaderText(#version 150
-
-uniform vec2 radiusAngle;
-uniform vec3 rollPitchYaw;
-uniform vec3 color;
-uniform vec3 edgeColor = vec3(1, 1, 1);
-
-in vec4 vertex;
-
-smooth out vec3 varyingWingColor;
-smooth out vec3 varyingEdgeColor;
-
-mat4 rotate(in float angle, in vec3 axis);
-mat4 translate(in vec3 move);
-
-const vec3 xAxis = vec3(1, 0, 0);
-const vec3 yAxis = vec3(0, 1, 0);
-const vec3 zAxis = vec3(0, 0, 1);
-
-void main() {
-    float radius = radiusAngle[0];
-    float angle = radiusAngle[1];
-    float roll = rollPitchYaw[0];
-    float pitch = rollPitchYaw[1];
-    float yaw = rollPitchYaw[2];
-
-    varyingWingColor = color;
-    varyingEdgeColor = edgeColor;
-
-    mat4 wingTransformation = rotate(angle, zAxis)
-                              * translate(vec3(radius, 0, 0))
-                              * rotate(-yaw, zAxis)
-                              * rotate(-pitch, yAxis)
-                              * rotate(roll, xAxis);
-    gl_Position = wingTransformation * vertex;
-}
-)shaderText",
-				rotateMatrixFunctionDeclaration,
-				translateMatrixFunctionDeclaration,
-			},
-			std::initializer_list<std::string>{
-				"gl_Position",
-				"varyingWingColor",
-				"varyingEdgeColor",
-			}
-		);
-		glGenVertexArrays(1, &wingTransformVertexArray);
-		glBindVertexArray(wingTransformVertexArray);
-		glEnableVertexAttribArray(wingTransformProgram->getAttributeLocation("vertex"));
-		glBindVertexArray(0);
+		wingTransformProgram = std::make_unique<WingTransformProgram>();
 
 		renderProgram = std::make_unique<Program>(
 			VertexShader{
@@ -391,10 +331,8 @@ void main() {
 		glDeleteBuffers(1, &modelViewProjectionUniformBuffer);
 
 		glDeleteVertexArrays(1, &renderVertexArray);
-		glDeleteVertexArrays(1, &wingTransformVertexArray);
 
 		wingIndexBuffer.reset();
-		originalVertexBuffer.reset();
 
 		wingTransformProgram.reset();
 		renderProgram.reset();
@@ -433,39 +371,14 @@ void main() {
 			wings.emplace_front(vertexBuffer, colorBuffer, edgeColorBuffer, deltaAngle, deltaZ);
 		}
 
-		GLuint const wingVertexBufferId{ wings.front().getVertexBufferId() };
-		GLuint const wingColorBufferId{ wings.front().getColorBufferId() };
-		GLuint const wingEdgeColorBufferId{ wings.front().getEdgeColorBufferId() };
+		Wing<GLfloat> const& newWing{ wings.front() };
 
-		wingTransformProgram->useProgram();
-		glUniform2f(wingTransformProgram->getUniformLocation("radiusAngle"), radius, angle);
-		glUniform3f(wingTransformProgram->getUniformLocation("rollPitchYaw"), roll, pitch, yaw);
-		glUniform3f(wingTransformProgram->getUniformLocation("color"), red, green, blue);
-		//glUniform3f(wingTransformProgram->getUniformLocation("edgeColor"), 1, 1, 1);
-
-		glBindVertexArray(wingTransformVertexArray);
-
-		glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer->getId());
-		glVertexAttribPointer(wingTransformProgram->getAttributeLocation("vertex"),
-			OriginalVertexBuffer::numCoordinatesPerVertex,
-			OriginalVertexBuffer::vertexCoordinateDataType,
-			GL_FALSE,
-			OriginalVertexBuffer::vertexStride,
-			0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		static_assert(TransformedVertexBuffer::numVertices == OriginalVertexBuffer::numVertices);
-		static_assert(TransformedColorBuffer::numVertices == OriginalVertexBuffer::numVertices);
-
-		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, wingVertexBufferId);
-		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, wingColorBufferId);
-		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 2, wingEdgeColorBufferId);
-
-		glBeginTransformFeedback(GL_POINTS);
-		glDrawArrays(GL_POINTS, 0, OriginalVertexBuffer::numVertices);
-		glEndTransformFeedback();
-
-		glBindVertexArray(0);
+		wingTransformProgram->Render(radius, angle,
+			roll, pitch, yaw,
+			red, green, blue,
+			*newWing.getVertexBuffer(),
+			*newWing.getColorBuffer(),
+			*newWing.getEdgeColorBuffer());
 	}
 
 	void DrawFrame(void)

@@ -20,6 +20,19 @@ namespace silnith::wings::gl3
     class Shader
     {
     public:
+        static std::string const rotateMatrixFunctionDeclaration;
+
+        static std::string const rotateMatrixFunctionDefinition;
+
+        static std::string const translateMatrixFunctionDeclaration;
+
+        static std::string const translateMatrixFunctionDefinition;
+
+        static std::string const scaleMatrixFunctionDeclaration;
+
+        static std::string const scaleMatrixFunctionDefinition;
+
+    public:
         Shader(void) noexcept = delete;
         Shader(Shader const&) noexcept = delete;
         Shader& operator=(Shader const&) noexcept = delete;
