@@ -3,9 +3,7 @@
 #include <Windows.h>
 #include <GL/glew.h>
 
-#include <array>
-
-#include <cstddef>
+#include "Buffer.h"
 
 namespace silnith::wings::gl3
 {
@@ -16,7 +14,7 @@ namespace silnith::wings::gl3
     /// transformed vertices.  It is populated using transform feedback,
     /// and is the source of rendering commands.
     /// </summary>
-    class TransformedVertexBuffer
+    class TransformedVertexBuffer : public Buffer
     {
     public:
         /// <summary>
@@ -27,6 +25,12 @@ namespace silnith::wings::gl3
         /// <summary>
         /// The number of coordinates per vertex in the buffer.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Since this is populated using transform feedback, it will receive
+        /// the full (x, y, z, w) coordinates calculated by the vertex shader.
+        /// </para>
+        /// </remarks>
         static GLint constexpr numCoordinatesPerVertex{ 4 };
 
         /// <summary>
@@ -40,36 +44,18 @@ namespace silnith::wings::gl3
         static GLsizei constexpr vertexStride{ 0 };
 
     public:
-        TransformedVertexBuffer(void)
-        {
-            glGenBuffers(1, &id);
-
-            // This static_assert is here as a reminder that the sizeof(GLfloat) must match.
-            GLsizeiptr constexpr transformedVerticesDataSize{ sizeof(GLfloat) * numCoordinatesPerVertex * numVertices };
-            static_assert(vertexCoordinateDataType == GL_FLOAT);
-
-            glBindBuffer(GL_ARRAY_BUFFER, id);
-            glBufferData(GL_ARRAY_BUFFER, transformedVerticesDataSize, nullptr, GL_DYNAMIC_COPY);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-        }
+        /// <summary>
+        /// Constructs an element array buffer and allocates enough space in it
+        /// to receive vertex coordinates (via transform feedback) for every
+        /// vertex in <see cref="OriginalVertexBuffer"/>.
+        /// </summary>
+        /// <param name=""></param>
+        TransformedVertexBuffer(void);
         TransformedVertexBuffer(TransformedVertexBuffer const&) = delete;
         TransformedVertexBuffer& operator=(TransformedVertexBuffer const&) = delete;
         TransformedVertexBuffer(TransformedVertexBuffer&&) noexcept = delete;
         TransformedVertexBuffer& operator=(TransformedVertexBuffer&&) noexcept = delete;
-        ~TransformedVertexBuffer(void) noexcept
-        {
-            glDeleteBuffers(1, &id);
-        }
-
-    public:
-        [[nodiscard]]
-        inline GLuint getId(void) const noexcept
-        {
-            return id;
-        }
-
-    private:
-        GLuint id{ 0 };
+        virtual ~TransformedVertexBuffer(void) noexcept override = default;
     };
 
 }

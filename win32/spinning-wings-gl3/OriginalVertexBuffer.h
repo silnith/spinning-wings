@@ -3,9 +3,7 @@
 #include <Windows.h>
 #include <GL/glew.h>
 
-#include <array>
-
-#include <cstddef>
+#include "Buffer.h"
 
 namespace silnith::wings::gl3
 {
@@ -15,7 +13,7 @@ namespace silnith::wings::gl3
     /// parameters that define the data stored in it.  This object contains
     /// the original untransformed vertices for a wing.
     /// </summary>
-    class OriginalVertexBuffer
+    class OriginalVertexBuffer : public Buffer
     {
     public:
         /// <summary>
@@ -39,40 +37,16 @@ namespace silnith::wings::gl3
         static GLsizei constexpr vertexStride{ 0 };
 
     public:
-        OriginalVertexBuffer(void)
-        {
-            glGenBuffers(1, &id);
-
-            std::array<GLfloat, numCoordinatesPerVertex * numVertices> constexpr quadVertices{
-                1, 1,
-                -1, 1,
-                -1, -1,
-                1, -1,
-            };
-            GLsizeiptr constexpr quadVerticesDataSize{ sizeof(GLfloat) * quadVertices.size() };
-
-            glBindBuffer(GL_ARRAY_BUFFER, id);
-            glBufferData(GL_ARRAY_BUFFER, quadVerticesDataSize, quadVertices.data(), GL_STATIC_DRAW);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-        }
+        /// <summary>
+        /// Constructs the buffer object and populates it with the vertex
+        /// coordinates for the wing.
+        /// </summary>
+        OriginalVertexBuffer(void);
         OriginalVertexBuffer(OriginalVertexBuffer const&) = delete;
         OriginalVertexBuffer& operator=(OriginalVertexBuffer const&) = delete;
         OriginalVertexBuffer(OriginalVertexBuffer&&) noexcept = delete;
         OriginalVertexBuffer& operator=(OriginalVertexBuffer&&) noexcept = delete;
-        ~OriginalVertexBuffer(void) noexcept
-        {
-            glDeleteBuffers(1, &id);
-        }
-
-    public:
-        [[nodiscard]]
-        inline GLuint getId(void) const noexcept
-        {
-            return id;
-        }
-
-    private:
-        GLuint id{ 0 };
+        virtual ~OriginalVertexBuffer(void) noexcept override = default;
     };
 
 }

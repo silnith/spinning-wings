@@ -3,9 +3,7 @@
 #include <Windows.h>
 #include <GL/glew.h>
 
-#include <array>
-
-#include <cstddef>
+#include "Buffer.h"
 
 namespace silnith::wings::gl3
 {
@@ -16,7 +14,7 @@ namespace silnith::wings::gl3
     /// transformed colors.  It is populated using transform feedback,
     /// and is the source of rendering commands.
     /// </summary>
-    class TransformedColorBuffer
+    class TransformedColorBuffer : public Buffer
     {
     public:
         /// <summary>
@@ -40,36 +38,16 @@ namespace silnith::wings::gl3
         static GLsizei constexpr vertexStride{ 0 };
 
     public:
-        TransformedColorBuffer(void)
-        {
-            glGenBuffers(1, &id);
-
-            // This static_assert is here as a reminder that the sizeof(GLfloat) must match.
-            GLsizeiptr constexpr transformedVerticesDataSize{ sizeof(GLfloat) * numCoordinatesPerVertex * numVertices };
-            static_assert(vertexCoordinateDataType == GL_FLOAT);
-
-            glBindBuffer(GL_ARRAY_BUFFER, id);
-            glBufferData(GL_ARRAY_BUFFER, transformedVerticesDataSize, nullptr, GL_DYNAMIC_COPY);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-        }
+        /// <summary>
+        /// Constructs an array buffer object and allocates enough space in it
+        /// to receive a color value for every vertex in <see cref="OriginalVertexBuffer"/>.
+        /// </summary>
+        TransformedColorBuffer(void);
         TransformedColorBuffer(TransformedColorBuffer const&) = delete;
         TransformedColorBuffer& operator=(TransformedColorBuffer const&) = delete;
         TransformedColorBuffer(TransformedColorBuffer&&) noexcept = delete;
         TransformedColorBuffer& operator=(TransformedColorBuffer&&) noexcept = delete;
-        ~TransformedColorBuffer(void) noexcept
-        {
-            glDeleteBuffers(1, &id);
-        }
-
-    public:
-        [[nodiscard]]
-        inline GLuint getId(void) const noexcept
-        {
-            return id;
-        }
-
-    private:
-        GLuint id{ 0 };
+        virtual ~TransformedColorBuffer(void) noexcept override = default;
     };
 
 }

@@ -1,0 +1,24 @@
+#include <Windows.h>
+#include <GL/glew.h>
+
+#include <array>
+
+#include "TransformedColorBuffer.h"
+
+#include "Buffer.h"
+
+namespace silnith::wings::gl3
+{
+
+    TransformedColorBuffer::TransformedColorBuffer(void) : Buffer{}
+    {
+        // This static_assert is here as a reminder that the sizeof(GLfloat) must match.
+        GLsizeiptr constexpr transformedVerticesDataSize{ sizeof(GLfloat) * numCoordinatesPerVertex * numVertices };
+        static_assert(vertexCoordinateDataType == GL_FLOAT);
+
+        glBindBuffer(GL_ARRAY_BUFFER, getId());
+        glBufferData(GL_ARRAY_BUFFER, transformedVerticesDataSize, nullptr, GL_DYNAMIC_COPY);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+}

@@ -166,8 +166,10 @@
     <None Include="render.vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Buffer.h" />
     <ClInclude Include="FragmentShader.h" />
     <ClInclude Include="IndexDataBuffer.h" />
+    <ClInclude Include="ModelViewProjectionUniformBuffer.h" />
     <ClInclude Include="OriginalVertexBuffer.h" />
     <ClInclude Include="Program.h" />
     <ClInclude Include="resource.h" />
@@ -180,10 +182,16 @@
     <ClInclude Include="WingTransformProgram.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="FragmentShader.cpp" />
+    <ClCompile Include="IndexDataBuffer.cpp" />
+    <ClCompile Include="ModelViewProjectionUniformBuffer.cpp" />
+    <ClCompile Include="OriginalVertexBuffer.cpp" />
     <ClCompile Include="Program.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SpinningWingsGL3.cpp" />
+    <ClCompile Include="TransformedColorBuffer.cpp" />
+    <ClCompile Include="TransformedVertexBuffer.cpp" />
     <ClCompile Include="VertexShader.cpp" />
     <ClCompile Include="WingGL3.cpp" />
     <ClCompile Include="WingsViewGL3.cpp" />
