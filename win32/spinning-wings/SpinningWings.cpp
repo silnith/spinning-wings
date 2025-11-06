@@ -297,7 +297,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_DESTROY:
 	{
-		wingsView.reset();
+		wingsView = nullptr;
 
 		// window about to be destroyed
 		HDC const hdc{ GetDC(hWnd) };
