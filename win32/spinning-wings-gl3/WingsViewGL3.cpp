@@ -17,31 +17,10 @@ using namespace std::literals::string_literals;
 namespace silnith::wings::gl3
 {
 
-	typedef std::deque<Wing<GLfloat> > wing_list;
-
-	size_t constexpr numWings{ 40 };
-
-	GLint glMajorVersion{ 1 };
-	GLint glMinorVersion{ 0 };
-
-	wing_list wings{};
-
-	CurveGenerator<GLfloat> radiusCurve{ 10.0f, -15.0f, 15.0f, false, 0.1f, 0.01f, 150 };
-	CurveGenerator<GLfloat> angleCurve{ CurveGenerator<GLfloat>::createGeneratorForAngles(0.0f, 2.0f, 0.05f, 120) };
-	CurveGenerator<GLfloat> deltaAngleCurve{ CurveGenerator<GLfloat>::createGeneratorForAngles(15.0f, 0.2f, 0.02f, 80) };
-	CurveGenerator<GLfloat> deltaZCurve{ 0.5f, 0.4f, 0.7f, false, 0.01f, 0.001f, 200 };
-	CurveGenerator<GLfloat> rollCurve{ CurveGenerator<GLfloat>::createGeneratorForAngles(0.0f, 1.0f, 0.25f, 80) };
-	CurveGenerator<GLfloat> pitchCurve{ CurveGenerator<GLfloat>::createGeneratorForAngles(0.0f, 2.0f, 0.25f, 40) };
-	CurveGenerator<GLfloat> yawCurve{ CurveGenerator<GLfloat>::createGeneratorForAngles(0.0f, 1.5f, 0.25f, 50) };
-	CurveGenerator<GLfloat> redCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 95) };
-	CurveGenerator<GLfloat> greenCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 40) };
-	CurveGenerator<GLfloat> blueCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
-
-	std::unique_ptr<WingTransformProgram> wingTransformProgram{ nullptr };
-	std::unique_ptr<WingRenderProgram> wingRenderProgram{ nullptr };
-
-	void InitializeOpenGLState(void)
+	WingsViewGL3::WingsViewGL3(void)
 	{
+		GLint glMajorVersion{ 1 };
+		GLint glMinorVersion{ 0 };
 		glGetIntegerv(GL_MAJOR_VERSION, &glMajorVersion);
 		glGetIntegerv(GL_MINOR_VERSION, &glMinorVersion);
 
@@ -76,13 +55,7 @@ namespace silnith::wings::gl3
 		wingRenderProgram = std::make_unique<WingRenderProgram>();
 	}
 
-	void CleanupOpenGLState(void)
-	{
-		wingRenderProgram.reset();
-		wingTransformProgram.reset();
-	}
-
-	void AdvanceAnimation(void)
+	void WingsViewGL3::AdvanceAnimation(void)
 	{
 		GLfloat const radius{ radiusCurve.getNextValue() };
 		GLfloat const angle{ angleCurve.getNextValue() };
@@ -106,7 +79,7 @@ namespace silnith::wings::gl3
 			std::shared_ptr<TransformedColorBuffer> edgeColorBuffer{ nullptr };
 			// This block is simply so lastWing goes out of scope before the pop_back.
 			{
-				wing_list::const_reference lastWing{ wings.back() };
+				Wing<GLfloat> const& lastWing{ wings.back() };
 				vertexBuffer = lastWing.getVertexBuffer();
 				colorBuffer = lastWing.getColorBuffer();
 				edgeColorBuffer = lastWing.getEdgeColorBuffer();
@@ -125,19 +98,19 @@ namespace silnith::wings::gl3
 			*newWing.getEdgeColorBuffer());
 	}
 
-	void DrawFrame(void)
+	void WingsViewGL3::DrawFrame(void) const
 	{
 		wingRenderProgram->RenderWings(wings);
 
 		glFlush();
 	}
 
-	void Resize(GLsizei width, GLsizei height)
+	void WingsViewGL3::Resize(GLsizei width, GLsizei height) const
 	{
 		Resize(0, 0, width, height);
 	}
 
-	void Resize(GLint x, GLint y, GLsizei width, GLsizei height)
+	void WingsViewGL3::Resize(GLint x, GLint y, GLsizei width, GLsizei height) const
 	{
 		/*
 		 * The projection matrix transforms the fragment coordinates to the

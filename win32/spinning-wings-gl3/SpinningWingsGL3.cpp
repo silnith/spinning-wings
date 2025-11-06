@@ -53,7 +53,7 @@ HGLRC hglrc{ nullptr };
 /// The object that encapsulates all of the logic for drawing and animating
 /// the spinning wings.
 /// </summary>
-//std::unique_ptr<silnith::wings::gl3::WingsViewGL3> wingsView{ nullptr };
+std::unique_ptr<silnith::wings::gl3::WingsViewGL3> wingsView{ nullptr };
 
 /// <summary>
 /// The <see cref="TIMERPROC"/> that advances the animation by one frame.
@@ -79,7 +79,7 @@ void CALLBACK AdvanceAnimation(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwT
 
 	assert(hglrc == wglGetCurrentContext());
 
-	silnith::wings::gl3::AdvanceAnimation();
+	wingsView->AdvanceAnimation();
 
 	HRGN constexpr hRegion{ nullptr };
 	BOOL constexpr eraseBackground{ FALSE };
@@ -222,7 +222,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		try
 		{
-			silnith::wings::gl3::InitializeOpenGLState();
+			wingsView = std::make_unique<silnith::wings::gl3::WingsViewGL3>();
 		}
 		catch ([[maybe_unused]] std::exception const& e)
 		{
@@ -259,7 +259,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		assert(hglrc == wglGetCurrentContext());
 
-		silnith::wings::gl3::Resize(width, height);
+		wingsView->Resize(width, height);
 
 		return 0;
 	}
@@ -277,7 +277,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		silnith::wings::gl3::DrawFrame();
+		wingsView->DrawFrame();
 
 		PAINTSTRUCT paintstruct{};
 		HDC const hdc{ BeginPaint(hWnd, &paintstruct) };
@@ -299,7 +299,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_DESTROY:
 	{
-		silnith::wings::gl3::CleanupOpenGLState();
+		wingsView = nullptr;
 
 		// window about to be destroyed
 		HDC const hdc{ GetDC(hWnd) };
