@@ -148,6 +148,9 @@ void main() {
 
 		glBindVertexArray(vertexArray);
 
+		/*
+		 * First, draw the solid wings using their solid color.
+		 */
 		GLfloat deltaZ{ 0 };
 		GLfloat deltaAngle{ 0 };
 		for (Wing<GLfloat> const& wing : wings) {
@@ -163,6 +166,11 @@ void main() {
 			glDrawElements(GL_TRIANGLE_FAN, IndexDataBuffer::numIndices, IndexDataBuffer::quadIndexDataType, 0);
 		}
 
+		/*
+		 * Second, draw the wing outlines using the outline color.
+		 * The outlines have smoothing (antialiasing) enabled, which
+		 * requires blending.
+		 */
 		deltaZ = 0;
 		deltaAngle = 0;
 		glEnable(GL_BLEND);
