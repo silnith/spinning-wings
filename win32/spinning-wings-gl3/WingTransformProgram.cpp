@@ -79,14 +79,7 @@ void main() {
         glGenVertexArrays(1, &vertexArray);
         glBindVertexArray(vertexArray);
         glEnableVertexAttribArray(vertexAttributeLocation);
-        glBindBuffer(GL_ARRAY_BUFFER, originalVertices.getId());
-        glVertexAttribPointer(vertexAttributeLocation,
-            OriginalVertexBuffer::numCoordinatesPerVertex,
-            OriginalVertexBuffer::vertexCoordinateDataType,
-            GL_FALSE,
-            OriginalVertexBuffer::vertexStride,
-            0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        originalVertices.SetAsVertexAttribute(vertexAttributeLocation);
         glBindVertexArray(0);
     }
 
