@@ -31,7 +31,24 @@ namespace silnith::wings::gl3
         virtual ~WingTransformProgram(void) noexcept override;
 
     public:
-        void Render(GLfloat radius, GLfloat angle,
+        /// <summary>
+        /// Generates the transformed vertex data for a new wing.
+        /// This applies the rotations and translations to put the wing in the
+        /// correct place, and places the vertex coordinates and colors for the
+        /// wing into the buffers provided.
+        /// </summary>
+        /// <param name="radius">The radius of the wing around the central axis.</param>
+        /// <param name="angle">The angle of the wing around the central axis.</param>
+        /// <param name="roll">The roll of the wing.</param>
+        /// <param name="pitch">The pitch of the wing.</param>
+        /// <param name="yaw">The yaw of the wing.</param>
+        /// <param name="red">The red component of the wing color.</param>
+        /// <param name="green">The green component of the wing color.</param>
+        /// <param name="blue">The blue component of the wing color.</param>
+        /// <param name="vertexBuffer">The buffer that will be populated with the wing geometry.</param>
+        /// <param name="colorBuffer">The buffer that will be populated with the wing surface color.</param>
+        /// <param name="edgeColorBuffer">The buffer that will be populated with the wing edge color.</param>
+        void TransformWing(GLfloat radius, GLfloat angle,
             GLfloat roll, GLfloat pitch, GLfloat yaw,
             GLfloat red, GLfloat green, GLfloat blue,
             TransformedVertexBuffer const& vertexBuffer,

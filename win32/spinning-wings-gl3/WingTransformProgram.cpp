@@ -117,7 +117,7 @@ void main() {
         glDeleteVertexArrays(1, &vertexArray);
     }
 
-    void WingTransformProgram::Render(GLfloat radius, GLfloat angle,
+    void WingTransformProgram::TransformWing(GLfloat radius, GLfloat angle,
         GLfloat roll, GLfloat pitch, GLfloat yaw,
         GLfloat red, GLfloat green, GLfloat blue,
         TransformedVertexBuffer const& vertexBuffer,

@@ -373,7 +373,7 @@ void main() {
 
 		Wing<GLfloat> const& newWing{ wings.front() };
 
-		wingTransformProgram->Render(radius, angle,
+		wingTransformProgram->TransformWing(radius, angle,
 			roll, pitch, yaw,
 			red, green, blue,
 			*newWing.getVertexBuffer(),
