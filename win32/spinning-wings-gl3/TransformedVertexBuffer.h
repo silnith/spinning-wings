@@ -22,6 +22,7 @@ namespace silnith::wings::gl3
         /// </summary>
         static GLsizei constexpr numVertices{ 4 };
 
+    private:
         /// <summary>
         /// The number of coordinates per vertex in the buffer.
         /// </summary>
@@ -49,13 +50,20 @@ namespace silnith::wings::gl3
         /// to receive vertex coordinates (via transform feedback) for every
         /// vertex in <see cref="OriginalVertexBuffer"/>.
         /// </summary>
-        /// <param name=""></param>
         TransformedVertexBuffer(void);
         TransformedVertexBuffer(TransformedVertexBuffer const&) = delete;
         TransformedVertexBuffer& operator=(TransformedVertexBuffer const&) = delete;
         TransformedVertexBuffer(TransformedVertexBuffer&&) noexcept = delete;
         TransformedVertexBuffer& operator=(TransformedVertexBuffer&&) noexcept = delete;
         virtual ~TransformedVertexBuffer(void) noexcept override = default;
+
+    public:
+        /// <summary>
+        /// Sets this buffer as the array buffer pointed to for the specified
+        /// vertex attribute.
+        /// </summary>
+        /// <param name="vertexAttributeLocation">The vertex attribute location to point to this buffer.</param>
+        void SetAsVertexAttribute(GLuint vertexAttributeLocation) const;
     };
 
 }

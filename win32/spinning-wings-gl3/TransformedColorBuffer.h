@@ -22,6 +22,7 @@ namespace silnith::wings::gl3
         /// </summary>
         static GLsizei constexpr numVertices{ 4 };
 
+    private:
         /// <summary>
         /// The number of color components per vertex in the buffer.
         /// </summary>
@@ -48,6 +49,14 @@ namespace silnith::wings::gl3
         TransformedColorBuffer(TransformedColorBuffer&&) noexcept = delete;
         TransformedColorBuffer& operator=(TransformedColorBuffer&&) noexcept = delete;
         virtual ~TransformedColorBuffer(void) noexcept override = default;
+
+    public:
+        /// <summary>
+        /// Sets this buffer as the array buffer pointed to for the specified
+        /// vertex attribute.
+        /// </summary>
+        /// <param name="vertexAttributeLocation">The vertex attribute location to point to this buffer.</param>
+        void SetAsVertexAttribute(GLuint vertexAttributeLocation) const;
     };
 
 }

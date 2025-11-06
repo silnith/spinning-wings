@@ -178,6 +178,7 @@
     <ClInclude Include="TransformedVertexBuffer.h" />
     <ClInclude Include="VertexShader.h" />
     <ClInclude Include="WingGL3.h" />
+    <ClInclude Include="WingRenderProgram.h" />
     <ClInclude Include="WingsViewGL3.h" />
     <ClInclude Include="WingTransformProgram.h" />
   </ItemGroup>
@@ -194,6 +195,7 @@
     <ClCompile Include="TransformedVertexBuffer.cpp" />
     <ClCompile Include="VertexShader.cpp" />
     <ClCompile Include="WingGL3.cpp" />
+    <ClCompile Include="WingRenderProgram.cpp" />
     <ClCompile Include="WingsViewGL3.cpp" />
     <ClCompile Include="WingTransformProgram.cpp" />
   </ItemGroup>
