@@ -19,28 +19,6 @@ using namespace std::literals::string_literals;
 namespace silnith::wings::gl3
 {
 
-    /// <summary>
-    /// The GLSL vertex shader.  This applies the wing-specific transformations,
-    /// and then captures the transformed vertices into a buffer for later use.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// This has one input attribute named <c>vertex</c> of type <c>vec4</c>.
-    /// </para>
-    /// <para>
-    /// There are three varying outputs.
-    /// <c>gl_Position</c> is of type <c>vec4</c>.
-    /// <c>varyingWingColor</c> is of type <c>vec3</c>.
-    /// <c>varyingEdgeColor</c> is of type <c>vec3</c>.
-    /// </para>
-    /// <para>
-    /// There are four uniforms.
-    /// <c>radiusAngle</c> is of type <c>vec2</c>.
-    /// <c>rollPitchYaw</c> is of type <c>vec3</c>.
-    /// <c>color</c> is of type <c>vec3</c>.
-    /// <c>edgeColor</c> is of type <c>vec3</c>, and is optional.
-    /// </para>
-    /// </remarks>
     std::string const WingTransformProgram::sourceCode{ R"shaderText(#version 150
 
 uniform vec2 radiusAngle;
