@@ -26,7 +26,7 @@ namespace silnith::wings::gl3
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    void OriginalVertexBuffer::SetAsVertexAttribute(GLuint vertexAttributeLocation) const
+    void OriginalVertexBuffer::SetForVertexAttribute(GLuint vertexAttributeLocation) const
     {
         glBindBuffer(GL_ARRAY_BUFFER, getId());
         glVertexAttribPointer(vertexAttributeLocation,

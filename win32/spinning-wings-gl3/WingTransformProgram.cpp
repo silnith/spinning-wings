@@ -79,7 +79,7 @@ void main() {
         glGenVertexArrays(1, &vertexArray);
         glBindVertexArray(vertexArray);
         glEnableVertexAttribArray(vertexAttributeLocation);
-        originalVertices.SetAsVertexAttribute(vertexAttributeLocation);
+        originalVertices.SetForVertexAttribute(vertexAttributeLocation);
         glBindVertexArray(0);
     }
 

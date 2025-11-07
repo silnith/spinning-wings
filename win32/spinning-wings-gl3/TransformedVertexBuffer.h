@@ -63,7 +63,7 @@ namespace silnith::wings::gl3
         /// vertex attribute.
         /// </summary>
         /// <param name="vertexAttributeLocation">The vertex attribute location to point to this buffer.</param>
-        void SetAsVertexAttribute(GLuint vertexAttributeLocation) const;
+        void SetForVertexAttribute(GLuint vertexAttributeLocation) const;
     };
 
 }

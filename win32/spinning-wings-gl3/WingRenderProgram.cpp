@@ -159,9 +159,9 @@ void main() {
 
 			glUniform2f(deltaZUniformLocation, deltaAngle, deltaZ);
 
-			wing.getVertexBuffer()->SetAsVertexAttribute(vertexAttributeLocation);
+			wing.getVertexBuffer()->SetForVertexAttribute(vertexAttributeLocation);
 
-			wing.getColorBuffer()->SetAsVertexAttribute(colorAttributeLocation);
+			wing.getColorBuffer()->SetForVertexAttribute(colorAttributeLocation);
 
 			glDrawElements(GL_TRIANGLE_FAN, IndexDataBuffer::numIndices, IndexDataBuffer::quadIndexDataType, 0);
 		}
@@ -180,9 +180,9 @@ void main() {
 
 			glUniform2f(deltaZUniformLocation, deltaAngle, deltaZ);
 
-			wing.getVertexBuffer()->SetAsVertexAttribute(vertexAttributeLocation);
+			wing.getVertexBuffer()->SetForVertexAttribute(vertexAttributeLocation);
 
-			wing.getEdgeColorBuffer()->SetAsVertexAttribute(colorAttributeLocation);
+			wing.getEdgeColorBuffer()->SetForVertexAttribute(colorAttributeLocation);
 
 			glDrawElements(GL_LINE_LOOP, IndexDataBuffer::numIndices, IndexDataBuffer::quadIndexDataType, 0);
 		}
