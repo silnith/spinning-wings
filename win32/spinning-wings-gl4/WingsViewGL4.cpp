@@ -435,6 +435,10 @@ void main() {
 
 	void AdvanceAnimation(void)
 	{
+		/*
+		 * Get the next updated values for all the parameters that define how
+		 * a wing moves.
+		 */
 		GLfloat const radius{ radiusCurve.getNextValue() };
 		GLfloat const angle{ angleCurve.getNextValue() };
 		GLfloat const deltaAngle{ deltaAngleCurve.getNextValue() };
@@ -481,6 +485,11 @@ void main() {
 		}
 		else
 		{
+			/*
+			 * If a wing expires off the end of the list of wings, we can reuse
+			 * the various buffers for the newly-created wing.  The old data
+			 * will be overwritten.
+			 */
 			// This block is simply so lastWing goes out of scope before the pop_back.
 			{
 				wing_list::const_reference lastWing{ wings.back() };
@@ -498,6 +507,11 @@ void main() {
 			wingTransformFeedbackObject,
 			deltaAngle, deltaZ);
 
+		/*
+		 * Run a vertex shader to transform the wing based on its current
+		 * animation state, and capture the transformed geometry using transform
+		 * feedback.
+		 */
 		wingTransformProgram->useProgram();
 
 		glBindVertexArray(wingTransformVertexArray);

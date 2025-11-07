@@ -88,6 +88,10 @@ namespace silnith::wings::gl
 
 	void WingsView::AdvanceAnimation(void)
 	{
+		/*
+		 * Get the next updated values for all the parameters that define how
+		 * a wing moves.
+		 */
 		GLfloat const radius{ radiusCurve.getNextValue() };
 		GLfloat const angle{ angleCurve.getNextValue() };
 		GLfloat const deltaAngle{ deltaAngleCurve.getNextValue() };
@@ -121,6 +125,11 @@ namespace silnith::wings::gl
 		}
 		else
 		{
+			/*
+			 * If a wing expires off the end of the list of wings, we can reuse
+			 * the display list identifier for the newly-created wing.  The old
+			 * data will be overwritten.
+			 */
 			displayList = wings.back().getGLDisplayList();
 			wings.pop_back();
 		}
@@ -132,6 +141,12 @@ namespace silnith::wings::gl
 			Color<GLfloat>{ red, green, blue },
 			Color<GLfloat>::WHITE);
 
+		/*
+		 * Create a display list that transforms the wing based on its current
+		 * animation state.  In order to preserve the state of the modelview
+		 * matrix, the current matrix is pushed and restored.  That makes execution
+		 * of this display list idempotent (in terms of rendering state).
+		 */
 		glNewList(displayList, GL_COMPILE);
 		glPushMatrix();
 		glRotatef(angle, 0, 0, 1);
@@ -151,6 +166,10 @@ namespace silnith::wings::gl
 		 */
 		glPushMatrix();
 		for (std::deque<Wing<GLuint, GLfloat> >::const_reference wing : wings) {
+			/*
+			 * Allow the delta transformations to accumulate as we go through the list
+			 * of wings.
+			 */
 			glTranslatef(0, 0, wing.getDeltaZ());
 			glRotatef(wing.getDeltaAngle(), 0, 0, 1);
 

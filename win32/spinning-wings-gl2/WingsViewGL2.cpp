@@ -253,6 +253,10 @@ void main() {
 
 	void WingsViewGL2::AdvanceAnimation(void)
 	{
+		/*
+		 * Get the next updated values for all the parameters that define how
+		 * a wing moves.
+		 */
 		GLfloat const radius{ radiusCurve.getNextValue() };
 		GLfloat const angle{ angleCurve.getNextValue() };
 		GLfloat const deltaAngle{ deltaAngleCurve.getNextValue() };
@@ -286,6 +290,11 @@ void main() {
 		}
 		else
 		{
+			/*
+			 * If a wing expires off the end of the list of wings, we can reuse
+			 * the display list identifier for the newly-created wing.  The old
+			 * data will be overwritten.
+			 */
 			displayList = wings.back().getGLDisplayList();
 			wings.pop_back();
 		}
@@ -297,6 +306,12 @@ void main() {
 			Color<GLfloat>{ red, green, blue },
 			Color<GLfloat>::WHITE);
 
+		/*
+		 * Create a display list that transforms the wing based on its current
+		 * animation state.  Since all transformations are applied in the
+		 * vertex shader instead of using the modelview matrix, no matrix push
+		 * or pop is necessary.
+		 */
 		glNewList(displayList, GL_COMPILE);
 		glVertexAttrib2f(radiusAngleAttribLocation, radius, angle);
 		glVertexAttrib3f(rollPitchYawAttribLocation, roll, pitch, yaw);

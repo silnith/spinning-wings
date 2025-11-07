@@ -57,6 +57,10 @@ namespace silnith::wings::gl3
 
 	void WingsViewGL3::AdvanceAnimation(void)
 	{
+		/*
+		 * Get the next updated values for all the parameters that define how
+		 * a wing moves.
+		 */
 		GLfloat const radius{ radiusCurve.getNextValue() };
 		GLfloat const angle{ angleCurve.getNextValue() };
 		GLfloat const deltaAngle{ deltaAngleCurve.getNextValue() };
@@ -74,6 +78,11 @@ namespace silnith::wings::gl3
 		}
 		else
 		{
+			/*
+			 * If a wing expires off the end of the list of wings, we can reuse
+			 * the various buffers for the newly-created wing.  The old data
+			 * will be overwritten.
+			 */
 			std::shared_ptr<TransformedVertexBuffer> vertexBuffer{ nullptr };
 			std::shared_ptr<TransformedColorBuffer> colorBuffer{ nullptr };
 			std::shared_ptr<TransformedColorBuffer> edgeColorBuffer{ nullptr };
@@ -90,6 +99,11 @@ namespace silnith::wings::gl3
 
 		Wing<GLfloat> const& newWing{ wings.front() };
 
+		/*
+		 * Run a vertex shader to transform the wing based on its current
+		 * animation state, and capture the transformed geometry using transform
+		 * feedback.
+		 */
 		wingTransformProgram->TransformWing(radius, angle,
 			roll, pitch, yaw,
 			red, green, blue,
