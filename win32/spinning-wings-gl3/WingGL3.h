@@ -52,21 +52,38 @@ namespace silnith::wings::gl3
 		/// <summary>
 		/// Creates a new wing with the provided parameters.
 		/// </summary>
+		/// <param name="deltaAngle">The additional angle around the central axis as the wing recedes into history.</param>
+		/// <param name="deltaZ">The additional height along the central axis as the wing recedes into history.</param>
 		/// <param name="vertexBuffer">The vertex buffer to reuse for this wing.</param>
 		/// <param name="colorBuffer">The color buffer to reuse.</param>
 		/// <param name="edgeColorBuffer">The edge color buffer to reuse.</param>
-		/// <param name="deltaAngle">The additional angle around the central axis as the wing recedes into history.</param>
-		/// <param name="deltaZ">The additional height along the central axis as the wing recedes into history.</param>
-		Wing(std::shared_ptr<TransformedVertexBuffer> const& vertexBuffer,
+		Wing(T deltaAngle, T deltaZ,
+			std::shared_ptr<TransformedVertexBuffer> const& vertexBuffer,
 			std::shared_ptr<TransformedColorBuffer> const& colorBuffer,
-			std::shared_ptr<TransformedColorBuffer> const& edgeColorBuffer,
-			T deltaAngle, T deltaZ) noexcept
-			: vertexBuffer{ vertexBuffer },
-			colorBuffer{ colorBuffer },
-			edgeColorBuffer{ edgeColorBuffer },
-			deltaAngle{ deltaAngle },
-			deltaZ{ deltaZ }
+			std::shared_ptr<TransformedColorBuffer> const& edgeColorBuffer) noexcept
+			: deltaAngle{ deltaAngle }, deltaZ{ deltaZ },
+			vertexBuffer{ vertexBuffer }, colorBuffer{ colorBuffer }, edgeColorBuffer{ edgeColorBuffer }
 		{}
+
+		/// <summary>
+		/// Returns the additional angle around the central axis that each subsequent wing should be rendered.
+		/// </summary>
+		/// <returns>The additional angle that the wing gains as it recedes into history.</returns>
+		[[nodiscard]]
+		inline T getDeltaAngle(void) const noexcept
+		{
+			return deltaAngle;
+		}
+
+		/// <summary>
+		/// Returns the additional distance up the central axis that each subsequent wing should be rendered.
+		/// </summary>
+		/// <returns>The additional height that the wing gains as it recedes into history.</returns>
+		[[nodiscard]]
+		inline T getDeltaZ(void) const noexcept
+		{
+			return deltaZ;
+		}
 
 		/// <summary>
 		/// Returns the vertex buffer.  This is only used to hand off ownership
@@ -150,32 +167,12 @@ namespace silnith::wings::gl3
 			return edgeColorBuffer->getId();
 		}
 
-		/// <summary>
-		/// Returns the additional angle around the central axis that each subsequent wing should be rendered.
-		/// </summary>
-		/// <returns>The additional angle that the wing gains as it recedes into history.</returns>
-		[[nodiscard]]
-		inline T getDeltaAngle(void) const noexcept
-		{
-			return deltaAngle;
-		}
-
-		/// <summary>
-		/// Returns the additional distance up the central axis that each subsequent wing should be rendered.
-		/// </summary>
-		/// <returns>The additional height that the wing gains as it recedes into history.</returns>
-		[[nodiscard]]
-		inline T getDeltaZ(void) const noexcept
-		{
-			return deltaZ;
-		}
-
 	private:
+		T const deltaAngle{ 15 };
+		T const deltaZ{ 0.5 };
 		std::shared_ptr<TransformedVertexBuffer> vertexBuffer{ std::make_shared<TransformedVertexBuffer>() };
 		std::shared_ptr<TransformedColorBuffer> colorBuffer{ std::make_shared<TransformedColorBuffer>() };
 		std::shared_ptr<TransformedColorBuffer> edgeColorBuffer{ std::make_shared<TransformedColorBuffer>() };
-		T const deltaAngle{ 15 };
-		T const deltaZ{ 0.5 };
 	};
 
 }

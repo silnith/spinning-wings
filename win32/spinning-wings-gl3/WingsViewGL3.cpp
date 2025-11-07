@@ -85,7 +85,7 @@ namespace silnith::wings::gl3
 				edgeColorBuffer = lastWing.getEdgeColorBuffer();
 			}
 			wings.pop_back();
-			wings.emplace_front(vertexBuffer, colorBuffer, edgeColorBuffer, deltaAngle, deltaZ);
+			wings.emplace_front(deltaAngle, deltaZ, vertexBuffer, colorBuffer, edgeColorBuffer);
 		}
 
 		Wing<GLfloat> const& newWing{ wings.front() };
