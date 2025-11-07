@@ -1,20 +1,29 @@
 #include <Windows.h>
 #include <GL/glew.h>
 
-#include "QuadRendererGL11.h"
+#include <array>
 
-#include "Quad.h"
+#include "QuadRendererGL11.h"
 
 namespace silnith::wings::gl
 {
 
-	QuadRendererGL11::QuadRendererGL11(void)
+	QuadRendererGL11::QuadRendererGL11(void) : QuadRenderer{},
+		wingVertices{
+			1, 1,
+			-1, 1,
+			-1, -1,
+			1, -1,
+		},
+		wingIndices{ 0, 1, 2, 3, }
 	{
+		GLsizei constexpr wingVertexStride{ 0 };
 		/*
 		 * Specifies vertex data to be used by subsequent calls to
-		 * DrawArrays and DrawElements.
+		 * DrawArrays and DrawElements.  The format of the data is defined
+		 * here, but the data is not read until the draw call is issued.
 		 */
-		glVertexPointer(numCoordinatesPerVertex, vertexCoordinateDataType, quadVertexStride, quadVertices.data());
+		glVertexPointer(numCoordinatesPerVertex, GL_FLOAT, wingVertexStride, wingVertices.data());
 
 		/*
 		 * EnableClientState is executed immediately, it is not compiled into
@@ -31,12 +40,16 @@ namespace silnith::wings::gl
 	void QuadRendererGL11::DrawQuad(void) const
 	{
 		/*
-		 * When compiling a display list,
-		 * DrawElements dereferences vertex pointers according to the client
-		 * state, and the dereferenced vertices are compiled into the
-		 * display list.
+		 * This reads the specified number of indices from the provided client
+		 * array.  For each index the corresponding vertex is read from the
+		 * vertex array using the format specified in the VertexPointer call.
+		 * The resulting vertices are assembled as though wrapped in Begin/End
+		 * calls for the specified primitive type.
+		 * 
+		 * When compiling a display list, the dereferenced vertices are
+		 * compiled into the display list.
 		 */
-		glDrawElements(GL_QUADS, numIndices, quadIndexDataType, quadIndices.data());
+		glDrawElements(GL_QUADS, numIndices, GL_UNSIGNED_INT, wingIndices.data());
 	}
 
 }

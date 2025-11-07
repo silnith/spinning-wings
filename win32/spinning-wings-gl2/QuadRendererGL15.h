@@ -11,6 +11,11 @@ namespace silnith::wings::gl
 	/// <summary>
 	/// The quad renderer that uses the OpenGL 1.5 rendering path.
 	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// This uses buffer objects to hold the vertex and element arrays.
+	/// </para>
+	/// </remarks>
 	class QuadRendererGL15 : public QuadRenderer
 	{
 	public:
@@ -25,8 +30,22 @@ namespace silnith::wings::gl
 		virtual void DrawQuad(void) const override;
 
 	private:
+		/// <summary>
+		/// A buffer to hold the vertex coordinates.
+		/// This is bound as the <c>GL_ARRAY_BUFFER</c>.
+		/// </summary>
 		GLuint wingBufferObject{ 0 };
+
+		/// <summary>
+		/// A buffer to hold the indices of the vertices.
+		/// This is bound as the <c>GL_ELEMENT_ARRAY_BUFFER</c>.
+		/// </summary>
 		GLuint wingIndicesBufferObject{ 0 };
+
+		/// <summary>
+		/// The number of indices that make up a quad.
+		/// </summary>
+		static GLsizei constexpr numIndices{ 4 };
 	};
 
 }

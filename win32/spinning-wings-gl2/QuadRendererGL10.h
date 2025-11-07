@@ -11,6 +11,12 @@ namespace silnith::wings::gl
 	/// <summary>
 	/// The quad renderer that uses the OpenGL 1.0 rendering path.
 	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// This simply provides the vertices with direct calls and captures them
+	/// in a display list.
+	/// </para>
+	/// </remarks>
 	class QuadRendererGL10 : public QuadRenderer
 	{
 	public:

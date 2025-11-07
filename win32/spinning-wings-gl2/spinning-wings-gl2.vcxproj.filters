@@ -81,9 +81,6 @@
     <ClInclude Include="QuadRendererGL11.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Quad.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="QuadRendererGL15.h">
       <Filter>Header Files</Filter>
     </ClInclude>

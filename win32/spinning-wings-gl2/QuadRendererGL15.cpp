@@ -1,30 +1,56 @@
 #include <Windows.h>
 #include <GL/glew.h>
 
-#include "QuadRendererGL15.h"
+#include <array>
 
-#include "Quad.h"
+#include "QuadRendererGL15.h"
 
 namespace silnith::wings::gl
 {
 
-	QuadRendererGL15::QuadRendererGL15(void)
+	QuadRendererGL15::QuadRendererGL15(void) : QuadRenderer{}
 	{
+		GLsizei constexpr numVertices{ 4 };
+		GLint constexpr numCoordinatesPerVertex{ 2 };
+		std::array<GLfloat const, numCoordinatesPerVertex * numVertices> const wingVertices{
+			1, 1,
+			-1, 1,
+			-1, -1,
+			1, -1,
+		};
+		GLsizeiptr const wingVerticesDataSize{ sizeof(GLfloat) * wingVertices.size() };
+
 		glGenBuffers(1, &wingBufferObject);
 		glBindBuffer(GL_ARRAY_BUFFER, wingBufferObject);
-		glBufferData(GL_ARRAY_BUFFER, quadVerticesDataSize, quadVertices.data(), GL_STATIC_DRAW);
+		/*
+		 * The vertex coordinates are defined in a local variable.  The array
+		 * contents are read and transferred to graphics memory during the call to
+		 * BufferData.  After that, the local array is no longer needed.
+		 */
+		glBufferData(GL_ARRAY_BUFFER, wingVerticesDataSize, wingVertices.data(), GL_STATIC_DRAW);
 		/*
 		 * Specifies vertex data to be used by subsequent calls to
 		 * DrawArrays and DrawElements.
 		 *
 		 * If there is an ARRAY_BUFFER bound, then the last parameter is interpreted
-		 * as an index/offset into the ARRAY_BUFFER.
+		 * as an index/offset into the ARRAY_BUFFER, instead of a pointer.
 		 */
-		glVertexPointer(numCoordinatesPerVertex, vertexCoordinateDataType, quadVertexStride, 0);
+		GLsizei constexpr wingVertexStride{ 0 };
+		glVertexPointer(numCoordinatesPerVertex, GL_FLOAT, wingVertexStride, 0);
+
+		/*
+		 * Just like with the vertex coordinates, the indices are transferred
+		 * to graphics memory when BufferData is called.  After that this array
+		 * is no longer needed.
+		 */
+		std::array<GLuint const, numIndices> const wingIndices{
+			0, 1, 2, 3,
+		};
+		GLsizeiptr const wingIndicesDataSize{ sizeof(GLuint) * numIndices };
 
 		glGenBuffers(1, &wingIndicesBufferObject);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndicesBufferObject);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesDataSize, quadIndices.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, wingIndicesDataSize, wingIndices.data(), GL_STATIC_DRAW);
 
 		glEnableClientState(GL_VERTEX_ARRAY);
 	}
@@ -50,12 +76,12 @@ namespace silnith::wings::gl
 		 *
 		 * If there is an ELEMENT_ARRAY_BUFFER bound, then the last parameter
 		 * to DrawElements is interpreted as an index/offset into the
-		 * ELEMENT_ARRAY_BUFFER.
+		 * ELEMENT_ARRAY_BUFFER, instead of a pointer.
 		 *
 		 * Vertices indexed by the ELEMENT_ARRAY_BUFFER are interpreted according to
 		 * the current VertexPointer.
 		 */
-		glDrawElements(GL_QUADS, numIndices, quadIndexDataType, 0);
+		glDrawElements(GL_QUADS, numIndices, GL_UNSIGNED_INT, 0);
 	}
 
 }

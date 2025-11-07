@@ -6,7 +6,8 @@
 namespace silnith::wings::gl
 {
 
-	QuadRendererGL10::QuadRendererGL10(void) : quadDisplayList{ glGenLists(1) }
+	QuadRendererGL10::QuadRendererGL10(void) : QuadRenderer{},
+		quadDisplayList{ glGenLists(1) }
 	{
 		glNewList(quadDisplayList, GL_COMPILE);
 		glBegin(GL_QUADS);
