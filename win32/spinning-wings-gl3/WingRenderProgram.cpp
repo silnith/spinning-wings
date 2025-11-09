@@ -6,10 +6,21 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <array>
+#include <deque>
+#include <memory>
+#include <string>
 
 #include "WingRenderProgram.h"
 
 #include "Program.h"
+#include "VertexShader.h"
+#include "FragmentShader.h"
+#include "Shader.h"
+
+#include "ArrayBuffer.h"
+#include "ModelViewProjectionUniformBuffer.h"
+
+#include "WingGeometry.h"
 
 using namespace std::literals::string_literals;
 
@@ -63,12 +74,13 @@ void main() {
 }
 )shaderText" };
 
-    WingRenderProgram::WingRenderProgram(void) :
+    WingRenderProgram::WingRenderProgram(std::shared_ptr<WingGeometry> const& wingGeometry) :
         Program{
             VertexShader{ vertexShaderSourceCode, Shader::rotateMatrixFunctionDefinition, Shader::translateMatrixFunctionDefinition },
             FragmentShader{ fragmentShaderSourceCode },
             "fragmentColor"s
         },
+		wingGeometry{ wingGeometry },
 		deltaZUniformLocation{ getUniformLocation("deltaZ"s) },
         vertexAttributeLocation{ getAttributeLocation("vertex"s) },
         colorAttributeLocation{ getAttributeLocation("color"s) }
@@ -77,7 +89,7 @@ void main() {
         glBindVertexArray(vertexArray);
         glEnableVertexAttribArray(vertexAttributeLocation);
         glEnableVertexAttribArray(colorAttributeLocation);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.getId());
+		wingGeometry->UseElementArrayBuffer();
         glBindVertexArray(0);
 
 		GLuint const programId{ getProgram() };
@@ -159,11 +171,11 @@ void main() {
 
 			glUniform2f(deltaZUniformLocation, deltaAngle, deltaZ);
 
-			wing.getVertexBuffer()->SetForVertexAttribute(vertexAttributeLocation);
+			wing.getVertexBuffer()->UseForVertexAttribute(vertexAttributeLocation);
 
-			wing.getColorBuffer()->SetForVertexAttribute(colorAttributeLocation);
+			wing.getColorBuffer()->UseForVertexAttribute(colorAttributeLocation);
 
-			glDrawElements(GL_TRIANGLE_FAN, IndexDataBuffer::numIndices, IndexDataBuffer::quadIndexDataType, 0);
+			wingGeometry->RenderAsPolygons();
 		}
 
 		/*
@@ -180,11 +192,11 @@ void main() {
 
 			glUniform2f(deltaZUniformLocation, deltaAngle, deltaZ);
 
-			wing.getVertexBuffer()->SetForVertexAttribute(vertexAttributeLocation);
+			wing.getVertexBuffer()->UseForVertexAttribute(vertexAttributeLocation);
 
-			wing.getEdgeColorBuffer()->SetForVertexAttribute(colorAttributeLocation);
+			wing.getEdgeColorBuffer()->UseForVertexAttribute(colorAttributeLocation);
 
-			glDrawElements(GL_LINE_LOOP, IndexDataBuffer::numIndices, IndexDataBuffer::quadIndexDataType, 0);
+			wingGeometry->RenderAsOutline();
 		}
 		glDisable(GL_BLEND);
 

@@ -1,18 +1,19 @@
 #include <Windows.h>
 #include <GL/glew.h>
 
+#include <array>
 #include <initializer_list>
 #include <map>
 #include <string>
 #include <vector>
 
+#include <cassert>
+
 #include "WingTransformProgram.h"
 
 #include "VertexShader.h"
 
-#include "OriginalVertexBuffer.h"
-#include "TransformedVertexBuffer.h"
-#include "TransformedColorBuffer.h"
+#include "ArrayBuffer.h"
 
 using namespace std::literals::string_literals;
 
@@ -65,11 +66,12 @@ void main() {
     constexpr char const* capturedVaryingTwo{ "varyingEdgeColor" };
     // TODO: Find a way to static_assert these match the initializer list passed to the superclass constructor.
 
-    WingTransformProgram::WingTransformProgram(void) :
+    WingTransformProgram::WingTransformProgram(std::shared_ptr<WingGeometry> const& wingGeometry) :
         Program{
             VertexShader{ sourceCode, Shader::rotateMatrixFunctionDefinition, Shader::translateMatrixFunctionDefinition },
             { capturedVaryingZero, capturedVaryingOne, capturedVaryingTwo }
         },
+        wingGeometry{ wingGeometry },
         radiusAngleUniformLocation{ getUniformLocation("radiusAngle"s) },
         rollPitchYawUniformLocation{ getUniformLocation("rollPitchYaw"s) },
         colorUniformLocation{ getUniformLocation("color"s) },
@@ -79,7 +81,7 @@ void main() {
         glGenVertexArrays(1, &vertexArray);
         glBindVertexArray(vertexArray);
         glEnableVertexAttribArray(vertexAttributeLocation);
-        originalVertices.SetForVertexAttribute(vertexAttributeLocation);
+        wingGeometry->UseForVertexAttribute(vertexAttributeLocation);
         glBindVertexArray(0);
     }
 
@@ -88,12 +90,22 @@ void main() {
         glDeleteVertexArrays(1, &vertexArray);
     }
 
+    std::shared_ptr<ArrayBuffer> WingTransformProgram::CreateVertexBuffer() const
+    {
+        return std::make_shared<ArrayBuffer>(numCapturedCoordinatesPerVertex, wingGeometry->getNumVertices(), GL_DYNAMIC_COPY);
+    }
+
+    std::shared_ptr<ArrayBuffer> WingTransformProgram::CreateColorBuffer() const
+    {
+        return std::make_shared<ArrayBuffer>(numCapturedColorComponentsPerVertex, wingGeometry->getNumVertices(), GL_DYNAMIC_COPY);
+    }
+
     void WingTransformProgram::TransformWing(GLfloat radius, GLfloat angle,
         GLfloat roll, GLfloat pitch, GLfloat yaw,
         GLfloat red, GLfloat green, GLfloat blue,
-        TransformedVertexBuffer const& vertexBuffer,
-        TransformedColorBuffer const& colorBuffer,
-        TransformedColorBuffer const& edgeColorBuffer) const
+        ArrayBuffer const& vertexBuffer,
+        ArrayBuffer const& colorBuffer,
+        ArrayBuffer const& edgeColorBuffer) const
     {
         useProgram();
         glUniform2f(radiusAngleUniformLocation, radius, angle);
@@ -103,15 +115,20 @@ void main() {
 
         glBindVertexArray(vertexArray);
 
-        static_assert(TransformedVertexBuffer::numVertices == OriginalVertexBuffer::numVertices);
-        static_assert(TransformedColorBuffer::numVertices == OriginalVertexBuffer::numVertices);
-
+        // Assert that the buffers are expecting the correct data layout.
+        assert(vertexBuffer.getNumComponentsPerVertex() == 4);
+        assert(colorBuffer.getNumComponentsPerVertex() == 3);
+        assert(edgeColorBuffer.getNumComponentsPerVertex() == 3);
+        // Assert that the buffers are sized appropriately.
+        assert(vertexBuffer.getNumVertices() == wingGeometry->getNumVertices());
+        assert(colorBuffer.getNumVertices() == wingGeometry->getNumVertices());
+        assert(edgeColorBuffer.getNumVertices() == wingGeometry->getNumVertices());
         glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, glPositionBindingPoint, vertexBuffer.getId());
         glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, varyingWingColorBindingPoint, colorBuffer.getId());
         glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, varyingEdgeColorBindingPoint, edgeColorBuffer.getId());
 
         glBeginTransformFeedback(GL_POINTS);
-        glDrawArrays(GL_POINTS, 0, OriginalVertexBuffer::numVertices);
+        wingGeometry->RenderAsPoints();
         glEndTransformFeedback();
 
         glBindVertexArray(0);

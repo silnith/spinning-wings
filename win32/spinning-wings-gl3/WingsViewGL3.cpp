@@ -51,8 +51,9 @@ namespace silnith::wings::gl3
 		 * Set up the pieces needed to render one single
 		 * (untransformed, uncolored) wing.
 		 */
-		wingTransformProgram = std::make_unique<WingTransformProgram>();
-		wingRenderProgram = std::make_unique<WingRenderProgram>();
+		wingGeometry = std::make_shared<WingGeometry>();
+		wingTransformProgram = std::make_unique<WingTransformProgram>(wingGeometry);
+		wingRenderProgram = std::make_unique<WingRenderProgram>(wingGeometry);
 	}
 
 	void WingsViewGL3::AdvanceAnimation(void)
@@ -74,7 +75,10 @@ namespace silnith::wings::gl3
 
 		if (wings.empty() || wings.size() < numWings)
 		{
-			wings.emplace_front(deltaAngle, deltaZ);
+			std::shared_ptr<ArrayBuffer> vertexBuffer{ wingTransformProgram->CreateVertexBuffer() };
+			std::shared_ptr<ArrayBuffer> colorBuffer{ wingTransformProgram->CreateColorBuffer() };
+			std::shared_ptr<ArrayBuffer> edgeColorBuffer{ wingTransformProgram->CreateColorBuffer() };
+			wings.emplace_front(deltaAngle, deltaZ, vertexBuffer, colorBuffer, edgeColorBuffer);
 		}
 		else
 		{
@@ -83,16 +87,9 @@ namespace silnith::wings::gl3
 			 * the various buffers for the newly-created wing.  The old data
 			 * will be overwritten.
 			 */
-			std::shared_ptr<TransformedVertexBuffer> vertexBuffer{ nullptr };
-			std::shared_ptr<TransformedColorBuffer> colorBuffer{ nullptr };
-			std::shared_ptr<TransformedColorBuffer> edgeColorBuffer{ nullptr };
-			// This block is simply so lastWing goes out of scope before the pop_back.
-			{
-				Wing<GLfloat> const& lastWing{ wings.back() };
-				vertexBuffer = lastWing.getVertexBuffer();
-				colorBuffer = lastWing.getColorBuffer();
-				edgeColorBuffer = lastWing.getEdgeColorBuffer();
-			}
+			std::shared_ptr<ArrayBuffer> vertexBuffer{ wings.back().getVertexBuffer() };
+			std::shared_ptr<ArrayBuffer> colorBuffer{ wings.back().getColorBuffer() };
+			std::shared_ptr<ArrayBuffer> edgeColorBuffer{ wings.back().getEdgeColorBuffer() };
 			wings.pop_back();
 			wings.emplace_front(deltaAngle, deltaZ, vertexBuffer, colorBuffer, edgeColorBuffer);
 		}

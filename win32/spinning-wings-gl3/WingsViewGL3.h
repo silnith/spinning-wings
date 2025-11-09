@@ -8,6 +8,7 @@
 
 #include "CurveGenerator.h"
 #include "WingGL3.h"
+#include "WingGeometry.h"
 #include "WingRenderProgram.h"
 #include "WingTransformProgram.h"
 
@@ -164,6 +165,11 @@ namespace silnith::wings::gl3
         /// The curve generator for the blue component of the wing color.
         /// </summary>
         CurveGenerator<GLfloat> blueCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
+
+        /// <summary>
+        /// The various buffers that hold the wing geometry.
+        /// </summary>
+        std::shared_ptr<WingGeometry> wingGeometry{ nullptr };
 
         /// <summary>
         /// The GLSL program for transforming each wing and capturing the

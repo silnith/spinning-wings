@@ -3,8 +3,7 @@
 #include <memory>
 
 #include "Color.h"
-#include "TransformedColorBuffer.h"
-#include "TransformedVertexBuffer.h"
+#include "ArrayBuffer.h"
 
 namespace silnith::wings::gl3
 {
@@ -45,22 +44,13 @@ namespace silnith::wings::gl3
 		/// </summary>
 		/// <param name="deltaAngle">The additional angle around the central axis as the wing recedes into history.</param>
 		/// <param name="deltaZ">The additional height along the central axis as the wing recedes into history.</param>
-		Wing(T deltaAngle, T deltaZ) noexcept
-			: deltaAngle{ deltaAngle }, deltaZ{ deltaZ }
-		{}
-
-		/// <summary>
-		/// Creates a new wing with the provided parameters.
-		/// </summary>
-		/// <param name="deltaAngle">The additional angle around the central axis as the wing recedes into history.</param>
-		/// <param name="deltaZ">The additional height along the central axis as the wing recedes into history.</param>
 		/// <param name="vertexBuffer">The vertex buffer to reuse for this wing.</param>
 		/// <param name="colorBuffer">The color buffer to reuse.</param>
 		/// <param name="edgeColorBuffer">The edge color buffer to reuse.</param>
 		Wing(T deltaAngle, T deltaZ,
-			std::shared_ptr<TransformedVertexBuffer> const& vertexBuffer,
-			std::shared_ptr<TransformedColorBuffer> const& colorBuffer,
-			std::shared_ptr<TransformedColorBuffer> const& edgeColorBuffer) noexcept
+			std::shared_ptr<ArrayBuffer> const& vertexBuffer,
+			std::shared_ptr<ArrayBuffer> const& colorBuffer,
+			std::shared_ptr<ArrayBuffer> const& edgeColorBuffer) noexcept
 			: deltaAngle{ deltaAngle }, deltaZ{ deltaZ },
 			vertexBuffer{ vertexBuffer }, colorBuffer{ colorBuffer }, edgeColorBuffer{ edgeColorBuffer }
 		{}
@@ -97,7 +87,7 @@ namespace silnith::wings::gl3
 		/// </remarks>
 		/// <returns>A shared pointer to the buffer.</returns>
 		[[nodiscard]]
-		inline std::shared_ptr<TransformedVertexBuffer> getVertexBuffer(void) const noexcept
+		inline std::shared_ptr<ArrayBuffer> getVertexBuffer(void) const noexcept
 		{
 			return vertexBuffer;
 		}
@@ -114,7 +104,7 @@ namespace silnith::wings::gl3
 		/// </remarks>
 		/// <returns>A shared pointer to the buffer.</returns>
 		[[nodiscard]]
-		inline std::shared_ptr<TransformedColorBuffer> getColorBuffer(void) const noexcept
+		inline std::shared_ptr<ArrayBuffer> getColorBuffer(void) const noexcept
 		{
 			return colorBuffer;
 		}
@@ -131,7 +121,7 @@ namespace silnith::wings::gl3
 		/// </remarks>
 		/// <returns>A shared pointer to the buffer.</returns>
 		[[nodiscard]]
-		inline std::shared_ptr<TransformedColorBuffer> getEdgeColorBuffer(void) const noexcept
+		inline std::shared_ptr<ArrayBuffer> getEdgeColorBuffer(void) const noexcept
 		{
 			return edgeColorBuffer;
 		}
@@ -170,9 +160,9 @@ namespace silnith::wings::gl3
 	private:
 		T const deltaAngle{ 15 };
 		T const deltaZ{ 0.5 };
-		std::shared_ptr<TransformedVertexBuffer> vertexBuffer{ std::make_shared<TransformedVertexBuffer>() };
-		std::shared_ptr<TransformedColorBuffer> colorBuffer{ std::make_shared<TransformedColorBuffer>() };
-		std::shared_ptr<TransformedColorBuffer> edgeColorBuffer{ std::make_shared<TransformedColorBuffer>() };
+		std::shared_ptr<ArrayBuffer> vertexBuffer{ nullptr };
+		std::shared_ptr<ArrayBuffer> colorBuffer{ nullptr };
+		std::shared_ptr<ArrayBuffer> edgeColorBuffer{ nullptr };
 	};
 
 }

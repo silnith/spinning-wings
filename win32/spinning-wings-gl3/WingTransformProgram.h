@@ -3,12 +3,13 @@
 #include <Windows.h>
 #include <GL/glew.h>
 
+#include <memory>
+
 #include "Program.h"
 
-#include "OriginalVertexBuffer.h"
+#include "WingGeometry.h"
 
-#include "TransformedVertexBuffer.h"
-#include "TransformedColorBuffer.h"
+#include "ArrayBuffer.h"
 
 namespace silnith::wings::gl3
 {
@@ -46,7 +47,7 @@ namespace silnith::wings::gl3
         static std::string const sourceCode;
 
     public:
-        WingTransformProgram(void);
+        WingTransformProgram(void) = delete;
         WingTransformProgram(WingTransformProgram const&) = delete;
         WingTransformProgram& operator=(WingTransformProgram const&) = delete;
         WingTransformProgram(WingTransformProgram&&) noexcept = delete;
@@ -54,6 +55,24 @@ namespace silnith::wings::gl3
         virtual ~WingTransformProgram(void) noexcept override;
 
     public:
+        WingTransformProgram(std::shared_ptr<WingGeometry> const& wingGeometry);
+
+        /// <summary>
+        /// Allocates a buffer object to serve as the recipient of the
+        /// transform feedback program.  The buffer will be of sufficient size
+        /// and configured with the appropriate format to receive vertex coordinates.
+        /// </summary>
+        /// <returns>A pre-allocated empty buffer for receiving transformed vertex coordinates.</returns>
+        std::shared_ptr<ArrayBuffer> CreateVertexBuffer() const;
+
+        /// <summary>
+        /// Allocates a buffer object to serve as the recipient of the
+        /// transform feedback program.  The buffer will be of sufficient size
+        /// and configured with the appropriate format to receive color values.
+        /// </summary>
+        /// <returns>A pre-allocated empty buffer for receiving transformed color values.</returns>
+        std::shared_ptr<ArrayBuffer> CreateColorBuffer() const;
+
         /// <summary>
         /// Generates the transformed vertex data for a new wing.
         /// This applies the rotations and translations to put the wing in the
@@ -74,16 +93,36 @@ namespace silnith::wings::gl3
         void TransformWing(GLfloat radius, GLfloat angle,
             GLfloat roll, GLfloat pitch, GLfloat yaw,
             GLfloat red, GLfloat green, GLfloat blue,
-            TransformedVertexBuffer const& vertexBuffer,
-            TransformedColorBuffer const& colorBuffer,
-            TransformedColorBuffer const& edgeColorBuffer) const;
+            ArrayBuffer const& vertexBuffer,
+            ArrayBuffer const& colorBuffer,
+            ArrayBuffer const& edgeColorBuffer) const;
 
     private:
+        std::shared_ptr<WingGeometry> wingGeometry{ nullptr };
+
         /// <summary>
-        /// A buffer object containing the original untransformed vertices for
-        /// a wing.
+        /// The number of vertex coordinates captured from the transform
+        /// feedback program.
         /// </summary>
-        OriginalVertexBuffer const originalVertices{};
+        /// <remarks>
+        /// <para>
+        /// The vertex shader sets the built-in variable <c>gl_Position</c>,
+        /// which is of type <c>vec4</c>.
+        /// </para>
+        /// </remarks>
+        static GLint constexpr numCapturedCoordinatesPerVertex{ 4 };
+
+        /// <summary>
+        /// The number of color components captured from the transform
+        /// feedback program.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The vertex shader sets the varying variables <c>varyingWingColor</c>
+        /// and <c>varyingEdgeColor</c>, which are both of type <c>vec3</c>.
+        /// </para>
+        /// </remarks>
+        static GLint constexpr numCapturedColorComponentsPerVertex{ 3 };
 
         /// <summary>
         /// The vertex array object that captures the <see cref="GL_ARRAY_BUFFER"/>

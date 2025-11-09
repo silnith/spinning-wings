@@ -7,8 +7,6 @@
 #include <memory>
 #include <string>
 
-#include "IndexDataBuffer.h"
-
 #include "Program.h"
 
 #include "VertexShader.h"
@@ -17,6 +15,8 @@
 #include "ModelViewProjectionUniformBuffer.h"
 
 #include "WingGL3.h"
+
+#include "WingGeometry.h"
 
 namespace silnith::wings::gl3
 {
@@ -46,7 +46,7 @@ namespace silnith::wings::gl3
         static GLuint constexpr modelViewProjectionBindingIndex{ 0 };
 
     public:
-        WingRenderProgram(void);
+        WingRenderProgram(void) = delete;
         WingRenderProgram(WingRenderProgram const&) = delete;
         WingRenderProgram& operator=(WingRenderProgram const&) = delete;
         WingRenderProgram(WingRenderProgram&&) noexcept = delete;
@@ -54,6 +54,12 @@ namespace silnith::wings::gl3
         virtual ~WingRenderProgram(void) noexcept override;
 
     public:
+        WingRenderProgram(std::shared_ptr<WingGeometry> const& wingGeometry);
+
+        /// <summary>
+        /// Renders the provided collection of wings.
+        /// </summary>
+        /// <param name="wings">The wings to render.</param>
         void RenderWings(std::deque<Wing<GLfloat> > const& wings) const;
 
         /// <summary>
@@ -66,10 +72,7 @@ namespace silnith::wings::gl3
         void Resize(GLfloat const width, GLfloat const height) const;
 
     private:
-        /// <summary>
-        /// The indices into <c>OriginalVertexBuffer</c>.
-        /// </summary>
-        IndexDataBuffer const indexBuffer{};
+        std::shared_ptr<WingGeometry> wingGeometry{ nullptr };
 
         /// <summary>
         /// The uniform buffer for the ModelViewProjection matrices.
