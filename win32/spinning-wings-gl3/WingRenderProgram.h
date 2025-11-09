@@ -9,9 +9,6 @@
 
 #include "Program.h"
 
-#include "VertexShader.h"
-#include "FragmentShader.h"
-
 #include "ModelViewProjectionUniformBuffer.h"
 
 #include "WingGL3.h"
@@ -72,6 +69,9 @@ namespace silnith::wings::gl3
         void Resize(GLfloat const width, GLfloat const height) const;
 
     private:
+        /// <summary>
+        /// A pointer to the wing geometry object.
+        /// </summary>
         std::shared_ptr<WingGeometry> wingGeometry{ nullptr };
 
         /// <summary>
