@@ -47,6 +47,12 @@ namespace silnith::wings::gl3
 
     void ArrayBuffer::UseForVertexAttribute(GLuint attributeLocation) const
     {
+        /*
+         * The currently-bound array buffer is captured as part of the state
+         * associated with a vertex attribute pointer.  Therefore, after the
+         * call to glVertexAttribPointer, the buffer can be unbound without
+         * affecting the stored state of the vertex attribute pointer.
+         */
         glBindBuffer(GL_ARRAY_BUFFER, getId());
         glVertexAttribPointer(attributeLocation, numComponentsPerVertex, dataType, normalized, stride, offset);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
