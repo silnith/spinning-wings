@@ -77,8 +77,8 @@ as a NuGet package.
 
 The OpenGL 2.0 version makes use of vertex and fragment shaders in order to do
 transformations and rendering.  OpenGL 2.0 was still considered a strict superset
-of previous versions of OpenGL, so my implementation continues to make of various
-features such as display lists and the projection matrix where it makes sense.
+of previous versions of OpenGL, so my implementation continues to make use of
+various features such as display lists and the projection matrix where it makes sense.
 
 #### OpenGL 3.2
 
