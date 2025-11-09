@@ -20,6 +20,30 @@ using namespace std::literals::string_literals;
 namespace silnith::wings::gl3
 {
 
+    /// <summary>
+    /// The number of vertex coordinates captured from the transform
+    /// feedback program.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The vertex shader sets the built-in variable <c>gl_Position</c>,
+    /// which is of type <c>vec4</c>.
+    /// </para>
+    /// </remarks>
+    static GLint constexpr numCapturedCoordinatesPerVertex{ 4 };
+
+    /// <summary>
+    /// The number of color components captured from the transform
+    /// feedback program.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The vertex shader sets the varying variables <c>varyingWingColor</c>
+    /// and <c>varyingEdgeColor</c>, which are both of type <c>vec3</c>.
+    /// </para>
+    /// </remarks>
+    static GLint constexpr numCapturedColorComponentsPerVertex{ 3 };
+
     std::string const WingTransformProgram::sourceCode{ R"shaderText(#version 150
 
 uniform vec2 radiusAngle;
@@ -27,6 +51,12 @@ uniform vec3 rollPitchYaw;
 uniform vec3 color;
 uniform vec3 edgeColor = vec3(1, 1, 1);
 
+/*
+ * Vertex attributes are always extended to type vec4 by the GL when read.
+ * Any missing values are filled in from the default values (0, 0, 0, 1).
+ * This is true regardless of whatever semantic meaning the programmer may
+ * assign to the specific attribute.
+ */
 in vec4 vertex;
 
 smooth out vec3 varyingWingColor;
@@ -61,7 +91,7 @@ void main() {
     GLuint constexpr glPositionBindingPoint{ 0 };
     GLuint constexpr varyingWingColorBindingPoint{ 1 };
     GLuint constexpr varyingEdgeColorBindingPoint{ 2 };
-    constexpr char const * capturedVaryingZero{ "gl_Position" };
+    constexpr char const* capturedVaryingZero{ "gl_Position" };
     constexpr char const* capturedVaryingOne{ "varyingWingColor" };
     constexpr char const* capturedVaryingTwo{ "varyingEdgeColor" };
     // TODO: Find a way to static_assert these match the initializer list passed to the superclass constructor.

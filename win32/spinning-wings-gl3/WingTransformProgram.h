@@ -98,31 +98,10 @@ namespace silnith::wings::gl3
             ArrayBuffer const& edgeColorBuffer) const;
 
     private:
+        /// <summary>
+        /// A pointer to the wing geometry object.
+        /// </summary>
         std::shared_ptr<WingGeometry> wingGeometry{ nullptr };
-
-        /// <summary>
-        /// The number of vertex coordinates captured from the transform
-        /// feedback program.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// The vertex shader sets the built-in variable <c>gl_Position</c>,
-        /// which is of type <c>vec4</c>.
-        /// </para>
-        /// </remarks>
-        static GLint constexpr numCapturedCoordinatesPerVertex{ 4 };
-
-        /// <summary>
-        /// The number of color components captured from the transform
-        /// feedback program.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// The vertex shader sets the varying variables <c>varyingWingColor</c>
-        /// and <c>varyingEdgeColor</c>, which are both of type <c>vec3</c>.
-        /// </para>
-        /// </remarks>
-        static GLint constexpr numCapturedColorComponentsPerVertex{ 3 };
 
         /// <summary>
         /// The vertex array object that captures the <see cref="GL_ARRAY_BUFFER"/>
