@@ -16,4 +16,9 @@ namespace silnith::wings::gl3
         glDeleteBuffers(1, &id);
     }
 
+    GLuint Buffer::getId(void) const
+    {
+        return id;
+    }
+
 }

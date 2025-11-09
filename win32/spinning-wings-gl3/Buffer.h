@@ -35,10 +35,7 @@ namespace silnith::wings::gl3
         /// </summary>
         /// <returns>The buffer ID.</returns>
         [[nodiscard]]
-        inline GLuint getId(void) const noexcept
-        {
-            return id;
-        }
+        GLuint getId(void) const;
 
     private:
         /// <summary>
