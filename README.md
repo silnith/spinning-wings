@@ -88,7 +88,7 @@ functionality declared "legacy".  My implementation uses the new WGL extensions
 to explicitly create a context that implements the OpenGL 3.2 Core profile, and
 solely uses the "modern" functionality.  The biggest change is that capturing
 wing-specific transformations in a display list is no longer possible.  Instead,
-The OpenGL 3.2 implementation has a separate vertex shader that re-implements
+the OpenGL 3.2 implementation has a separate vertex shader that re-implements
 those transformations, and as each wing is created the wing geometry is passed
 through this shader and captured using transform feedback into buffers.  When
 all the wings are then rendered to the display, each wing's transformed geometry
