@@ -157,9 +157,11 @@ void main() {
         glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, varyingWingColorBindingPoint, colorBuffer.getId());
         glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, varyingEdgeColorBindingPoint, edgeColorBuffer.getId());
 
+        glEnable(GL_RASTERIZER_DISCARD);
         glBeginTransformFeedback(GL_POINTS);
         wingGeometry->RenderAsPoints();
         glEndTransformFeedback();
+        glDisable(GL_RASTERIZER_DISCARD);
 
         glBindVertexArray(0);
     }

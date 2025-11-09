@@ -26,6 +26,7 @@ namespace silnith::wings::gl4
 
 	std::size_t constexpr numWings{ 40 };
 
+	// TODO: Investigate glObjectLabel
 	GLint glMajorVersion{ 1 };
 	GLint glMinorVersion{ 0 };
 
@@ -518,9 +519,11 @@ void main() {
 
 		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, wingTransformFeedbackObject);
 
+		glEnable(GL_RASTERIZER_DISCARD);
 		glBeginTransformFeedback(GL_POINTS);
 		glDrawArrays(GL_POINTS, 0, numVertices);
 		glEndTransformFeedback();
+		glDisable(GL_RASTERIZER_DISCARD);
 
 		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
 
