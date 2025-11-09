@@ -21,7 +21,8 @@ namespace silnith::wings::gl3
 {
 
     Program::Program(VertexShader const& vertexShader, std::initializer_list<std::string> const& capturedVaryings)
-        : id{ glCreateProgram() }, linkLog{}
+        : id{ glCreateProgram() },
+        linkLog{}
     {
         // Limit scope of pointers to string sources.
         {
@@ -30,7 +31,9 @@ namespace silnith::wings::gl3
             {
                 cPtrs.emplace_back(capturedVarying.c_str());
             }
-            glTransformFeedbackVaryings(id, static_cast<GLsizei>(cPtrs.size()), cPtrs.data(), GL_SEPARATE_ATTRIBS);
+            GLsizei const count{ static_cast<GLsizei>(cPtrs.size()) };
+            GLchar const** varyings{ cPtrs.data() };
+            glTransformFeedbackVaryings(id, count, varyings, GL_SEPARATE_ATTRIBS);
         }
 
         glAttachShader(id, vertexShader.getShader());
@@ -44,7 +47,7 @@ namespace silnith::wings::gl3
         if (logSize > 0) {
             std::unique_ptr<GLchar[]> log{ std::make_unique<GLchar[]>(static_cast<std::size_t>(logSize)) };
             glGetProgramInfoLog(id, static_cast<GLsizei>(logSize), nullptr, log.get());
-            linkLog = { log.get() };
+            linkLog = std::string{ log.get() };
         }
 
         GLint linkSuccess{ 0 };
@@ -72,7 +75,11 @@ namespace silnith::wings::gl3
     Program::Program(VertexShader const& vertexShader, FragmentShader const& fragmentShader, std::string const& fragmentData)
         : id{ glCreateProgram() }, linkLog{}
     {
-        glBindFragDataLocation(id, 0, fragmentData.c_str());
+        /*
+         * The color number allow rendering to multiple draw buffers.
+         */
+        GLuint constexpr colorNumber{ 0 };
+        glBindFragDataLocation(id, colorNumber, fragmentData.c_str());
 
         glAttachShader(id, vertexShader.getShader());
         glAttachShader(id, fragmentShader.getShader());
@@ -87,7 +94,7 @@ namespace silnith::wings::gl3
         if (logSize > 0) {
             std::unique_ptr<GLchar[]> log{ std::make_unique<GLchar[]>(static_cast<std::size_t>(logSize)) };
             glGetProgramInfoLog(id, static_cast<GLsizei>(logSize), nullptr, log.get());
-            linkLog = { log.get() };
+            linkLog = std::string{ log.get() };
         }
 
         GLint linkSuccess{ 0 };

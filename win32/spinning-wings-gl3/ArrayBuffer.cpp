@@ -38,7 +38,7 @@ namespace silnith::wings::gl3
         stride{ 0 },
         offset{ 0 }
     {
-        GLsizeiptr const dataSize{ sizeof(GLfloat) * numComponentsPerVertex * numVertices };
+        GLsizeiptr const dataSize{ static_cast<GLsizeiptr>(sizeof(GLfloat) * numComponentsPerVertex * numVertices) };
 
         glBindBuffer(GL_ARRAY_BUFFER, getId());
         glBufferData(GL_ARRAY_BUFFER, dataSize, nullptr, usageHint);

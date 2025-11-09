@@ -81,7 +81,8 @@ mat4 scale(in vec3 factor) {
     };
 
     Shader::Shader(GLenum type, std::initializer_list<std::string> const& sources)
-        : id{ glCreateShader(type) }, compilationLog{}
+        : id{ glCreateShader(type) },
+        compilationLog{}
     {
         assert((type == GL_VERTEX_SHADER)
             || (type == GL_GEOMETRY_SHADER)
@@ -117,7 +118,7 @@ mat4 scale(in vec3 factor) {
         if (logSize > 0) {
             std::unique_ptr<GLchar[]> log{ std::make_unique<GLchar[]>(static_cast<std::size_t>(logSize)) };
             glGetShaderInfoLog(id, static_cast<GLsizei>(logSize), nullptr, log.get());
-            compilationLog = { log.get() };
+            compilationLog = std::string{ log.get() };
         }
 
         GLint compilationSuccess{ 0 };
