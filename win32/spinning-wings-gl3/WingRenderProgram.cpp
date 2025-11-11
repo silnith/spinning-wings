@@ -27,7 +27,7 @@ using namespace std::literals::string_literals;
 namespace silnith::wings::gl3
 {
 
-    std::string const WingRenderProgram::vertexShaderSourceCode{ R"shaderText(#version 150
+	std::string const WingRenderProgram::vertexShaderSourceCode{ R"shaderText(#version 150
 
 uniform ModelViewProjection {
     mat4 model;
@@ -63,7 +63,7 @@ void main() {
 }
 )shaderText" };
 
-    std::string const WingRenderProgram::fragmentShaderSourceCode{ R"shaderText(#version 150
+	std::string const WingRenderProgram::fragmentShaderSourceCode{ R"shaderText(#version 150
 
 smooth in vec4 varyingColor;
 
@@ -74,24 +74,29 @@ void main() {
 }
 )shaderText" };
 
-    WingRenderProgram::WingRenderProgram(std::shared_ptr<WingGeometry> const& wingGeometry) :
-        Program{
-            VertexShader{ vertexShaderSourceCode, Shader::rotateMatrixFunctionDefinition, Shader::translateMatrixFunctionDefinition },
-            FragmentShader{ fragmentShaderSourceCode },
-            "fragmentColor"s
-        },
+	WingRenderProgram::WingRenderProgram(std::shared_ptr<WingGeometry> const& wingGeometry) :
+		Program{
+			VertexShader{ vertexShaderSourceCode, Shader::rotateMatrixFunctionDefinition, Shader::translateMatrixFunctionDefinition },
+			FragmentShader{ fragmentShaderSourceCode },
+			"fragmentColor"s
+	},
 		wingGeometry{ wingGeometry },
 		deltaZUniformLocation{ getUniformLocation("deltaZ"s) },
-        vertexAttributeLocation{ getAttributeLocation("vertex"s) },
-        colorAttributeLocation{ getAttributeLocation("color"s) }
-    {
-        glGenVertexArrays(1, &vertexArray);
-        glBindVertexArray(vertexArray);
-        glEnableVertexAttribArray(vertexAttributeLocation);
-        glEnableVertexAttribArray(colorAttributeLocation);
+		vertexAttributeLocation{ getAttributeLocation("vertex"s) },
+		colorAttributeLocation{ getAttributeLocation("color"s) }
+	{
+		glGenVertexArrays(1, &vertexArray);
+		glBindVertexArray(vertexArray);
+		glEnableVertexAttribArray(vertexAttributeLocation);
+		glEnableVertexAttribArray(colorAttributeLocation);
 		wingGeometry->UseElementArrayBuffer();
-        glBindVertexArray(0);
+		glBindVertexArray(0);
 
+		/*
+		 * All of the following code is to query the GLSL program for how the
+		 * named uniform block is layed out, so that a buffer can be allocated
+		 * matching that layout.
+		 */
 		GLuint const programId{ getProgram() };
 		/*
 		 * Get the location (index) of the uniform block.
@@ -100,7 +105,7 @@ void main() {
 		glUniformBlockBinding(programId, blockIndex, modelViewProjectionBindingIndex);
 
 		/*
-		 * Find the data size required by the uniform block.
+		 * Find the data size required for the uniform block.
 		 */
 		GLint modelViewProjectionUniformDataSize{ 0 };
 		glGetActiveUniformBlockiv(programId, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &modelViewProjectionUniformDataSize);
@@ -127,9 +132,10 @@ void main() {
 		static_assert(names[2] == "projection");
 		GLintptr const projectionOffset{ uniformOffsets[2] };
 
-		modelViewProjectionUniformBuffer = std::make_unique<ModelViewProjectionUniformBuffer>(modelViewProjectionUniformDataSize, modelOffset, viewOffset, projectionOffset);
-
 #if !defined(NDEBUG)
+		/*
+		 * Confirm that the uniform variables are of the correct type.
+		 */
 		std::array<GLint, numUniforms> uniformTypes{ 0, 0, 0, };
 		glGetActiveUniformsiv(programId, numUniforms, uniformIndices.data(), GL_UNIFORM_TYPE, uniformTypes.data());
 		assert(uniformTypes[0] == GL_FLOAT_MAT4);
@@ -146,13 +152,23 @@ void main() {
 		assert(isRowMajor[2] == 0);
 #endif
 
-		glBindBufferBase(GL_UNIFORM_BUFFER, modelViewProjectionBindingIndex, modelViewProjectionUniformBuffer->getId());
-    }
+		/*
+		 * Allocate a buffer that can be bound for the uniform block.  Whatever
+		 * is written to this buffer will be available in the GLSL program as
+		 * the named uniform variables.
+		 */
+		modelViewProjectionUniformBuffer = std::make_unique<ModelViewProjectionUniformBuffer>(modelViewProjectionUniformDataSize, modelOffset, viewOffset, projectionOffset);
 
-    WingRenderProgram::~WingRenderProgram(void) noexcept
-    {
-        glDeleteVertexArrays(1, &vertexArray);
-    }
+		/*
+		 * And finally, bind the buffer to the chosen binding point for the uniform block.
+		 */
+		glBindBufferBase(GL_UNIFORM_BUFFER, modelViewProjectionBindingIndex, modelViewProjectionUniformBuffer->getId());
+	}
+
+	WingRenderProgram::~WingRenderProgram(void) noexcept
+	{
+		glDeleteVertexArrays(1, &vertexArray);
+	}
 
 	void WingRenderProgram::RenderWings(std::deque<Wing> const& wings) const
 	{
