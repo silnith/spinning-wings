@@ -87,6 +87,11 @@ void CALLBACK AdvanceAnimation(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwT
 }
 
 /// <summary>
+/// Whether the animation is currently running.
+/// </summary>
+bool animating{ false };
+
+/// <summary>
 /// Begins a timer that calls <see cref="AdvanceAnimation"/> every <see cref="updateDelayMilliseconds"/> milliseconds.
 /// </summary>
 /// <param name="hWnd">The window handle.  This is required for the timer.</param>
@@ -95,14 +100,19 @@ void CALLBACK AdvanceAnimation(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwT
 /// <seealso cref="SetTimer"/>
 void StartAnimation(HWND hWnd)
 {
-	TIMERPROC constexpr timerProc{ AdvanceAnimation };
-	UINT_PTR const timerSet{ SetTimer(hWnd, animationTimerId, updateDelayMilliseconds, timerProc) };
+	if (animating) {}
+	else {
+		TIMERPROC constexpr timerProc{ AdvanceAnimation };
+		UINT_PTR const timerSet{ SetTimer(hWnd, animationTimerId, updateDelayMilliseconds, timerProc) };
 
-	assert(timerSet != 0);
+		assert(timerSet != 0);
 
-	if (timerSet == 0)
-	{
-		DWORD const error{ GetLastError() };
+		if (timerSet == 0)
+		{
+			DWORD const error{ GetLastError() };
+		}
+
+		animating = true;
 	}
 }
 
@@ -115,9 +125,15 @@ void StartAnimation(HWND hWnd)
 /// <seealso cref="KillTimer"/>
 void StopAnimation(HWND hWnd)
 {
-	BOOL const timerStopped{ KillTimer(hWnd, animationTimerId) };
+	if (animating) {
+		BOOL const timerStopped{ KillTimer(hWnd, animationTimerId) };
 
-	assert(timerStopped);
+		assert(timerStopped);
+
+		animating = false;
+	}
+	else
+	{}
 }
 
 /// <summary>
@@ -218,6 +234,34 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		ReleaseDC(hWnd, hdc);
 
 		StartAnimation(hWnd);
+
+		return 0;
+	}
+	case WM_CHAR:
+	{
+		switch (wParam)
+		{
+		case VK_SPACE:
+		{
+			if (animating)
+			{
+				StopAnimation(hWnd);
+			}
+			else
+			{
+#pragma warning(suppress: 28159)
+				AdvanceAnimation(hWnd, WM_TIMER, animationTimerId, GetTickCount());
+			}
+
+			break;
+		}
+		default:
+		{
+			StartAnimation(hWnd);
+
+			break;
+		}
+		}
 
 		return 0;
 	}
