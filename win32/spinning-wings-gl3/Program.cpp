@@ -124,6 +124,39 @@ namespace silnith::wings::gl3
         glDeleteProgram(id);
     }
 
+    void Program::Validate(void) const
+    {
+        glValidateProgram(id);
+        GLint validationStatus{ 0 };
+        glGetProgramiv(id, GL_VALIDATE_STATUS, &validationStatus);
+
+        std::string validationLog{};
+
+        GLint logSize{ 0 };
+        glGetProgramiv(id, GL_INFO_LOG_LENGTH, &logSize);
+        if (logSize > 0) {
+            std::unique_ptr<GLchar[]> log{ std::make_unique<GLchar[]>(static_cast<std::size_t>(logSize)) };
+            glGetProgramInfoLog(id, static_cast<GLsizei>(logSize), nullptr, log.get());
+            validationLog = std::string{ log.get() };
+        }
+
+        switch (validationStatus)
+        {
+        case GL_TRUE: break;
+        case GL_FALSE:
+        {
+            throw std::runtime_error{ validationLog };
+        }
+        default:
+        {
+            std::ostringstream errorMessage{};
+            errorMessage << "Unknown validation status: "s;
+            errorMessage << validationStatus;
+            throw std::runtime_error{ errorMessage.str() };
+        }
+        }
+    }
+
     GLuint Program::getProgram(void) const noexcept
     {
         return id;
