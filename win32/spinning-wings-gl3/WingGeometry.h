@@ -19,7 +19,7 @@ namespace silnith::wings::gl3
     class WingGeometry
     {
     public:
-        WingGeometry(void);
+        explicit WingGeometry(void);
         WingGeometry(WingGeometry const&) = default;
         WingGeometry& operator=(WingGeometry const&) = default;
         WingGeometry(WingGeometry&&) noexcept = default;
@@ -56,10 +56,9 @@ namespace silnith::wings::gl3
         /// </summary>
         /// <remarks>
         /// <para>
-        /// This requires that the buffer identified by
-        /// <see cref="getVertexArrayBufferId"/> be bound as the source of
-        /// vertex coordinates, or another buffer with the same number of
-        /// vertices.
+        /// This expects that <see cref="UseForVertexAttribute"/> be called to
+        /// set the source of vertex coordinates, or another buffer used that
+        /// contains the same number of vertices.
         /// </para>
         /// </remarks>
         void RenderAsPoints(void) const;
@@ -70,14 +69,13 @@ namespace silnith::wings::gl3
         /// </summary>
         /// <remarks>
         /// <para>
-        /// This requires that the buffer identified by
-        /// <see cref="getVertexArrayBufferId"/> be bound as the source of
-        /// vertex coordinates, or another buffer with the same number of
-        /// vertices.
+        /// This expects that <see cref="UseForVertexAttribute"/> be called to
+        /// set the source of vertex coordinates, or another buffer used that
+        /// contains the same number of vertices.
         /// </para>
         /// <para>
-        /// This also requires that the index buffer be bound as the
-        /// <c>GL_ELEMENT_ARRAY_BUFFER</c>.
+        /// This also expects that the index buffer be bound using
+        /// <see cref="UseElementArrayBuffer"/>.
         /// </para>
         /// </remarks>
         /// <seealso cref="UseElementArrayBuffer"/>
@@ -89,15 +87,13 @@ namespace silnith::wings::gl3
         /// </summary>
         /// <remarks>
         /// <para>
-        /// This requires that the buffer identified by
-        /// <see cref="getVertexArrayBufferId"/> be bound as the source of
-        /// vertex coordinates, or another buffer with the same number of
-        /// vertices.
+        /// This expects that <see cref="UseForVertexAttribute"/> be called to
+        /// set the source of vertex coordinates, or another buffer used that
+        /// contains the same number of vertices.
         /// </para>
         /// <para>
-        /// This also requires that the buffer identified by
-        /// <see cref="getElementArrayBufferId"/> be bound as the
-        /// <c>GL_ELEMENT_ARRAY_BUFFER</c>.
+        /// This also expects that the index buffer be bound using
+        /// <see cref="UseElementArrayBuffer"/>.
         /// </para>
         /// </remarks>
         /// <seealso cref="UseElementArrayBuffer"/>

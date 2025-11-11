@@ -18,11 +18,51 @@
 namespace silnith::wings::gl3
 {
 
+    /// <summary>
+    /// The GLSL program that renders all the wings.
+    /// </summary>
     class WingRenderProgram : public Program
     {
     private:
+        /// <summary>
+        /// The GLSL vertex shader source code.  This applies the transformations
+        /// that are relative to the position of the wing in the list of wings.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// This has two input attributes, <c>vertex</c> and <c>color</c>.
+        /// Vertex attributes are always extended to type <c>vec4</c> after being
+        /// read from their source buffers.
+        /// </para>
+        /// <para>
+        /// There is one varying output.
+        /// <c>varyingColor</c> is of type <c>vec4</c>.
+        /// </para>
+        /// <para>
+        /// There is one independent uniform.
+        /// <c>deltaZ</c> is of type <c>vec2</c>.
+        /// </para>
+        /// <para>
+        /// There is one uniform interface block that specifies the model, view,
+        /// and projection matrices.
+        /// </para>
+        /// </remarks>
         static std::string const vertexShaderSourceCode;
 
+        /// <summary>
+        /// The GLSL fragment shader source code.  This simply sets the fragment
+        /// color.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// This has one input attribute.
+        /// <c>varyingColor</c> is of type <c>vec4</c>.
+        /// </para>
+        /// <para>
+        /// There is one varying output.
+        /// <c>fragmentColor</c> is of type <c>vec4</c>.
+        /// </para>
+        /// </remarks>
         static std::string const fragmentShaderSourceCode;
 
         /// <summary>
@@ -51,7 +91,7 @@ namespace silnith::wings::gl3
         virtual ~WingRenderProgram(void) noexcept override;
 
     public:
-        WingRenderProgram(std::shared_ptr<WingGeometry> const& wingGeometry);
+        explicit WingRenderProgram(std::shared_ptr<WingGeometry> const& wingGeometry);
 
         /// <summary>
         /// Renders the provided collection of wings.
@@ -86,9 +126,11 @@ namespace silnith::wings::gl3
         std::unique_ptr<ModelViewProjectionUniformBuffer> modelViewProjectionUniformBuffer{ nullptr };
 
         /// <summary>
-        /// The vertex array used for rendering.
-        /// This maintains the state of the enabled vertex attributes,
-        /// as well as the binding for the ELEMENT_ARRAY_BUFFER.
+        /// The vertex array object that stores all the rendering state for
+		/// execution of the GLSL program.  This keeps the bound element array
+		/// buffer and the vertex attribute arrays that are enabled.  The only
+		/// things that need to be set are the specific buffers bound for each
+        /// vertex attribute location, since those are different for every wing.
         /// </summary>
         GLuint vertexArray{ 0 };
 

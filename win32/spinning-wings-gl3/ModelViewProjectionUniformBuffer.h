@@ -49,7 +49,7 @@ namespace silnith::wings::gl3
 		/// <param name="modelOffset">The offset within the buffer of the <c>model</c> matrix.</param>
 		/// <param name="viewOffset">The offset within the buffer of the <c>view</c> matrix.</param>
 		/// <param name="projectionOffset">The offset within the buffer of the <c>projection</c> matrix.</param>
-		ModelViewProjectionUniformBuffer(GLsizei dataSize,
+		explicit ModelViewProjectionUniformBuffer(GLsizei dataSize,
 			GLintptr modelOffset,
 			GLintptr viewOffset,
 			GLintptr projectionOffset);

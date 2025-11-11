@@ -31,11 +31,19 @@ namespace silnith::wings::gl3
         /// </summary>
         /// <param name="indexData">The data to store in the buffer.</param>
         /// <param name="usageHint">A hint to the GL about how the data will be used.</param>
-        ElementArrayBuffer(std::span<GLuint const> indexData, GLenum usageHint);
+        explicit ElementArrayBuffer(std::span<GLuint const> indexData, GLenum usageHint);
 
         /// <summary>
         /// Makes this buffer the active buffer for <c>GL_ELEMENT_ARRAY_BUFFER</c>.
         /// </summary>
+        /// <example>
+        /// <code>
+        /// ...;  // Bind the vertex attribute buffers.
+        /// ElementArrayBuffer elementArrayBuffer{ ... };
+        /// elementArrayBuffer.UseAsElementArray();
+        /// glDrawElements(GL_TRIANGLE_FAN, elementArrayBuffer.getNumIndices(), elementArrayBuffer.getDataType(), elementArrayBuffer.getOffset());
+        /// </code>
+        /// </example>
         void UseAsElementArray() const;
 
         /// <summary>

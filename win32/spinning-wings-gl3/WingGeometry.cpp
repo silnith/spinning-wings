@@ -56,21 +56,34 @@ namespace silnith::wings::gl3
 
     void WingGeometry::UseElementArrayBuffer(void) const
     {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementArrayBuffer.getId());
+        elementArrayBuffer.UseAsElementArray();
     }
 
     void WingGeometry::RenderAsPoints(void) const
     {
+        /*
+         * Since this ignores any connection between vertices, there is no need
+         * to go through the indirection of the element array (which is there
+         * to allow vertex reuse).
+         */
         glDrawArrays(GL_POINTS, 0, vertexArrayBuffer.getNumVertices());
     }
 
     void WingGeometry::RenderAsPolygons(void) const
     {
+        /*
+         * OpenGL 3.2 Core removed the quad primitive type.
+         * Triangle fan is the closest approximation.
+         */
         glDrawElements(GL_TRIANGLE_FAN, elementArrayBuffer.getNumIndices(), elementArrayBuffer.getDataType(), elementArrayBuffer.getOffset());
     }
 
     void WingGeometry::RenderAsOutline(void) const
     {
+        /*
+         * Since OpenGL 3.2 Core does not support the quad primitive type,
+         * we can no longer render as polygons using line mode.
+         */
         glDrawElements(GL_LINE_LOOP, elementArrayBuffer.getNumIndices(), elementArrayBuffer.getDataType(), elementArrayBuffer.getOffset());
     }
 

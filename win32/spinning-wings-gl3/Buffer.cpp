@@ -11,7 +11,7 @@ namespace silnith::wings::gl3
         glGenBuffers(1, &id);
     }
 
-    Buffer::~Buffer(void)
+    Buffer::~Buffer(void) noexcept
     {
         glDeleteBuffers(1, &id);
     }

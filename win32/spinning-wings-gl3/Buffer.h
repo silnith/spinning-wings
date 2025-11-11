@@ -22,11 +22,14 @@ namespace silnith::wings::gl3
         /// Constructs a new buffer object.  The buffer has no attached storage
         /// until some is allocated using <c>glBufferData</c>.
         /// </summary>
-        Buffer(void);
+        explicit Buffer(void);
         Buffer(Buffer const&) = delete;
         Buffer& operator=(Buffer const&) = delete;
         Buffer(Buffer&&) noexcept = delete;
         Buffer& operator=(Buffer&&) noexcept = delete;
+        /// <summary>
+        /// Deletes the buffer object.
+        /// </summary>
         virtual ~Buffer(void) noexcept;
 
     public:

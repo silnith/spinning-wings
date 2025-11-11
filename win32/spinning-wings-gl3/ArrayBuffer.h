@@ -36,7 +36,7 @@ namespace silnith::wings::gl3
         /// <param name="numVertices">The number of vertices for the buffer to hold.</param>
         /// <param name="data">The data to write into the buffer.</param>
         /// <param name="usageHint">A hint to the GL about how the data will be used.</param>
-        ArrayBuffer(GLint numComponentsPerVertex, GLsizei numVertices, std::span<GLfloat const> data, GLenum usageHint);
+        explicit ArrayBuffer(GLint numComponentsPerVertex, GLsizei numVertices, std::span<GLfloat const> data, GLenum usageHint);
 
         /// <summary>
         /// Constructs a buffer and allocates sufficient space to hold the
@@ -46,7 +46,7 @@ namespace silnith::wings::gl3
         /// <param name="numComponentsPerVertex">The number of components per vertex.</param>
         /// <param name="numVertices">The number of vertices for the buffer to hold.</param>
         /// <param name="usageHint">A hint to the GL about how the data will be used.</param>
-        ArrayBuffer(GLint numComponentsPerVertex, GLsizei numVertices, GLenum usageHint);
+        explicit ArrayBuffer(GLint numComponentsPerVertex, GLsizei numVertices, GLenum usageHint);
 
         /// <summary>
         /// Makes this buffer the active buffer for the specified vertex

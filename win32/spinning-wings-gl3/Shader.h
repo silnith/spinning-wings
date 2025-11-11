@@ -20,16 +20,40 @@ namespace silnith::wings::gl3
     class Shader
     {
     public:
+        /// <summary>
+        /// The GLSL function declaration for <c>rotate</c>, which returns a
+        /// transformation matrix that rotates around an axis.
+        /// </summary>
         static std::string const rotateMatrixFunctionDeclaration;
 
+        /// <summary>
+        /// The GLSL function definition for <c>rotate</c>, which returns a
+        /// transformation matrix that rotates around an axis.
+        /// </summary>
         static std::string const rotateMatrixFunctionDefinition;
 
+        /// <summary>
+        /// The GLSL function declaration for <c>translate</c>, which returns a
+        /// transformation matrix that translates.
+        /// </summary>
         static std::string const translateMatrixFunctionDeclaration;
 
+        /// <summary>
+        /// The GLSL function definition for <c>translate</c>, which returns a
+        /// transformation matrix that translates.
+        /// </summary>
         static std::string const translateMatrixFunctionDefinition;
 
+        /// <summary>
+        /// The GLSL function declaration for <c>scale</c>, which returns a
+        /// transformation matrix that scales.
+        /// </summary>
         static std::string const scaleMatrixFunctionDeclaration;
 
+        /// <summary>
+        /// The GLSL function definition for <c>scale</c>, which returns a
+        /// transformation matrix that scales.
+        /// </summary>
         static std::string const scaleMatrixFunctionDefinition;
 
     public:
@@ -59,7 +83,14 @@ namespace silnith::wings::gl3
         GLuint getShader(void) const noexcept;
 
     private:
+        /// <summary>
+        /// The OpenGL identifier for the shader.
+        /// </summary>
         GLuint const id{ 0 };
+
+        /// <summary>
+        /// The compilation log.
+        /// </summary>
         std::string compilationLog{};
     };
 
