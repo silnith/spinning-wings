@@ -52,30 +52,21 @@ namespace silnith::wings::gl3
 		Wing(GLfloat deltaAngle, GLfloat deltaZ,
 			std::shared_ptr<ArrayBuffer> const& vertexBuffer,
 			std::shared_ptr<ArrayBuffer> const& colorBuffer,
-			std::shared_ptr<ArrayBuffer> const& edgeColorBuffer) noexcept
-			: deltaAngle{ deltaAngle }, deltaZ{ deltaZ },
-			vertexBuffer{ vertexBuffer }, colorBuffer{ colorBuffer }, edgeColorBuffer{ edgeColorBuffer }
-		{}
+			std::shared_ptr<ArrayBuffer> const& edgeColorBuffer) noexcept;
 
 		/// <summary>
 		/// Returns the additional angle around the central axis that each subsequent wing should be rendered.
 		/// </summary>
 		/// <returns>The additional angle that the wing gains as it recedes into history.</returns>
 		[[nodiscard]]
-		inline GLfloat getDeltaAngle(void) const noexcept
-		{
-			return deltaAngle;
-		}
+		GLfloat getDeltaAngle(void) const noexcept;
 
 		/// <summary>
 		/// Returns the additional distance up the central axis that each subsequent wing should be rendered.
 		/// </summary>
 		/// <returns>The additional height that the wing gains as it recedes into history.</returns>
 		[[nodiscard]]
-		inline GLfloat getDeltaZ(void) const noexcept
-		{
-			return deltaZ;
-		}
+		GLfloat getDeltaZ(void) const noexcept;
 
 		/// <summary>
 		/// Returns the vertex buffer.  This is only used to hand off ownership
@@ -89,10 +80,7 @@ namespace silnith::wings::gl3
 		/// </remarks>
 		/// <returns>A shared pointer to the buffer.</returns>
 		[[nodiscard]]
-		inline std::shared_ptr<ArrayBuffer> getVertexBuffer(void) const noexcept
-		{
-			return vertexBuffer;
-		}
+		std::shared_ptr<ArrayBuffer> getVertexBuffer(void) const noexcept;
 
 		/// <summary>
 		/// Returns the color buffer.  This is only used to hand off ownership
@@ -106,10 +94,7 @@ namespace silnith::wings::gl3
 		/// </remarks>
 		/// <returns>A shared pointer to the buffer.</returns>
 		[[nodiscard]]
-		inline std::shared_ptr<ArrayBuffer> getColorBuffer(void) const noexcept
-		{
-			return colorBuffer;
-		}
+		std::shared_ptr<ArrayBuffer> getColorBuffer(void) const noexcept;
 
 		/// <summary>
 		/// Returns the edge color buffer.  This is only used to hand off ownership
@@ -123,10 +108,7 @@ namespace silnith::wings::gl3
 		/// </remarks>
 		/// <returns>A shared pointer to the buffer.</returns>
 		[[nodiscard]]
-		inline std::shared_ptr<ArrayBuffer> getEdgeColorBuffer(void) const noexcept
-		{
-			return edgeColorBuffer;
-		}
+		std::shared_ptr<ArrayBuffer> getEdgeColorBuffer(void) const noexcept;
 
 		/// <summary>
 		/// Returns the OpenGL vertex buffer identifier for this wing.
@@ -134,30 +116,21 @@ namespace silnith::wings::gl3
 		/// </summary>
 		/// <returns>The OpenGL vertex buffer identifier.</returns>
 		[[nodiscard]]
-		inline GLuint getVertexBufferId(void) const noexcept
-		{
-			return vertexBuffer->getId();
-		}
+		GLuint getVertexBufferId(void) const noexcept;
 
 		/// <summary>
 		/// Returns the OpenGL color buffer identifier for this wing.
 		/// </summary>
 		/// <returns>The OpenGL color buffer identifier.</returns>
 		[[nodiscard]]
-		inline GLuint getColorBufferId(void) const noexcept
-		{
-			return colorBuffer->getId();
-		}
+		GLuint getColorBufferId(void) const noexcept;
 
 		/// <summary>
 		/// Returns the OpenGL edge color buffer identifier for this wing.
 		/// </summary>
 		/// <returns>The OpenGL edge color buffer identifier.</returns>
 		[[nodiscard]]
-		inline GLuint getEdgeColorBufferId(void) const noexcept
-		{
-			return edgeColorBuffer->getId();
-		}
+		GLuint getEdgeColorBufferId(void) const noexcept;
 
 	private:
 		GLfloat const deltaAngle{ 15 };
