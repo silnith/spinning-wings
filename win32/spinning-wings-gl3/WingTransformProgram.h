@@ -55,7 +55,7 @@ namespace silnith::wings::gl3
         virtual ~WingTransformProgram(void) noexcept override;
 
     public:
-        WingTransformProgram(std::shared_ptr<WingGeometry> const& wingGeometry);
+        explicit WingTransformProgram(std::shared_ptr<WingGeometry> const& wingGeometry);
 
         /// <summary>
         /// Allocates a buffer object to serve as the recipient of the
