@@ -138,6 +138,7 @@ void main() {
         ArrayBuffer const& edgeColorBuffer) const
     {
         useProgram();
+
         glUniform2f(radiusAngleUniformLocation, radius, angle);
         glUniform3f(rollPitchYawUniformLocation, roll, pitch, yaw);
         glUniform3f(colorUniformLocation, red, green, blue);
@@ -164,6 +165,8 @@ void main() {
         glDisable(GL_RASTERIZER_DISCARD);
 
         glBindVertexArray(0);
+
+        glUseProgram(0);
     }
 
 }
