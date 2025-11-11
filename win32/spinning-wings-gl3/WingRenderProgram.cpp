@@ -201,6 +201,8 @@ void main() {
 		glDisable(GL_BLEND);
 
 		glBindVertexArray(0);
+
+		glUseProgram(0);
 	}
 
 	void WingRenderProgram::Resize(GLfloat const width, GLfloat const height) const
