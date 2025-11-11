@@ -77,6 +77,7 @@ namespace silnith::wings::gl3
 		 */
 		glBufferSubData(GL_UNIFORM_BUFFER, modelOffset, identityDataSize, identity.data());
 		glBufferSubData(GL_UNIFORM_BUFFER, viewOffset, viewDataSize, view.data());
+		//glBufferSubData(GL_UNIFORM_BUFFER, viewOffset, viewDataSize, glm::value_ptr(view2));
 		/*
 		 * The projection matrix is initialized here to the identity matrix.
 		 * It will be replaced with the real projection matrix later when the window is resized.
@@ -161,6 +162,10 @@ namespace silnith::wings::gl3
 			-(farZ + nearZ) / viewDepth,
 			static_cast<GLfloat>(1),
 		};
+		//glm::mat4 const foo{ glm::ortho(defaultLeft * xmult, defaultRight * xmult,
+		//	defaultBottom * ymult, defaultTop * ymult,
+		//	defaultNear, defaultFar) };
+		//GLfloat const* bar{ glm::value_ptr(foo) };
 		GLsizeiptr constexpr projectionDataSize{ sizeof(GLfloat) * projection.size() };
 
 		glBindBuffer(GL_UNIFORM_BUFFER, getId());
