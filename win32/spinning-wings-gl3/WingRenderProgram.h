@@ -132,6 +132,7 @@ namespace silnith::wings::gl3
 		/// things that need to be set are the specific buffers bound for each
         /// vertex attribute location, since those are different for every wing.
         /// </summary>
+        /// <seealso cref="ArrayBuffer::UseForVertexAttribute"/>
         GLuint vertexArray{ 0 };
 
         /// <summary>
