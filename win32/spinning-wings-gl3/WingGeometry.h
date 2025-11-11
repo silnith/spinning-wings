@@ -20,10 +20,10 @@ namespace silnith::wings::gl3
     {
     public:
         explicit WingGeometry(void);
-        WingGeometry(WingGeometry const&) = default;
-        WingGeometry& operator=(WingGeometry const&) = default;
-        WingGeometry(WingGeometry&&) noexcept = default;
-        WingGeometry& operator=(WingGeometry&&) noexcept = default;
+        WingGeometry(WingGeometry const&) = delete;
+        WingGeometry& operator=(WingGeometry const&) = delete;
+        WingGeometry(WingGeometry&&) noexcept = delete;
+        WingGeometry& operator=(WingGeometry&&) noexcept = delete;
         ~WingGeometry(void) noexcept = default;
 
     public:
