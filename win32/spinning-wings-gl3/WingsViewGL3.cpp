@@ -94,7 +94,7 @@ namespace silnith::wings::gl3
 			wings.emplace_front(deltaAngle, deltaZ, vertexBuffer, colorBuffer, edgeColorBuffer);
 		}
 
-		Wing<GLfloat> const& newWing{ wings.front() };
+		Wing const& newWing{ wings.front() };
 
 		/*
 		 * Run a vertex shader to transform the wing based on its current

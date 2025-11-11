@@ -154,7 +154,7 @@ void main() {
         glDeleteVertexArrays(1, &vertexArray);
     }
 
-	void WingRenderProgram::RenderWings(std::deque<Wing<GLfloat> > const& wings) const
+	void WingRenderProgram::RenderWings(std::deque<Wing> const& wings) const
 	{
 		useProgram();
 
@@ -165,7 +165,7 @@ void main() {
 		 */
 		GLfloat deltaZ{ 0 };
 		GLfloat deltaAngle{ 0 };
-		for (Wing<GLfloat> const& wing : wings) {
+		for (Wing const& wing : wings) {
 			deltaZ += wing.getDeltaZ();
 			deltaAngle += wing.getDeltaAngle();
 
@@ -186,7 +186,7 @@ void main() {
 		deltaZ = 0;
 		deltaAngle = 0;
 		glEnable(GL_BLEND);
-		for (Wing<GLfloat> const& wing : wings) {
+		for (Wing const& wing : wings) {
 			deltaZ += wing.getDeltaZ();
 			deltaAngle += wing.getDeltaAngle();
 

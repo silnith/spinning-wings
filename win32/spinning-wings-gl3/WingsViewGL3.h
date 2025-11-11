@@ -96,7 +96,7 @@ namespace silnith::wings::gl3
         /// <summary>
         /// The sequence of transformed wings.
         /// </summary>
-        std::deque<Wing<GLfloat> > wings{};
+        std::deque<Wing> wings{};
 
         /// <summary>
         /// The curve generator for the distance of the wing from the central axis.

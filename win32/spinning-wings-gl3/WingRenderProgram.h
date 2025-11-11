@@ -97,7 +97,7 @@ namespace silnith::wings::gl3
         /// Renders the provided collection of wings.
         /// </summary>
         /// <param name="wings">The wings to render.</param>
-        void RenderWings(std::deque<Wing<GLfloat> > const& wings) const;
+        void RenderWings(std::deque<Wing> const& wings) const;
 
         /// <summary>
         /// Sets up the orthographic projection that transforms modelview coordinates

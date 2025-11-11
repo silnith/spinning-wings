@@ -1,5 +1,8 @@
 #pragma once
 
+#include <Windows.h>
+#include <GL/glew.h>
+
 #include <memory>
 
 #include "Color.h"
@@ -28,7 +31,6 @@ namespace silnith::wings::gl3
 	/// All angles are in degrees.
 	/// </para>
 	/// </remarks>
-	template<typename T>
 	class Wing
 	{
 	public:
@@ -47,7 +49,7 @@ namespace silnith::wings::gl3
 		/// <param name="vertexBuffer">The vertex buffer to reuse for this wing.</param>
 		/// <param name="colorBuffer">The color buffer to reuse.</param>
 		/// <param name="edgeColorBuffer">The edge color buffer to reuse.</param>
-		Wing(T deltaAngle, T deltaZ,
+		Wing(GLfloat deltaAngle, GLfloat deltaZ,
 			std::shared_ptr<ArrayBuffer> const& vertexBuffer,
 			std::shared_ptr<ArrayBuffer> const& colorBuffer,
 			std::shared_ptr<ArrayBuffer> const& edgeColorBuffer) noexcept
@@ -60,7 +62,7 @@ namespace silnith::wings::gl3
 		/// </summary>
 		/// <returns>The additional angle that the wing gains as it recedes into history.</returns>
 		[[nodiscard]]
-		inline T getDeltaAngle(void) const noexcept
+		inline GLfloat getDeltaAngle(void) const noexcept
 		{
 			return deltaAngle;
 		}
@@ -70,7 +72,7 @@ namespace silnith::wings::gl3
 		/// </summary>
 		/// <returns>The additional height that the wing gains as it recedes into history.</returns>
 		[[nodiscard]]
-		inline T getDeltaZ(void) const noexcept
+		inline GLfloat getDeltaZ(void) const noexcept
 		{
 			return deltaZ;
 		}
@@ -158,8 +160,8 @@ namespace silnith::wings::gl3
 		}
 
 	private:
-		T const deltaAngle{ 15 };
-		T const deltaZ{ 0.5 };
+		GLfloat const deltaAngle{ 15 };
+		GLfloat const deltaZ{ 0.5 };
 		std::shared_ptr<ArrayBuffer> vertexBuffer{ nullptr };
 		std::shared_ptr<ArrayBuffer> colorBuffer{ nullptr };
 		std::shared_ptr<ArrayBuffer> edgeColorBuffer{ nullptr };
