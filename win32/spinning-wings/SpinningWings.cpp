@@ -129,23 +129,6 @@ void CALLBACK AdvanceAnimation(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwT
 /// <seealso cref="SetTimer"/>
 void StartAnimation(HWND hWnd)
 {
-	/*
-	 * This is to disable the "helpful" exception handler that Windows puts around timers, starting with Windows 2000.
-	 * They added it, then immediately realized it was a terrible idea and a security vulnerability,
-	 * but kept it for "compatibility" and instead told everybody to change their code to disable it instead.
-	 */
-	HANDLE const processHandle{ GetCurrentProcess() };
-	BOOL suppressExceptions{ FALSE };
-	PVOID const buffer_address{ &suppressExceptions };
-	DWORD constexpr buffer_length{ sizeof(suppressExceptions) };
-	BOOL const exceptionHandlerDisabled{ SetUserObjectInformationW(processHandle, UOI_TIMERPROC_EXCEPTION_SUPPRESSION, buffer_address, buffer_length) };
-
-	if (exceptionHandlerDisabled) {}
-	else
-	{
-		DWORD const error{ GetLastError() };
-	}
-
 	TIMERPROC constexpr timerProc{ AdvanceAnimation };
 	UINT_PTR const timerSet{ SetTimer(hWnd, animationTimerId, updateDelayMilliseconds, timerProc) };
 
@@ -334,6 +317,23 @@ int APIENTRY wWinMain(
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
+
+	/*
+	 * This is to disable the "helpful" exception handler that Windows puts around timers, starting with Windows 2000.
+	 * They added it, then immediately realized it was a terrible idea and a security vulnerability,
+	 * but kept it for "compatibility" and instead told everybody to change their code to disable it instead.
+	 */
+	HANDLE const processHandle{ GetCurrentProcess() };
+	BOOL suppressExceptions{ FALSE };
+	PVOID const buffer_address{ &suppressExceptions };
+	DWORD constexpr buffer_length{ sizeof(suppressExceptions) };
+	BOOL const exceptionHandlerDisabled{ SetUserObjectInformationW(processHandle, UOI_TIMERPROC_EXCEPTION_SUPPRESSION, buffer_address, buffer_length) };
+
+	if (exceptionHandlerDisabled) {}
+	else
+	{
+		DWORD const error{ GetLastError() };
+	}
 
 	// register the window class for the main window
 
