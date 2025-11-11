@@ -107,6 +107,8 @@ namespace silnith::wings::gl3
 			*newWing.getVertexBuffer(),
 			*newWing.getColorBuffer(),
 			*newWing.getEdgeColorBuffer());
+
+		glFlush();
 	}
 
 	void WingsViewGL3::DrawFrame(void) const
