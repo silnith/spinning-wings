@@ -32,22 +32,16 @@ namespace silnith::wings::gl4
             throw std::runtime_error{ "Failed to allocate shader." };
         }
 
-        // Limit scope of copies of string sources.
+        // Limit scope of temporary variables.
         {
-            std::vector<std::string> sourcesCopy{};
-            sourcesCopy.reserve(sources.size());
-            for (std::string const& source : sources)
-            {
-                sourcesCopy.emplace_back(source + '\n');
-            }
-
             std::vector<GLchar const*> cSources{};
-            cSources.reserve(sourcesCopy.size());
-            for (std::string const& source : sourcesCopy)
+            cSources.reserve(sources.size());
+            for (std::string const& source : sources)
             {
                 cSources.emplace_back(source.c_str());
             }
-            glShaderSource(id, static_cast<GLsizei>(cSources.size()), cSources.data(), nullptr);
+            GLsizei const cSourcesSize{ static_cast<GLsizei>(cSources.size()) };
+            glShaderSource(id, cSourcesSize, cSources.data(), nullptr);
         }
 
         glCompileShader(id);
