@@ -20,6 +20,43 @@ namespace silnith::wings::gl2
     class Shader
     {
     public:
+        /// <summary>
+        /// The GLSL function declaration for <c>rotate</c>, which returns a
+        /// transformation matrix that rotates around an axis.
+        /// </summary>
+        static std::string const rotateMatrixFunctionDeclaration;
+
+        /// <summary>
+        /// The GLSL function definition for <c>rotate</c>, which returns a
+        /// transformation matrix that rotates around an axis.
+        /// </summary>
+        static std::string const rotateMatrixFunctionDefinition;
+
+        /// <summary>
+        /// The GLSL function declaration for <c>translate</c>, which returns a
+        /// transformation matrix that translates.
+        /// </summary>
+        static std::string const translateMatrixFunctionDeclaration;
+
+        /// <summary>
+        /// The GLSL function definition for <c>translate</c>, which returns a
+        /// transformation matrix that translates.
+        /// </summary>
+        static std::string const translateMatrixFunctionDefinition;
+
+        /// <summary>
+        /// The GLSL function declaration for <c>scale</c>, which returns a
+        /// transformation matrix that scales.
+        /// </summary>
+        static std::string const scaleMatrixFunctionDeclaration;
+
+        /// <summary>
+        /// The GLSL function definition for <c>scale</c>, which returns a
+        /// transformation matrix that scales.
+        /// </summary>
+        static std::string const scaleMatrixFunctionDefinition;
+
+    public:
         Shader(void) noexcept = delete;
         Shader(Shader const&) noexcept = delete;
         Shader& operator=(Shader const&) noexcept = delete;
