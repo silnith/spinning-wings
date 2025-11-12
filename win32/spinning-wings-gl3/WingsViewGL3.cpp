@@ -30,10 +30,10 @@ namespace silnith::wings::gl3
 		glEnable(GL_DEPTH_TEST);
 
 		/*
-		 * The body of each wing is rendered using polygon offset to prevent
-		 * Z-fighting.
+		 * The body of each wing is rendered using polygon offset to reduce
+		 * Z-fighting with the edge.
 		 */
-		glPolygonOffset(0.5, 2);
+		glPolygonOffset(0.75, 2);
 		glEnable(GL_POLYGON_OFFSET_FILL);
 
 		/*

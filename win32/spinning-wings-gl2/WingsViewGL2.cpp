@@ -37,10 +37,10 @@ namespace silnith::wings::gl2
 		if (enablePolygonOffset)
 		{
 			/*
-			 * The edge of each wing is rendered using polygon offset to prevent
-			 * Z-fighting.
+			 * The edge of each wing is rendered using polygon offset to reduce
+			 * Z-fighting with the body.
 			 */
-			glPolygonOffset(-0.5, -2);
+			glPolygonOffset(-0.75, -2);
 			glEnable(GL_POLYGON_OFFSET_LINE);
 
 			/*
@@ -342,7 +342,16 @@ void main() {
 			 * Second, draw the wing outlines using the outline color.
 			 * The outlines have smoothing (antialiasing) enabled, which
 			 * requires blending.
+			 * 
+			 * In order to reduce Z-fighting, the depth test function is changed from the
+			 * default "less than" to "less than or equal".  Also, writes to the depth
+			 * buffer are disabled.  This way fragments generated for the lines will be
+			 * discarded if the line is behind an existing polygon, but drawn otherwise.
+			 * And corners where lines adjoin will allow overlapping partial fragments to
+			 * blend together rather than displace each other.
 			 */
+			glDepthFunc(GL_LEQUAL);
+			glDepthMask(GL_FALSE);
 			glEnable(GL_BLEND);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			deltaZ = 0;
@@ -358,6 +367,8 @@ void main() {
 			}
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			glDisable(GL_BLEND);
+			glDepthMask(GL_TRUE);
+			glDepthFunc(GL_LESS);
 		}
 
 		glFlush();

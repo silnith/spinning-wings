@@ -198,9 +198,18 @@ void main() {
 		 * Second, draw the wing outlines using the outline color.
 		 * The outlines have smoothing (antialiasing) enabled, which
 		 * requires blending.
+		 *
+		 * In order to reduce Z-fighting, the depth test function is changed from the
+		 * default "less than" to "less than or equal".  Also, writes to the depth
+		 * buffer are disabled.  This way fragments generated for the lines will be
+		 * discarded if the line is behind an existing polygon, but drawn otherwise.
+		 * And corners where lines adjoin will allow overlapping partial fragments to
+		 * blend together rather than displace each other.
 		 */
 		deltaZ = 0;
 		deltaAngle = 0;
+		glDepthFunc(GL_LEQUAL);
+		glDepthMask(GL_FALSE);
 		glEnable(GL_BLEND);
 		for (Wing const& wing : wings) {
 			deltaZ += wing.getDeltaZ();
@@ -215,6 +224,8 @@ void main() {
 			wingGeometry->RenderAsOutline();
 		}
 		glDisable(GL_BLEND);
+		glDepthMask(GL_TRUE);
+		glDepthFunc(GL_LESS);
 
 		glBindVertexArray(0);
 

@@ -117,10 +117,10 @@ namespace silnith::wings::gl4
 		glEnable(GL_DEPTH_TEST);
 
 		/*
-		 * The body of each wing is rendered using polygon offset to prevent
-		 * Z-fighting.
+		 * The body of each wing is rendered using polygon offset to reduce
+		 * Z-fighting with the edge.
 		 */
-		glPolygonOffset(0.5, 2);
+		glPolygonOffset(0.75, 2);
 		glEnable(GL_POLYGON_OFFSET_FILL);
 
 		/*
@@ -555,15 +555,32 @@ void main() {
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glDrawElements(GL_TRIANGLE_FAN, numIndices, GL_UNSIGNED_INT, 0);
+		}
+
+		deltaZ = 0;
+		deltaAngle = 0;
+		glDepthFunc(GL_LEQUAL);
+		glDepthMask(GL_FALSE);
+		glEnable(GL_BLEND);
+		for (wing_list::const_reference wing : wings) {
+			deltaZ += wing.getDeltaZ();
+			deltaAngle += wing.getDeltaAngle();
+
+			glUniform2f(renderProgram->getUniformLocation("deltaZ"s), deltaAngle, deltaZ);
+
+			glBindBuffer(GL_ARRAY_BUFFER, wing.getVertexBuffer());
+			glVertexAttribPointer(vertexAttribLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glBindBuffer(GL_ARRAY_BUFFER, wing.getEdgeColorBuffer());
 			glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnable(GL_BLEND);
 			glDrawElements(GL_LINE_LOOP, numIndices, GL_UNSIGNED_INT, 0);
-			glDisable(GL_BLEND);
 		}
+		glDisable(GL_BLEND);
+		glDepthMask(GL_TRUE);
+		glDepthFunc(GL_LESS);
 
 		glBindVertexArray(0);
 
