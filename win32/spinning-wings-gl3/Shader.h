@@ -66,7 +66,7 @@ namespace silnith::wings::gl3
     protected:
         /// <summary>
         /// Creates and compiles a shader from the given GLSL sources.
-        /// The source strings are concatenated with newlines appended to each.
+        /// The source strings are concatenated.
         /// </summary>
         /// <param name="type">The type of shader.  This should be one of
         /// <c>GL_VERTEX_SHADER</c>, <c>GL_GEOMETRY_SHADER</c>, or <c>GL_FRAGMENT_SHADER</c>.</param>
