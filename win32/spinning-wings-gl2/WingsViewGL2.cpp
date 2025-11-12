@@ -159,8 +159,8 @@ void main() {
     gl_Position = gl_ModelViewProjectionMatrix * deltaTransformation * wingTransformation * gl_Vertex;
 }
 )shaderText",
-					Shader::rotateMatrixFunctionDeclaration,
-					Shader::translateMatrixFunctionDeclaration,
+					Shader::rotateMatrixFunctionDefinition,
+					Shader::translateMatrixFunctionDefinition,
 				},
 				FragmentShader{
 					R"shaderText(#version 120
