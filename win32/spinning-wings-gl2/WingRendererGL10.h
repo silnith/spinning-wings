@@ -9,7 +9,7 @@ namespace silnith::wings::gl
 {
 
 	/// <summary>
-	/// The quad renderer that uses the OpenGL 1.0 rendering path.
+	/// The wing renderer that uses the OpenGL 1.0 rendering path.
 	/// </summary>
 	/// <remarks>
 	/// <para>
