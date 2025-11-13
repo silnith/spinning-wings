@@ -306,7 +306,7 @@ void main() {
 		glNewList(displayList, GL_COMPILE);
 		glVertexAttrib2f(radiusAngleAttribLocation, radius, angle);
 		glVertexAttrib3f(rollPitchYawAttribLocation, roll, pitch, yaw);
-		wingRenderer->DrawQuad();
+		wingRenderer->DrawWing();
 		glEndList();
 	}
 

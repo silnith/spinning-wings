@@ -28,7 +28,7 @@ namespace silnith::wings::gl
 		virtual ~QuadRendererGL10(void) noexcept override;
 
 	public:
-		virtual void DrawQuad(void) const override;
+		virtual void DrawWing(void) const override;
 
 	private:
 		/// <summary>

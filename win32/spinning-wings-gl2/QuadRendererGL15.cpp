@@ -66,7 +66,7 @@ namespace silnith::wings::gl
 		glDeleteBuffers(1, &wingBufferObject);
 	}
 
-	void QuadRendererGL15::DrawQuad(void) const
+	void QuadRendererGL15::DrawWing(void) const
 	{
 		/*
 		 * When compiled into a display list,

@@ -24,7 +24,7 @@ namespace silnith::wings::gl
 		glDeleteLists(quadDisplayList, 1);
 	}
 
-    void QuadRendererGL10::DrawQuad(void) const
+    void QuadRendererGL10::DrawWing(void) const
 	{
 		glCallList(quadDisplayList);
 	}

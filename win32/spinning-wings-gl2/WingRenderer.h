@@ -33,6 +33,6 @@ namespace silnith::wings::gl
 		/// normalized device coordinates, namely <c>[-1, 1]</c>.
 		/// </para>
 		/// </remarks>
-		virtual void DrawQuad(void) const = 0;
+		virtual void DrawWing(void) const = 0;
 	};
 }

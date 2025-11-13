@@ -37,7 +37,7 @@ namespace silnith::wings::gl
 		glDisableClientState(GL_VERTEX_ARRAY);
 	}
 	
-	void QuadRendererGL11::DrawQuad(void) const
+	void QuadRendererGL11::DrawWing(void) const
 	{
 		/*
 		 * This reads the specified number of indices from the provided client
