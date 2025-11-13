@@ -128,7 +128,7 @@ void main() {
     float radius = radiusAngle[0];
     float angle = radiusAngle[1];
     float deltaAngle = deltaZ[0];
-    float deltaZ = deltaZ[1];
+    float dZ = deltaZ[1];
     float roll = rollPitchYaw[0];
     float pitch = rollPitchYaw[1];
     float yaw = rollPitchYaw[2];
@@ -141,7 +141,7 @@ void main() {
      * glTranslatef(0, 0, wing.getDeltaZ());
      * glRotatef(wing.getDeltaAngle(), 0, 0, 1);
      */
-    mat4 deltaTransformation = translate(vec3(0, 0, deltaZ))
+    mat4 deltaTransformation = translate(vec3(0, 0, dZ))
                                * rotate(deltaAngle, zAxis);
     /*
      * This implements the transformations that were handled by the
