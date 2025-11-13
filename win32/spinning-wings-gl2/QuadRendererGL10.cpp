@@ -6,7 +6,7 @@
 namespace silnith::wings::gl
 {
 
-	QuadRendererGL10::QuadRendererGL10(void) : WingRenderer{},
+	WingRendererGL10::WingRendererGL10(void) : WingRenderer{},
 		quadDisplayList{ glGenLists(1) }
 	{
 		glNewList(quadDisplayList, GL_COMPILE);
@@ -19,12 +19,12 @@ namespace silnith::wings::gl
 		glEndList();
 	}
 
-	QuadRendererGL10::~QuadRendererGL10(void) noexcept
+	WingRendererGL10::~WingRendererGL10(void) noexcept
 	{
 		glDeleteLists(quadDisplayList, 1);
 	}
 
-    void QuadRendererGL10::DrawWing(void) const
+    void WingRendererGL10::DrawWing(void) const
 	{
 		glCallList(quadDisplayList);
 	}

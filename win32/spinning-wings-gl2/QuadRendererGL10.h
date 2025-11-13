@@ -17,15 +17,15 @@ namespace silnith::wings::gl
 	/// in a display list.
 	/// </para>
 	/// </remarks>
-	class QuadRendererGL10 : public WingRenderer
+	class WingRendererGL10 : public WingRenderer
 	{
 	public:
-		QuadRendererGL10(void);
-		QuadRendererGL10(QuadRendererGL10 const&) = delete;
-		QuadRendererGL10& operator=(QuadRendererGL10 const&) = delete;
-		QuadRendererGL10(QuadRendererGL10&&) noexcept = delete;
-		QuadRendererGL10& operator=(QuadRendererGL10&&) noexcept = delete;
-		virtual ~QuadRendererGL10(void) noexcept override;
+		WingRendererGL10(void);
+		WingRendererGL10(WingRendererGL10 const&) = delete;
+		WingRendererGL10& operator=(WingRendererGL10 const&) = delete;
+		WingRendererGL10(WingRendererGL10&&) noexcept = delete;
+		WingRendererGL10& operator=(WingRendererGL10&&) noexcept = delete;
+		virtual ~WingRendererGL10(void) noexcept override;
 
 	public:
 		virtual void DrawWing(void) const override;
