@@ -9,8 +9,8 @@
 namespace silnith::wings::gl2
 {
     /// <summary>
-    /// Manages a single GLSL shader.  Use <c>FragmentShader</c>
-    /// or <c>VertexShader</c> instead.
+    /// Manages a single GLSL shader.  Use the <c>FragmentShader</c>
+    /// or <c>VertexShader</c> specializations instead.
     /// </summary>
     /// <remarks>
     /// <para>

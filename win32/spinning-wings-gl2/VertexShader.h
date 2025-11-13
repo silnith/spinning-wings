@@ -59,10 +59,11 @@ namespace silnith::wings::gl2
         VertexShader(VertexShader&&) noexcept = delete;
         VertexShader& operator=(VertexShader&&) noexcept = delete;
         virtual ~VertexShader(void) noexcept override = default;
+
     public:
         /// <summary>
         /// Creates and compiles a vertex shader from the given GLSL sources.
-        /// The source strings are concatenated with newlines appended to each.
+        /// The source strings are concatenated.
         /// </summary>
         /// <param name="sources">The source strings to concatenate.</param>
         /// <exception cref="std::runtime_error">If an error occurs creating the shader object in the OpenGL state machine.</exception>

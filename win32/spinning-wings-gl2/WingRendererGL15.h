@@ -43,7 +43,7 @@ namespace silnith::wings::gl
 		GLuint wingIndicesBufferObject{ 0 };
 
 		/// <summary>
-		/// The number of indices that make up a quad.
+		/// The number of indices that make up a wing.
 		/// </summary>
 		static GLsizei constexpr numIndices{ 4 };
 	};

@@ -120,6 +120,10 @@ namespace silnith::wings::gl2
         /// outlines will be rendered.  The outlines will also have smoothing
         /// enabled, which requires fragment blending.
         /// </para>
+        /// <para>
+        /// Since this project is a demonstration for OpenGL 2.0, this will
+        /// always be <see langword="true"/>.
+        /// </para>
         /// </remarks>
         bool const enablePolygonOffset{ false };
 

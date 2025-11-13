@@ -32,7 +32,7 @@ namespace silnith::wings::gl
 
 	private:
 		/// <summary>
-		/// The GL display list for rendering a single quad.
+		/// The GL display list for rendering a single wing.
 		/// </summary>
 		GLuint const quadDisplayList{ 0 };
 	};
