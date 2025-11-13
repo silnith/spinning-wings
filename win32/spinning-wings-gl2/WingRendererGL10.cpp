@@ -1,7 +1,7 @@
 #include <Windows.h>
 #include <GL/glew.h>
 
-#include "QuadRendererGL10.h"
+#include "WingRendererGL10.h"
 
 namespace silnith::wings::gl
 {

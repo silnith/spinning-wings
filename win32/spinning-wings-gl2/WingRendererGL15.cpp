@@ -3,7 +3,7 @@
 
 #include <array>
 
-#include "QuadRendererGL15.h"
+#include "WingRendererGL15.h"
 
 namespace silnith::wings::gl
 {

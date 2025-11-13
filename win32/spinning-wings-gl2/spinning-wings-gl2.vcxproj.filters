@@ -33,13 +33,13 @@
     <ClCompile Include="VertexShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="QuadRendererGL10.cpp">
+    <ClCompile Include="WingRendererGL10.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="QuadRendererGL11.cpp">
+    <ClCompile Include="WingRendererGL11.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="QuadRendererGL15.cpp">
+    <ClCompile Include="WingRendererGL15.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -75,13 +75,13 @@
     <ClInclude Include="WingRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="QuadRendererGL10.h">
+    <ClInclude Include="WingRendererGL10.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="QuadRendererGL11.h">
+    <ClInclude Include="WingRendererGL11.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="QuadRendererGL15.h">
+    <ClInclude Include="WingRendererGL15.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

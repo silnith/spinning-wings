@@ -14,9 +14,9 @@
 #include "FragmentShader.h"
 #include "GLInfo.h"
 #include "Program.h"
-#include "QuadRendererGL10.h"
-#include "QuadRendererGL11.h"
-#include "QuadRendererGL15.h"
+#include "WingRendererGL10.h"
+#include "WingRendererGL11.h"
+#include "WingRendererGL15.h"
 #include "VertexShader.h"
 #include "Wing.h"
 
