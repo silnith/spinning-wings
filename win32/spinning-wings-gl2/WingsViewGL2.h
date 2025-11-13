@@ -10,7 +10,7 @@
 
 #include "CurveGenerator.h"
 #include "GLInfo.h"
-#include "QuadRenderer.h"
+#include "WingRenderer.h"
 #include "Wing.h"
 
 #include "FragmentShader.h"

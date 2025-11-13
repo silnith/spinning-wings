@@ -72,7 +72,7 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="QuadRenderer.h">
+    <ClInclude Include="WingRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="QuadRendererGL10.h">

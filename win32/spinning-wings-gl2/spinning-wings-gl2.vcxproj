@@ -187,7 +187,7 @@
   <ItemGroup>
     <ClInclude Include="FragmentShader.h" />
     <ClInclude Include="Program.h" />
-    <ClInclude Include="QuadRenderer.h" />
+    <ClInclude Include="WingRenderer.h" />
     <ClInclude Include="QuadRendererGL10.h" />
     <ClInclude Include="QuadRendererGL11.h" />
     <ClInclude Include="QuadRendererGL15.h" />

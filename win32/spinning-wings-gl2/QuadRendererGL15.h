@@ -3,7 +3,7 @@
 #include <Windows.h>
 #include <GL/glew.h>
 
-#include "QuadRenderer.h"
+#include "WingRenderer.h"
 
 namespace silnith::wings::gl
 {
