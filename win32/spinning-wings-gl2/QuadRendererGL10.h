@@ -17,7 +17,7 @@ namespace silnith::wings::gl
 	/// in a display list.
 	/// </para>
 	/// </remarks>
-	class QuadRendererGL10 : public QuadRenderer
+	class QuadRendererGL10 : public WingRenderer
 	{
 	public:
 		QuadRendererGL10(void);

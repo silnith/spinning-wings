@@ -136,7 +136,7 @@ namespace silnith::wings::gl2
         /// renderer chosen will always be the OpenGL 1.5 implementation.)
         /// </para>
         /// </remarks>
-        std::unique_ptr<silnith::wings::gl::QuadRenderer> quadRenderer{ nullptr };
+        std::unique_ptr<silnith::wings::gl::WingRenderer> quadRenderer{ nullptr };
 
         /// <summary>
         /// The sequence of transformed wings.

@@ -8,7 +8,7 @@
 namespace silnith::wings::gl
 {
 
-	QuadRendererGL11::QuadRendererGL11(void) : QuadRenderer{},
+	QuadRendererGL11::QuadRendererGL11(void) : WingRenderer{},
 		wingVertices{
 			1, 1,
 			-1, 1,

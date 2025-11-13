@@ -16,7 +16,7 @@ namespace silnith::wings::gl
 	/// This uses buffer objects to hold the vertex and element arrays.
 	/// </para>
 	/// </remarks>
-	class QuadRendererGL15 : public QuadRenderer
+	class QuadRendererGL15 : public WingRenderer
 	{
 	public:
 		QuadRendererGL15(void);

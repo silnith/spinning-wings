@@ -8,7 +8,7 @@
 namespace silnith::wings::gl
 {
 
-	QuadRendererGL15::QuadRendererGL15(void) : QuadRenderer{}
+	QuadRendererGL15::QuadRendererGL15(void) : WingRenderer{}
 	{
 		GLsizei constexpr numVertices{ 4 };
 		GLint constexpr numCoordinatesPerVertex{ 2 };

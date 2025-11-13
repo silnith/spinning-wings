@@ -3,26 +3,26 @@
 namespace silnith::wings::gl
 {
 	/// <summary>
-	/// Interface for utility classes that draw a single quad.
+	/// Interface for utility classes that draw a single wing.
 	/// </summary>
 	/// <remarks>
 	/// <para>
 	/// There will be implementations for OpenGL 1.0, 1.1, and 1.5.
 	/// </para>
 	/// </remarks>
-	class QuadRenderer
+	class WingRenderer
 	{
 	public:
-		QuadRenderer(void) = default;
-		QuadRenderer(QuadRenderer const&) = delete;
-		QuadRenderer& operator=(QuadRenderer const&) = delete;
-		QuadRenderer(QuadRenderer&&) noexcept = delete;
-		QuadRenderer& operator=(QuadRenderer&&) noexcept = delete;
-		virtual ~QuadRenderer(void) noexcept = default;
+		WingRenderer(void) = default;
+		WingRenderer(WingRenderer const&) = delete;
+		WingRenderer& operator=(WingRenderer const&) = delete;
+		WingRenderer(WingRenderer&&) noexcept = delete;
+		WingRenderer& operator=(WingRenderer&&) noexcept = delete;
+		virtual ~WingRenderer(void) noexcept = default;
 
 	public:
 		/// <summary>
-		/// Draws a single quad to represent a wing.  This is suitable for compiling
+		/// Draws a single wing.  This is suitable for compiling
 		/// into a display list, or for immediate-mode rendering.
 		/// </summary>
 		/// <remarks>

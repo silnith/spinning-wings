@@ -18,7 +18,7 @@ namespace silnith::wings::gl
 	/// This uses the client array functionality.
 	/// </para>
 	/// </remarks>
-	class QuadRendererGL11 : public QuadRenderer
+	class QuadRendererGL11 : public WingRenderer
 	{
 	public:
 		QuadRendererGL11(void);
