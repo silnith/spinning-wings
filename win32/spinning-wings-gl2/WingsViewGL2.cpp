@@ -82,22 +82,39 @@ namespace silnith::wings::gl2
 
 		if (glInfo.isAtLeastVersion(2, 1))
 		{
-			glslProgram = std::make_unique<Program>(
-				VertexShader{
-					R"shaderText(#version 120
-// Shader version 1.20 corresponds to OpenGL 2.1
-
+			/*
+			 * This block scope is only here so the shaders go
+			 * out of scope the moment they are no longer needed.
+			 * 
+			 * This could have been accomplished by inlining them into the
+			 * call to create the GLSL program, but doing that makes that
+			 * line of code quite long and difficult to understand.
+			 */
+			{
+				/// <summary>
+				/// The main vertex shader.  This has three input attributes,
+				/// <c>deltaZ</c>, <c>radiusAngle</c>, and <c>rollPitchYaw</c>.
+				/// It requires linking against the vertex shaders provided by
+				/// <see cref="VertexShader::MakeRotateMatrixShader"/>,
+				/// <see cref="VertexShader::MakeTranslateMatrixShader"/>, and
+				/// <see cref="VertexShader::MakeScaleMatrixShader"/>.
+				/// </summary>
+				std::shared_ptr<VertexShader const> const mainVertexShader{
+					std::make_shared<VertexShader const>(std::initializer_list<std::string>{
+						Shader::versionDeclaration,
+						R"shaderText(
 attribute vec2 deltaZ;
 attribute vec2 radiusAngle;
 attribute vec3 rollPitchYaw;
 
-mat4 rotate(in float angle, in vec3 axis);
-mat4 translate(in vec3 move);
-
 const vec3 xAxis = vec3(1, 0, 0);
 const vec3 yAxis = vec3(0, 1, 0);
 const vec3 zAxis = vec3(0, 0, 1);
-
+)shaderText"s,
+						Shader::rotateMatrixFunctionDeclaration,
+						Shader::translateMatrixFunctionDeclaration,
+						Shader::scaleMatrixFunctionDeclaration,
+						R"shaderText(
 /*
  * The shader entry point.
  * Vertex shaders may read gl_Color, gl_SecondaryColor,
@@ -158,14 +175,13 @@ void main() {
      */
     gl_Position = gl_ModelViewProjectionMatrix * deltaTransformation * wingTransformation * gl_Vertex;
 }
-)shaderText",
-					Shader::rotateMatrixFunctionDefinition,
-					Shader::translateMatrixFunctionDefinition,
-				},
-				FragmentShader{
-					R"shaderText(#version 120
-// Shader version 1.20 corresponds to OpenGL 2.1
-
+)shaderText"s,
+					})
+				};
+				std::shared_ptr<FragmentShader const> const mainFragmentShader{
+					std::make_shared<FragmentShader const>(std::initializer_list<std::string>{
+						Shader::versionDeclaration,
+						R"shaderText(
 /*
  * The shader entry point.
  * Fragment shaders may read the variables gl_FragCoord and gl_FrontFacing.
@@ -181,9 +197,27 @@ void main() {
     gl_FragColor = gl_Color;
     gl_FragDepth = gl_FragCoord.z;
 }
-)shaderText",
-				}
-			);
+)shaderText"s,
+					})
+				};
+				/*
+				 * There are actually four vertex shaders instead of just one.
+				 * The one containing the main entry point is inlined above for
+				 * clarity.  The other three provide implementations replacing
+				 * fixed-function features without defining a main function, so
+				 * the main shader can use them without being cluttered.
+				 */
+				std::initializer_list<std::shared_ptr<VertexShader const> > const vertexShaders{
+					mainVertexShader,
+					VertexShader::MakeRotateMatrixShader(),
+					VertexShader::MakeTranslateMatrixShader(),
+					VertexShader::MakeScaleMatrixShader(),
+				};
+				std::initializer_list<std::shared_ptr<FragmentShader const> > const fragmentShaders{
+					mainFragmentShader,
+				};
+				glslProgram = std::make_unique<Program>(vertexShaders, fragmentShaders);
+			}
 
 			deltaZAttribLocation = glslProgram->getAttributeLocation("deltaZ"s);
 			radiusAngleAttribLocation = glslProgram->getAttributeLocation("radiusAngle"s);
