@@ -124,7 +124,7 @@ namespace silnith::wings::gl2
         bool const enablePolygonOffset{ false };
 
         /// <summary>
-        /// A handler for drawing the actual quad that is the wing.
+        /// A handler for drawing the actual wing.
         /// </summary>
         /// <remarks>
         /// <para>
@@ -136,7 +136,7 @@ namespace silnith::wings::gl2
         /// renderer chosen will always be the OpenGL 1.5 implementation.)
         /// </para>
         /// </remarks>
-        std::unique_ptr<silnith::wings::gl::WingRenderer> quadRenderer{ nullptr };
+        std::unique_ptr<silnith::wings::gl::WingRenderer> wingRenderer{ nullptr };
 
         /// <summary>
         /// The sequence of transformed wings.

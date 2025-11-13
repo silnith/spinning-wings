@@ -69,15 +69,15 @@ namespace silnith::wings::gl2
 		 */
 		if (glInfo.isAtLeastVersion(1, 5))
 		{
-			quadRenderer = std::make_unique<silnith::wings::gl::QuadRendererGL15>();
+			wingRenderer = std::make_unique<silnith::wings::gl::QuadRendererGL15>();
 		}
 		else if (glInfo.isAtLeastVersion(1, 1))
 		{
-			quadRenderer = std::make_unique<silnith::wings::gl::QuadRendererGL11>();
+			wingRenderer = std::make_unique<silnith::wings::gl::QuadRendererGL11>();
 		}
 		else
 		{
-			quadRenderer = std::make_unique<silnith::wings::gl::QuadRendererGL10>();
+			wingRenderer = std::make_unique<silnith::wings::gl::QuadRendererGL10>();
 		}
 
 		if (glInfo.isAtLeastVersion(2, 1))
@@ -306,7 +306,7 @@ void main() {
 		glNewList(displayList, GL_COMPILE);
 		glVertexAttrib2f(radiusAngleAttribLocation, radius, angle);
 		glVertexAttrib3f(rollPitchYawAttribLocation, roll, pitch, yaw);
-		quadRenderer->DrawQuad();
+		wingRenderer->DrawQuad();
 		glEndList();
 	}
 
