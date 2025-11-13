@@ -8,7 +8,7 @@
 namespace silnith::wings::gl
 {
 
-	QuadRendererGL15::QuadRendererGL15(void) : WingRenderer{}
+	WingRendererGL15::WingRendererGL15(void) : WingRenderer{}
 	{
 		GLsizei constexpr numVertices{ 4 };
 		GLint constexpr numCoordinatesPerVertex{ 2 };
@@ -55,7 +55,7 @@ namespace silnith::wings::gl
 		glEnableClientState(GL_VERTEX_ARRAY);
 	}
 
-	QuadRendererGL15::~QuadRendererGL15(void) noexcept
+	WingRendererGL15::~WingRendererGL15(void) noexcept
 	{
 		glDisableClientState(GL_VERTEX_ARRAY);
 
@@ -66,7 +66,7 @@ namespace silnith::wings::gl
 		glDeleteBuffers(1, &wingBufferObject);
 	}
 
-	void QuadRendererGL15::DrawWing(void) const
+	void WingRendererGL15::DrawWing(void) const
 	{
 		/*
 		 * When compiled into a display list,

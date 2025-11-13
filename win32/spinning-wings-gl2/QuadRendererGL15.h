@@ -16,15 +16,15 @@ namespace silnith::wings::gl
 	/// This uses buffer objects to hold the vertex and element arrays.
 	/// </para>
 	/// </remarks>
-	class QuadRendererGL15 : public WingRenderer
+	class WingRendererGL15 : public WingRenderer
 	{
 	public:
-		QuadRendererGL15(void);
-		QuadRendererGL15(QuadRendererGL15 const&) = delete;
-		QuadRendererGL15& operator=(QuadRendererGL15 const&) = delete;
-		QuadRendererGL15(QuadRendererGL15&&) noexcept = delete;
-		QuadRendererGL15& operator=(QuadRendererGL15&&) noexcept = delete;
-		virtual ~QuadRendererGL15(void) noexcept override;
+		WingRendererGL15(void);
+		WingRendererGL15(WingRendererGL15 const&) = delete;
+		WingRendererGL15& operator=(WingRendererGL15 const&) = delete;
+		WingRendererGL15(WingRendererGL15&&) noexcept = delete;
+		WingRendererGL15& operator=(WingRendererGL15&&) noexcept = delete;
+		virtual ~WingRendererGL15(void) noexcept override;
 
 	public:
 		virtual void DrawWing(void) const override;

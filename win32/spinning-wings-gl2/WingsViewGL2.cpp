@@ -69,7 +69,7 @@ namespace silnith::wings::gl2
 		 */
 		if (glInfo.isAtLeastVersion(1, 5))
 		{
-			wingRenderer = std::make_unique<silnith::wings::gl::QuadRendererGL15>();
+			wingRenderer = std::make_unique<silnith::wings::gl::WingRendererGL15>();
 		}
 		else if (glInfo.isAtLeastVersion(1, 1))
 		{
