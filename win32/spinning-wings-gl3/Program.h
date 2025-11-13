@@ -32,17 +32,23 @@ namespace silnith::wings::gl3
         /// <summary>
         /// Creates a GLSL program for transformation feedback.
         /// </summary>
-        /// <param name="vertexShader">The vertex shader.</param>
+        /// <param name="vertexShader">The vertex shaders to assemble.  Only one may define the <c>main</c> function.</param>
         /// <param name="capturedVaryings">The varying variables to capture.</param>
-        explicit Program(VertexShader const& vertexShader, std::initializer_list<std::string> const& capturedVaryings);
+        /// <exception cref="std::runtime_error">If the program fails to link.</exception>
+        explicit Program(std::initializer_list<std::shared_ptr<VertexShader const> > const& vertexShaders,
+            std::initializer_list<std::string> const& capturedVaryings);
 
         /// <summary>
         /// Creates a GLSL program for rendering.
         /// </summary>
-        /// <param name="vertexShader">The vertex shader.</param>
-        /// <param name="fragmentShader">The fragment shader.</param>
+        /// <param name="vertexShader">The vertex shaders to assemble.  Only one may define the <c>main</c> function.</param>
+        /// <param name="fragmentShaders">The fragment shaders to assemble.  Only one may define the <c>main</c> function.</param>
         /// <param name="fragmentData">The fragment shader output variable to be written into the output buffer.</param>
-        explicit Program(VertexShader const& vertexShader, FragmentShader const& fragmentShader, std::string const& fragmentData);
+        /// <exception cref="std::runtime_error">If the program fails to link.</exception>
+        explicit Program(
+            std::initializer_list<std::shared_ptr<VertexShader const> > const& vertexShaders,
+            std::initializer_list<std::shared_ptr<FragmentShader const> > const& fragmentShaders,
+            std::string const& fragmentData);
 
         /// <summary>
         /// Validate that the GLSL program can execute given the current GL state.

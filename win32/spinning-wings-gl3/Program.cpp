@@ -20,10 +20,16 @@ using namespace std::literals::string_literals;
 namespace silnith::wings::gl3
 {
 
-    Program::Program(VertexShader const& vertexShader, std::initializer_list<std::string> const& capturedVaryings)
+    Program::Program(std::initializer_list<std::shared_ptr<VertexShader const> > const& vertexShaders,
+        std::initializer_list<std::string> const& capturedVaryings)
         : id{ glCreateProgram() },
         linkLog{}
     {
+        if (id == 0)
+        {
+            throw std::runtime_error{ "Failed to allocate GLSL program."s };
+        }
+
         // Limit scope of pointers to string sources.
         {
             std::vector<GLchar const*> cPtrs{};
@@ -36,11 +42,17 @@ namespace silnith::wings::gl3
             glTransformFeedbackVaryings(id, count, varyings, GL_SEPARATE_ATTRIBS);
         }
 
-        glAttachShader(id, vertexShader.getShader());
+        for (std::shared_ptr<VertexShader const> const& vertexShader : vertexShaders)
+        {
+            glAttachShader(id, vertexShader->getShader());
+        }
 
         glLinkProgram(id);
 
-        glDetachShader(id, vertexShader.getShader());
+        for (std::shared_ptr<VertexShader const> const& vertexShader : vertexShaders)
+        {
+            glDetachShader(id, vertexShader->getShader());
+        }
 
         GLint logSize{ 0 };
         glGetProgramiv(id, GL_INFO_LOG_LENGTH, &logSize);
@@ -72,22 +84,42 @@ namespace silnith::wings::gl3
         }
     }
 
-    Program::Program(VertexShader const& vertexShader, FragmentShader const& fragmentShader, std::string const& fragmentData)
+    Program::Program(
+        std::initializer_list<std::shared_ptr<VertexShader const> > const& vertexShaders,
+        std::initializer_list<std::shared_ptr<FragmentShader const> > const& fragmentShaders,
+        std::string const& fragmentData)
         : id{ glCreateProgram() }, linkLog{}
     {
+        if (id == 0)
+        {
+            throw std::runtime_error{ "Failed to allocate GLSL program."s };
+        }
+
         /*
          * The color number allow rendering to multiple draw buffers.
          */
         GLuint constexpr colorNumber{ 0 };
         glBindFragDataLocation(id, colorNumber, fragmentData.c_str());
 
-        glAttachShader(id, vertexShader.getShader());
-        glAttachShader(id, fragmentShader.getShader());
+        for (std::shared_ptr<VertexShader const> const& vertexShader : vertexShaders)
+        {
+            glAttachShader(id, vertexShader->getShader());
+        }
+        for (std::shared_ptr<FragmentShader const> const& fragmentShader : fragmentShaders)
+        {
+            glAttachShader(id, fragmentShader->getShader());
+        }
 
         glLinkProgram(id);
 
-        glDetachShader(id, fragmentShader.getShader());
-        glDetachShader(id, vertexShader.getShader());
+        for (std::shared_ptr<VertexShader const> const& vertexShader : vertexShaders)
+        {
+            glDetachShader(id, vertexShader->getShader());
+        }
+        for (std::shared_ptr<FragmentShader const> const& fragmentShader : fragmentShaders)
+        {
+            glDetachShader(id, fragmentShader->getShader());
+        }
 
         GLint logSize{ 0 };
         glGetProgramiv(id, GL_INFO_LOG_LENGTH, &logSize);

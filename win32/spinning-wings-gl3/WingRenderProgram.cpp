@@ -27,8 +27,14 @@ using namespace std::literals::string_literals;
 namespace silnith::wings::gl3
 {
 
-	std::string const WingRenderProgram::vertexShaderSourceCode{ R"shaderText(#version 150
-
+	WingRenderProgram::WingRenderProgram(std::shared_ptr<WingGeometry> const& wingGeometry,
+		std::shared_ptr<VertexShader const> const& rotateMatrixShader,
+		std::shared_ptr<VertexShader const> const& translateMatrixShader) :
+		Program{
+			std::initializer_list<std::shared_ptr<VertexShader const> >{
+				std::make_shared<VertexShader const>(std::initializer_list<std::string>{
+					Shader::versionDeclaration,
+					R"shaderText(
 uniform ModelViewProjection {
     mat4 model;
     mat4 view;
@@ -42,13 +48,13 @@ in vec4 color;
 
 smooth out vec4 varyingColor;
 
-mat4 rotate(in float angle, in vec3 axis);
-mat4 translate(in vec3 move);
-
 const vec3 xAxis = vec3(1, 0, 0);
 const vec3 yAxis = vec3(0, 1, 0);
 const vec3 zAxis = vec3(0, 0, 1);
-
+)shaderText",
+					Shader::rotateMatrixFunctionDeclaration,
+					Shader::translateMatrixFunctionDeclaration,
+					R"shaderText(
 void main() {
     float deltaAngle = deltaZ[0];
     float dZ = deltaZ[1];
@@ -61,10 +67,15 @@ void main() {
                   * rotate(deltaAngle, zAxis)
                   * vertex;
 }
-)shaderText" };
-
-	std::string const WingRenderProgram::fragmentShaderSourceCode{ R"shaderText(#version 150
-
+)shaderText",
+				}),
+				rotateMatrixShader,
+				translateMatrixShader,
+			},
+			std::initializer_list<std::shared_ptr<FragmentShader const> >{
+				std::make_shared<FragmentShader const>(std::initializer_list<std::string>{
+					Shader::versionDeclaration,
+					R"shaderText(
 smooth in vec4 varyingColor;
 
 out vec4 fragmentColor;
@@ -72,14 +83,11 @@ out vec4 fragmentColor;
 void main() {
     fragmentColor = varyingColor;
 }
-)shaderText" };
-
-	WingRenderProgram::WingRenderProgram(std::shared_ptr<WingGeometry> const& wingGeometry) :
-		Program{
-			VertexShader{ vertexShaderSourceCode, Shader::rotateMatrixFunctionDefinition, Shader::translateMatrixFunctionDefinition },
-			FragmentShader{ fragmentShaderSourceCode },
+)shaderText",
+				}),
+			},
 			"fragmentColor"s
-	},
+		},
 		wingGeometry{ wingGeometry },
 		deltaZUniformLocation{ getUniformLocation("deltaZ"s) },
 		vertexAttributeLocation{ getAttributeLocation("vertex"s) },

@@ -17,6 +17,14 @@ using namespace std::literals::string_literals;
 namespace silnith::wings::gl3
 {
 
+    std::string const Shader::versionDeclaration{
+        R"shaderText(#version 150 core
+// Shader version 1.50 corresponds to OpenGL 3.2
+
+layout(shared, column_major) uniform;
+)shaderText"
+    };
+
     std::string const Shader::rotateMatrixFunctionDeclaration{
         R"shaderText(
 mat4 rotate(in float angle, in vec3 axis);
@@ -75,7 +83,12 @@ mat4 scale(in vec3 factor);
     std::string const Shader::scaleMatrixFunctionDefinition{
         R"shaderText(
 mat4 scale(in vec3 factor) {
-    return mat4(vec4(factor, 1));
+    mat4 result;
+    result[0][0] = factor.x;
+    result[1][1] = factor.y;
+    result[2][2] = factor.z;
+    result[3][3] = 1;
+    return result;
 }
 )shaderText"
     };

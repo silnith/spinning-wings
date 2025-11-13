@@ -20,32 +20,6 @@ namespace silnith::wings::gl3
     /// </summary>
     class WingTransformProgram : public Program
     {
-    private:
-        /// <summary>
-        /// The GLSL vertex shader source code.  This applies the wing-specific
-        /// transformations, and then captures the transformed vertices into a
-        /// buffer for later use.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// This has one input attribute named <c>vertex</c> of type <c>vec4</c>.
-        /// </para>
-        /// <para>
-        /// There are three varying outputs.
-        /// <c>gl_Position</c> is of type <c>vec4</c>.
-        /// <c>varyingWingColor</c> is of type <c>vec3</c>.
-        /// <c>varyingEdgeColor</c> is of type <c>vec3</c>.
-        /// </para>
-        /// <para>
-        /// There are four uniforms.
-        /// <c>radiusAngle</c> is of type <c>vec2</c>.
-        /// <c>rollPitchYaw</c> is of type <c>vec3</c>.
-        /// <c>color</c> is of type <c>vec3</c>.
-        /// <c>edgeColor</c> is of type <c>vec3</c>, and is optional.
-        /// </para>
-        /// </remarks>
-        static std::string const sourceCode;
-
     public:
         WingTransformProgram(void) = delete;
         WingTransformProgram(WingTransformProgram const&) = delete;
@@ -55,7 +29,9 @@ namespace silnith::wings::gl3
         virtual ~WingTransformProgram(void) noexcept override;
 
     public:
-        explicit WingTransformProgram(std::shared_ptr<WingGeometry> const& wingGeometry);
+        explicit WingTransformProgram(std::shared_ptr<WingGeometry> const& wingGeometry,
+            std::shared_ptr<VertexShader const> const& rotateMatrixShader,
+            std::shared_ptr<VertexShader const> const& translateMatrixShader);
 
         /// <summary>
         /// Allocates a buffer object to serve as the recipient of the

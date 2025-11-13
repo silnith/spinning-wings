@@ -51,9 +51,15 @@ namespace silnith::wings::gl3
 		 * Set up the pieces needed to render one single
 		 * (untransformed, uncolored) wing.
 		 */
+		std::shared_ptr<VertexShader const> rotateMatrixShader{
+			VertexShader::MakeRotateMatrixShader()
+		};
+		std::shared_ptr<VertexShader const> translateMatrixShader{
+			VertexShader::MakeTranslateMatrixShader()
+		};
 		wingGeometry = std::make_shared<WingGeometry>();
-		wingTransformProgram = std::make_unique<WingTransformProgram>(wingGeometry);
-		wingRenderProgram = std::make_unique<WingRenderProgram>(wingGeometry);
+		wingTransformProgram = std::make_unique<WingTransformProgram>(wingGeometry, rotateMatrixShader, translateMatrixShader);
+		wingRenderProgram = std::make_unique<WingRenderProgram>(wingGeometry, rotateMatrixShader, translateMatrixShader);
 	}
 
 	void WingsViewGL3::AdvanceAnimation(void)

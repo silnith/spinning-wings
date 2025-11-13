@@ -44,8 +44,22 @@ namespace silnith::wings::gl3
     /// </remarks>
     static GLint constexpr numCapturedColorComponentsPerVertex{ 3 };
 
-    std::string const WingTransformProgram::sourceCode{ R"shaderText(#version 150
+    GLuint constexpr glPositionBindingPoint{ 0 };
+    GLuint constexpr varyingWingColorBindingPoint{ 1 };
+    GLuint constexpr varyingEdgeColorBindingPoint{ 2 };
+    constexpr char const* capturedVaryingZero{ "gl_Position" };
+    constexpr char const* capturedVaryingOne{ "varyingWingColor" };
+    constexpr char const* capturedVaryingTwo{ "varyingEdgeColor" };
+    // TODO: Find a way to static_assert these match the initializer list passed to the superclass constructor.
 
+    WingTransformProgram::WingTransformProgram(std::shared_ptr<WingGeometry> const& wingGeometry,
+        std::shared_ptr<VertexShader const> const& rotateMatrixShader,
+        std::shared_ptr<VertexShader const> const& translateMatrixShader)
+        : Program{
+            std::initializer_list<std::shared_ptr<VertexShader const> >{
+                std::make_shared<VertexShader const>(std::initializer_list<std::string>{
+                    Shader::versionDeclaration,
+                    R"shaderText(
 uniform vec2 radiusAngle;
 uniform vec3 rollPitchYaw;
 uniform vec3 color;
@@ -62,13 +76,13 @@ in vec4 vertex;
 smooth out vec3 varyingWingColor;
 smooth out vec3 varyingEdgeColor;
 
-mat4 rotate(in float angle, in vec3 axis);
-mat4 translate(in vec3 move);
-
 const vec3 xAxis = vec3(1, 0, 0);
 const vec3 yAxis = vec3(0, 1, 0);
 const vec3 zAxis = vec3(0, 0, 1);
-
+)shaderText",
+                    Shader::rotateMatrixFunctionDeclaration,
+                    Shader::translateMatrixFunctionDeclaration,
+                    R"shaderText(
 void main() {
     float radius = radiusAngle[0];
     float angle = radiusAngle[1];
@@ -86,20 +100,16 @@ void main() {
                               * rotate(roll, xAxis);
     gl_Position = wingTransformation * vertex;
 }
-)shaderText" };
-
-    GLuint constexpr glPositionBindingPoint{ 0 };
-    GLuint constexpr varyingWingColorBindingPoint{ 1 };
-    GLuint constexpr varyingEdgeColorBindingPoint{ 2 };
-    constexpr char const* capturedVaryingZero{ "gl_Position" };
-    constexpr char const* capturedVaryingOne{ "varyingWingColor" };
-    constexpr char const* capturedVaryingTwo{ "varyingEdgeColor" };
-    // TODO: Find a way to static_assert these match the initializer list passed to the superclass constructor.
-
-    WingTransformProgram::WingTransformProgram(std::shared_ptr<WingGeometry> const& wingGeometry) :
-        Program{
-            VertexShader{ sourceCode, Shader::rotateMatrixFunctionDefinition, Shader::translateMatrixFunctionDefinition },
-            { capturedVaryingZero, capturedVaryingOne, capturedVaryingTwo }
+)shaderText",
+                }),
+                rotateMatrixShader,
+                translateMatrixShader,
+            },
+            std::initializer_list<std::string>{
+                capturedVaryingZero,
+                capturedVaryingOne,
+                capturedVaryingTwo,
+            }
         },
         wingGeometry{ wingGeometry },
         radiusAngleUniformLocation{ getUniformLocation("radiusAngle"s) },

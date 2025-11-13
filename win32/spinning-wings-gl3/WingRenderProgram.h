@@ -25,47 +25,6 @@ namespace silnith::wings::gl3
     {
     private:
         /// <summary>
-        /// The GLSL vertex shader source code.  This applies the transformations
-        /// that are relative to the position of the wing in the list of wings.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// This has two input attributes, <c>vertex</c> and <c>color</c>.
-        /// Vertex attributes are always extended to type <c>vec4</c> after being
-        /// read from their source buffers.
-        /// </para>
-        /// <para>
-        /// There is one varying output.
-        /// <c>varyingColor</c> is of type <c>vec4</c>.
-        /// </para>
-        /// <para>
-        /// There is one independent uniform.
-        /// <c>deltaZ</c> is of type <c>vec2</c>.
-        /// </para>
-        /// <para>
-        /// There is one uniform interface block that specifies the model, view,
-        /// and projection matrices.
-        /// </para>
-        /// </remarks>
-        static std::string const vertexShaderSourceCode;
-
-        /// <summary>
-        /// The GLSL fragment shader source code.  This simply sets the fragment
-        /// color.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// This has one input attribute.
-        /// <c>varyingColor</c> is of type <c>vec4</c>.
-        /// </para>
-        /// <para>
-        /// There is one varying output.
-        /// <c>fragmentColor</c> is of type <c>vec4</c>.
-        /// </para>
-        /// </remarks>
-        static std::string const fragmentShaderSourceCode;
-
-        /// <summary>
         /// The uniform buffer binding index for the ModelViewProjection matrices.
         /// </summary>
         /// <remarks>
@@ -91,7 +50,9 @@ namespace silnith::wings::gl3
         virtual ~WingRenderProgram(void) noexcept override;
 
     public:
-        explicit WingRenderProgram(std::shared_ptr<WingGeometry> const& wingGeometry);
+        explicit WingRenderProgram(std::shared_ptr<WingGeometry> const& wingGeometry,
+            std::shared_ptr<VertexShader const> const& rotateMatrixShader,
+            std::shared_ptr<VertexShader const> const& translateMatrixShader);
 
         /// <summary>
         /// Renders the provided collection of wings.
