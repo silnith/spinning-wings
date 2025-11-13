@@ -18,15 +18,15 @@ namespace silnith::wings::gl
 	/// This uses the client array functionality.
 	/// </para>
 	/// </remarks>
-	class QuadRendererGL11 : public WingRenderer
+	class WingRendererGL11 : public WingRenderer
 	{
 	public:
-		QuadRendererGL11(void);
-		QuadRendererGL11(QuadRendererGL11 const&) = delete;
-		QuadRendererGL11& operator=(QuadRendererGL11 const&) = delete;
-		QuadRendererGL11(QuadRendererGL11&&) noexcept = delete;
-		QuadRendererGL11& operator=(QuadRendererGL11&&) noexcept = delete;
-		virtual ~QuadRendererGL11(void) noexcept override;
+		WingRendererGL11(void);
+		WingRendererGL11(WingRendererGL11 const&) = delete;
+		WingRendererGL11& operator=(WingRendererGL11 const&) = delete;
+		WingRendererGL11(WingRendererGL11&&) noexcept = delete;
+		WingRendererGL11& operator=(WingRendererGL11&&) noexcept = delete;
+		virtual ~WingRendererGL11(void) noexcept override;
 
 	public:
 		virtual void DrawWing(void) const override;

@@ -8,7 +8,7 @@
 namespace silnith::wings::gl
 {
 
-	QuadRendererGL11::QuadRendererGL11(void) : WingRenderer{},
+	WingRendererGL11::WingRendererGL11(void) : WingRenderer{},
 		wingVertices{
 			1, 1,
 			-1, 1,
@@ -32,12 +32,12 @@ namespace silnith::wings::gl
 		glEnableClientState(GL_VERTEX_ARRAY);
 	}
 
-	QuadRendererGL11::~QuadRendererGL11(void) noexcept
+	WingRendererGL11::~WingRendererGL11(void) noexcept
 	{
 		glDisableClientState(GL_VERTEX_ARRAY);
 	}
 	
-	void QuadRendererGL11::DrawWing(void) const
+	void WingRendererGL11::DrawWing(void) const
 	{
 		/*
 		 * This reads the specified number of indices from the provided client
