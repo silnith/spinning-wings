@@ -39,9 +39,6 @@ namespace silnith::wings::gl2
         WingsViewGL2& operator=(WingsViewGL2 const&) = delete;
         WingsViewGL2(WingsViewGL2&&) noexcept = delete;
         WingsViewGL2& operator=(WingsViewGL2&&) noexcept = delete;
-        /// <summary>
-        /// Cleans up any resources allocated.
-        /// </summary>
         ~WingsViewGL2(void) noexcept;
 
     public:
