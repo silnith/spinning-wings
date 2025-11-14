@@ -102,7 +102,7 @@ namespace silnith::wings::gl3
         GLuint const id{ 0 };
 
         /// <summary>
-        /// The compilation log.
+        /// The log output from compiling the shader.
         /// </summary>
         std::string compilationLog{};
     };

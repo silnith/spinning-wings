@@ -89,7 +89,14 @@ namespace silnith::wings::gl3
         void useProgram(void) const;
 
     private:
+        /// <summary>
+        /// The OpenGL identifier for the program.
+        /// </summary>
         GLuint const id{ 0 };
+
+        /// <summary>
+        /// The log output from linking the shaders into a program.
+        /// </summary>
         std::string linkLog{};
     };
 

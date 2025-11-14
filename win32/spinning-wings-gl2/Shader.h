@@ -95,7 +95,14 @@ namespace silnith::wings::gl2
         GLuint getShader(void) const noexcept;
 
     private:
+        /// <summary>
+        /// The OpenGL identifier for the shader.
+        /// </summary>
         GLuint const id{ 0 };
+
+        /// <summary>
+        /// The log output from compiling the shader.
+        /// </summary>
         std::string compilationLog{};
     };
 
