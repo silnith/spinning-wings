@@ -235,7 +235,7 @@ void main() {
 
 	WingsViewGL2::~WingsViewGL2(void)
 	{
-		for (std::deque<Wing<GLuint, GLfloat> >::const_reference wing : wings)
+		for (Wing<GLuint, GLfloat> const& wing : wings)
 		{
 			GLuint const displayList{ wing.getGLDisplayList() };
 			glDeleteLists(displayList, 1);
@@ -317,7 +317,7 @@ void main() {
 		 */
 		GLfloat deltaZ{ 0 };
 		GLfloat deltaAngle{ 0 };
-		for (std::deque<Wing<GLuint, GLfloat> >::const_reference wing : wings) {
+		for (Wing<GLuint, GLfloat> const& wing : wings) {
 			deltaZ += wing.getDeltaZ();
 			deltaAngle += wing.getDeltaAngle();
 
@@ -347,7 +347,7 @@ void main() {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			deltaZ = 0;
 			deltaAngle = 0;
-			for (std::deque<Wing<GLuint, GLfloat> >::const_reference wing : wings) {
+			for (Wing<GLuint, GLfloat> const& wing : wings) {
 				deltaZ += wing.getDeltaZ();
 				deltaAngle += wing.getDeltaAngle();
 
