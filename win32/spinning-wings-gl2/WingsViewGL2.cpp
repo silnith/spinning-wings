@@ -99,6 +99,12 @@ namespace silnith::wings::gl2
 				/// <see cref="VertexShader::MakeTranslateMatrixShader"/>, and
 				/// <see cref="VertexShader::MakeScaleMatrixShader"/>.
 				/// </summary>
+				/// <remarks>
+				/// <para>
+				/// The part about the scale matrix shader is a lie.  That is
+				/// unused and will be discarded when the GLSL program is linked.
+				/// </para>
+				/// </remarks>
 				std::shared_ptr<VertexShader const> const mainVertexShader{
 					std::make_shared<VertexShader const>(std::initializer_list<std::string>{
 						Shader::versionDeclaration,
