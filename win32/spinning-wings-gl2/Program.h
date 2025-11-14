@@ -42,8 +42,8 @@ namespace silnith::wings::gl2
         /// <param name="vertexShaders">The vertex shaders.  Only one may define the <c>main</c> function.</param>
         /// <param name="fragmentShaders">The fragment shaders.  Only one may define the <c>main</c> function.</param>
         /// <exception cref="std::runtime_error">If the program fails to link.</exception>
-        explicit Program(std::initializer_list<std::shared_ptr<VertexShader const> > const& vertexShaders,
-            std::initializer_list<std::shared_ptr<FragmentShader const> > const& fragmentShaders);
+        explicit Program(std::initializer_list<std::shared_ptr<VertexShader const> > vertexShaders,
+            std::initializer_list<std::shared_ptr<FragmentShader const> > fragmentShaders);
 
         /// <summary>
         /// Returns the OpenGL name for the program.

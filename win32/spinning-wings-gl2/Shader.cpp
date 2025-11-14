@@ -91,7 +91,7 @@ mat4 scale(in vec3 factor) {
 )shaderText"
     };
 
-    Shader::Shader(GLenum type, std::initializer_list<std::string> const& sources)
+    Shader::Shader(GLenum type, std::initializer_list<std::string> sources)
         : id{ glCreateShader(type) }, compilationLog{}
     {
         assert((type == GL_VERTEX_SHADER)

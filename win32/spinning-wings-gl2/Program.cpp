@@ -64,8 +64,8 @@ namespace silnith::wings::gl2
         }
     }
 
-    Program::Program(std::initializer_list<std::shared_ptr<VertexShader const> > const& vertexShaders,
-        std::initializer_list<std::shared_ptr<FragmentShader const> > const& fragmentShaders)
+    Program::Program(std::initializer_list<std::shared_ptr<VertexShader const> > vertexShaders,
+        std::initializer_list<std::shared_ptr<FragmentShader const> > fragmentShaders)
         : id{ glCreateProgram() }, linkLog{}
     {
         if (id == 0)

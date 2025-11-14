@@ -35,8 +35,8 @@ namespace silnith::wings::gl3
         /// <param name="vertexShader">The vertex shaders to assemble.  Only one may define the <c>main</c> function.</param>
         /// <param name="capturedVaryings">The varying variables to capture.</param>
         /// <exception cref="std::runtime_error">If the program fails to link.</exception>
-        explicit Program(std::initializer_list<std::shared_ptr<VertexShader const> > const& vertexShaders,
-            std::initializer_list<std::string> const& capturedVaryings);
+        explicit Program(std::initializer_list<std::shared_ptr<VertexShader const> > vertexShaders,
+            std::initializer_list<std::string> capturedVaryings);
 
         /// <summary>
         /// Creates a GLSL program for rendering.
@@ -46,8 +46,8 @@ namespace silnith::wings::gl3
         /// <param name="fragmentData">The fragment shader output variable to be written into the output buffer.</param>
         /// <exception cref="std::runtime_error">If the program fails to link.</exception>
         explicit Program(
-            std::initializer_list<std::shared_ptr<VertexShader const> > const& vertexShaders,
-            std::initializer_list<std::shared_ptr<FragmentShader const> > const& fragmentShaders,
+            std::initializer_list<std::shared_ptr<VertexShader const> > vertexShaders,
+            std::initializer_list<std::shared_ptr<FragmentShader const> > fragmentShaders,
             std::string const& fragmentData);
 
         /// <summary>

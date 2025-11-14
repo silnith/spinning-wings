@@ -84,7 +84,7 @@ namespace silnith::wings::gl2
         /// <param name="type">The type of shader.  This should be one of <c>GL_VERTEX_SHADER</c> or <c>GL_FRAGMENT_SHADER</c>.</param>
         /// <param name="sources">The source strings to concatenate.</param>
         /// <exception cref="std::runtime_error">If an error occurs creating the shader object in the OpenGL state machine.</exception>
-        explicit Shader(GLenum type, std::initializer_list<std::string> const& sources);
+        explicit Shader(GLenum type, std::initializer_list<std::string> sources);
 
     public:
         /// <summary>

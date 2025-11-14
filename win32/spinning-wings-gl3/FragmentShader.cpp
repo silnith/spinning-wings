@@ -9,7 +9,7 @@
 namespace silnith::wings::gl3
 {
 
-    FragmentShader::FragmentShader(std::initializer_list<std::string> const& sources)
+    FragmentShader::FragmentShader(std::initializer_list<std::string> sources)
         : Shader{ GL_FRAGMENT_SHADER, sources }
     {}
 

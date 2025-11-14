@@ -20,8 +20,8 @@ using namespace std::literals::string_literals;
 namespace silnith::wings::gl3
 {
 
-    Program::Program(std::initializer_list<std::shared_ptr<VertexShader const> > const& vertexShaders,
-        std::initializer_list<std::string> const& capturedVaryings)
+    Program::Program(std::initializer_list<std::shared_ptr<VertexShader const> > vertexShaders,
+        std::initializer_list<std::string> capturedVaryings)
         : id{ glCreateProgram() },
         linkLog{}
     {
@@ -85,8 +85,8 @@ namespace silnith::wings::gl3
     }
 
     Program::Program(
-        std::initializer_list<std::shared_ptr<VertexShader const> > const& vertexShaders,
-        std::initializer_list<std::shared_ptr<FragmentShader const> > const& fragmentShaders,
+        std::initializer_list<std::shared_ptr<VertexShader const> > vertexShaders,
+        std::initializer_list<std::shared_ptr<FragmentShader const> > fragmentShaders,
         std::string const& fragmentData)
         : id{ glCreateProgram() }, linkLog{}
     {

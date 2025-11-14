@@ -67,7 +67,7 @@ namespace silnith::wings::gl2
         /// </summary>
         /// <param name="sources">The source strings to concatenate.</param>
         /// <exception cref="std::runtime_error">If an error occurs creating the shader object in the OpenGL state machine.</exception>
-        explicit VertexShader(std::initializer_list<std::string> const& sources);
+        explicit VertexShader(std::initializer_list<std::string> sources);
     };
 
 }
