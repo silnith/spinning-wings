@@ -306,6 +306,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_DESTROY:
 	{
+		/*
+		 * Yay smart pointers!  This calls the destructor on the previous value.
+		 */
 		wingsView = nullptr;
 
 		// window about to be destroyed
