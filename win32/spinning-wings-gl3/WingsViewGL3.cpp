@@ -101,7 +101,7 @@ namespace silnith::wings::gl3
 			wings.pop_back();
 		}
 
-		Wing const& newWing{ wings.emplace_front(deltaAngle, deltaZ, vertexBuffer, colorBuffer, edgeColorBuffer) };
+		wings.emplace_front(deltaAngle, deltaZ, vertexBuffer, colorBuffer, edgeColorBuffer);
 
 		/*
 		 * Run a vertex shader to transform the wing based on its current
