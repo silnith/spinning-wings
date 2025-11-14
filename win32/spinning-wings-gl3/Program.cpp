@@ -76,8 +76,7 @@ namespace silnith::wings::gl3
         default:
         {
             glDeleteProgram(id);
-            std::ostringstream errorMessage{};
-            errorMessage << "Unknown link status: "s;
+            std::ostringstream errorMessage{ "Unknown link status: "s };
             errorMessage << linkSuccess;
             throw std::runtime_error{ errorMessage.str() };
         }
@@ -143,8 +142,7 @@ namespace silnith::wings::gl3
         default:
         {
             glDeleteProgram(id);
-            std::ostringstream errorMessage{};
-            errorMessage << "Unknown link status: "s;
+            std::ostringstream errorMessage{ "Unknown link status: "s };
             errorMessage << linkSuccess;
             throw std::runtime_error{ errorMessage.str() };
         }
@@ -181,8 +179,7 @@ namespace silnith::wings::gl3
         }
         default:
         {
-            std::ostringstream errorMessage{};
-            errorMessage << "Unknown validation status: "s;
+            std::ostringstream errorMessage{ "Unknown validation status: "s };
             errorMessage << validationStatus;
             throw std::runtime_error{ errorMessage.str() };
         }

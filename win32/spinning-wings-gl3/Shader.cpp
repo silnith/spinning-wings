@@ -142,8 +142,7 @@ mat4 scale(in vec3 factor) {
         default:
         {
             glDeleteShader(id);
-            std::ostringstream errorMessage{};
-            errorMessage << "Unknown compilation status: "s;
+            std::ostringstream errorMessage{ "Unknown compilation status: "s };
             errorMessage << compilationSuccess;
             throw std::runtime_error{ errorMessage.str() };
         }

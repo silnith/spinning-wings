@@ -115,8 +115,7 @@ namespace silnith::wings::gl2
         default:
         {
             glDeleteProgram(id);
-            std::ostringstream errorMessage{};
-            errorMessage << "Unknown link status: "s;
+            std::ostringstream errorMessage{ "Unknown link status: "s };
             errorMessage << linkSuccess;
             throw std::runtime_error{ errorMessage.str() };
         }
