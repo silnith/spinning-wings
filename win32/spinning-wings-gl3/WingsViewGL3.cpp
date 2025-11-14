@@ -79,12 +79,14 @@ namespace silnith::wings::gl3
 		GLfloat const green{ greenCurve.getNextValue() };
 		GLfloat const blue{ blueCurve.getNextValue() };
 
+		std::shared_ptr<ArrayBuffer> vertexBuffer{ nullptr };
+		std::shared_ptr<ArrayBuffer> colorBuffer{ nullptr };
+		std::shared_ptr<ArrayBuffer> edgeColorBuffer{ nullptr };
 		if (wings.empty() || wings.size() < numWings)
 		{
-			std::shared_ptr<ArrayBuffer> vertexBuffer{ wingTransformProgram->CreateVertexBuffer() };
-			std::shared_ptr<ArrayBuffer> colorBuffer{ wingTransformProgram->CreateColorBuffer() };
-			std::shared_ptr<ArrayBuffer> edgeColorBuffer{ wingTransformProgram->CreateColorBuffer() };
-			wings.emplace_front(deltaAngle, deltaZ, vertexBuffer, colorBuffer, edgeColorBuffer);
+			vertexBuffer = wingTransformProgram->CreateVertexBuffer();
+			colorBuffer = wingTransformProgram->CreateColorBuffer();
+			edgeColorBuffer = wingTransformProgram->CreateColorBuffer();
 		}
 		else
 		{
@@ -93,14 +95,13 @@ namespace silnith::wings::gl3
 			 * the various buffers for the newly-created wing.  The old data
 			 * will be overwritten.
 			 */
-			std::shared_ptr<ArrayBuffer> vertexBuffer{ wings.back().getVertexBuffer() };
-			std::shared_ptr<ArrayBuffer> colorBuffer{ wings.back().getColorBuffer() };
-			std::shared_ptr<ArrayBuffer> edgeColorBuffer{ wings.back().getEdgeColorBuffer() };
+			vertexBuffer = wings.back().getVertexBuffer();
+			colorBuffer = wings.back().getColorBuffer();
+			edgeColorBuffer = wings.back().getEdgeColorBuffer();
 			wings.pop_back();
-			wings.emplace_front(deltaAngle, deltaZ, vertexBuffer, colorBuffer, edgeColorBuffer);
 		}
 
-		Wing const& newWing{ wings.front() };
+		Wing const& newWing{ wings.emplace_front(deltaAngle, deltaZ, vertexBuffer, colorBuffer, edgeColorBuffer) };
 
 		/*
 		 * Run a vertex shader to transform the wing based on its current
