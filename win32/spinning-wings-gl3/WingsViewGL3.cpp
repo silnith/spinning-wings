@@ -111,9 +111,9 @@ namespace silnith::wings::gl3
 		wingTransformProgram->TransformWing(radius, angle,
 			roll, pitch, yaw,
 			red, green, blue,
-			*newWing.getVertexBuffer(),
-			*newWing.getColorBuffer(),
-			*newWing.getEdgeColorBuffer());
+			*vertexBuffer,
+			*colorBuffer,
+			*edgeColorBuffer);
 
 		glFlush();
 	}
