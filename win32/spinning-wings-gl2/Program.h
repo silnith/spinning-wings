@@ -27,6 +27,7 @@ namespace silnith::wings::gl2
         Program(Program&&) noexcept = delete;
         Program& operator=(Program&&) noexcept = delete;
         virtual ~Program(void) noexcept;
+
     public:
         /// <summary>
         /// Creates and links a program using the provided vertex and fragment shaders.
