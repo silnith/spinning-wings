@@ -151,6 +151,9 @@ mat4 scale(in vec3 factor) {
 
     Shader::~Shader(void) noexcept
     {
+        /*
+         * Passing zero to the delete function will be silently ignored.
+         */
         glDeleteShader(id);
     }
 

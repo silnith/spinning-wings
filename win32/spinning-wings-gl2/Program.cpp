@@ -78,6 +78,9 @@ namespace silnith::wings::gl2
 
     Program::~Program(void) noexcept
     {
+        /*
+         * Passing zero to the delete function will be silently ignored.
+         */
         glDeleteProgram(id);
     }
 

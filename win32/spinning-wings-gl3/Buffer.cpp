@@ -13,6 +13,9 @@ namespace silnith::wings::gl3
 
     Buffer::~Buffer(void) noexcept
     {
+        /*
+         * The delete function silently ignores zero and any values that are not buffers.
+         */
         glDeleteBuffers(1, &id);
     }
 

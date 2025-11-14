@@ -151,6 +151,9 @@ namespace silnith::wings::gl3
 
     Program::~Program(void) noexcept
     {
+        /*
+         * Passing zero to the delete function will be silently ignored.
+         */
         glDeleteProgram(id);
     }
 
