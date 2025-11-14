@@ -29,15 +29,7 @@ namespace silnith::wings::gl2
         virtual ~Program(void) noexcept;
     public:
         /// <summary>
-        /// Creates and links a program from a given vertex and fragment shader.
-        /// </summary>
-        /// <param name="vertexShader">The vertex shader.</param>
-        /// <param name="fragmentShader">The fragment shader.</param>
-        /// <exception cref="std::runtime_error">If the program fails to link.</exception>
-        explicit Program(VertexShader const& vertexShader, FragmentShader const& fragmentShader);
-
-        /// <summary>
-        /// Creates and links a program from the provided vertex and fragment shaders.
+        /// Creates and links a program using the provided vertex and fragment shaders.
         /// </summary>
         /// <param name="vertexShaders">The vertex shaders.  Only one may define the <c>main</c> function.</param>
         /// <param name="fragmentShaders">The fragment shaders.  Only one may define the <c>main</c> function.</param>

@@ -18,52 +18,6 @@ using namespace std::literals::string_literals;
 namespace silnith::wings::gl2
 {
 
-    Program::Program(VertexShader const& vertexShader, FragmentShader const& fragmentShader)
-        : id{ glCreateProgram() }, linkLog{}
-    {
-        if (id == 0)
-        {
-            throw std::runtime_error{ "Failed to allocate GLSL program."s };
-        }
-
-        glAttachShader(id, vertexShader.getShader());
-        glAttachShader(id, fragmentShader.getShader());
-
-        glLinkProgram(id);
-
-        glDetachShader(id, fragmentShader.getShader());
-        glDetachShader(id, vertexShader.getShader());
-
-        GLint logSize{ 0 };
-        glGetProgramiv(id, GL_INFO_LOG_LENGTH, &logSize);
-        if (logSize > 0) {
-            std::unique_ptr<GLchar[]> log{ std::make_unique<GLchar[]>(static_cast<std::size_t>(logSize)) };
-            glGetProgramInfoLog(id, static_cast<GLsizei>(logSize), nullptr, log.get());
-            linkLog = { log.get() };
-        }
-
-        GLint linkSuccess{ 0 };
-        glGetProgramiv(id, GL_LINK_STATUS, &linkSuccess);
-        switch (linkSuccess)
-        {
-        case GL_TRUE:
-            break;
-        case GL_FALSE:
-        {
-            glDeleteProgram(id);
-            throw std::runtime_error{ linkLog };
-        }
-        default:
-        {
-            glDeleteProgram(id);
-            std::ostringstream errorMessage{};
-            errorMessage << "Unknown link status: "s;
-            errorMessage << linkSuccess;
-            throw std::runtime_error{ errorMessage.str() };
-        }
-        }
-    }
-
     Program::Program(std::initializer_list<std::shared_ptr<VertexShader const> > vertexShaders,
         std::initializer_list<std::shared_ptr<FragmentShader const> > fragmentShaders)
         : id{ glCreateProgram() }, linkLog{}
