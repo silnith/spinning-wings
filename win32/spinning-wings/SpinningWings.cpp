@@ -279,6 +279,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_WINDOWPOSCHANGED:
 	{
+		/*
+		 * This handles the WM_WINDOWPOSCHANGED message directly rather than
+		 * relying on the default window handler to dispatch a WM_SIZE message
+		 * because the WM_SIZE message truncates the window width and height to
+		 * a reduced precision.
+		 */
 		WINDOWPOS const* windowPos{ reinterpret_cast<WINDOWPOS*>(lParam) };
 
 		GLsizei const width{ static_cast<GLsizei>(windowPos->cx) };
@@ -354,7 +360,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 /// <param name="hPrevInstance">A handle to the previous instance of the application.  This is always <c>NULL</c>.</param>
 /// <param name="lpCmdLine">The command line for the application, excluding the program name.</param>
 /// <param name="nShowCmd">Specifies how the window should be shown.  See <see cref="ShowWindow"/>.</param>
-/// <returns>The value of the <see cref="WM_QUIT"/> message, or <c>0</c> if the program never procesed any messages.</returns>
+/// <returns>The value of the <see cref="WM_QUIT"/> message, or <c>0</c> if the program never processed any messages.</returns>
 int APIENTRY wWinMain(
 	_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,

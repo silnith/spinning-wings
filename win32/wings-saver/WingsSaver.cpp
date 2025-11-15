@@ -277,6 +277,12 @@ LRESULT WINAPI ScreenSaverProcW(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 	}
 	case WM_WINDOWPOSCHANGED:
 	{
+		/*
+		 * This handles the WM_WINDOWPOSCHANGED message directly rather than
+		 * relying on the default window handler to dispatch a WM_SIZE message
+		 * because the WM_SIZE message truncates the window width and height to
+		 * a reduced precision.
+		 */
 		WINDOWPOS const* windowPos{ reinterpret_cast<WINDOWPOS*>(lParam) };
 
 		currentWindowWidth = static_cast<GLsizei>(windowPos->cx);
