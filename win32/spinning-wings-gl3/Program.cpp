@@ -42,6 +42,10 @@ namespace silnith::wings::gl3
             glTransformFeedbackVaryings(id, count, varyings, GL_SEPARATE_ATTRIBS);
         }
 
+        /*
+         * In order to create a GLSL program, compiled shaders must be attached
+         * to it and then the program linked.
+         */
         for (std::shared_ptr<VertexShader const> const& vertexShader : vertexShaders)
         {
             glAttachShader(id, vertexShader->getShader());
@@ -49,11 +53,22 @@ namespace silnith::wings::gl3
 
         glLinkProgram(id);
 
+        /*
+         * Once the program is linked, the shaders are no longer needed and may
+         * be detached.
+         */
         for (std::shared_ptr<VertexShader const> const& vertexShader : vertexShaders)
         {
             glDetachShader(id, vertexShader->getShader());
         }
 
+        /*
+         * Whether the link succeeded or failed, a log may be created.  The
+         * length of the log must be queried in order to know how much buffer
+         * space is needed to retrieve the log.  The length will include the
+         * terminating null character.  If the length is zero, there is nothing
+         * in the log.
+         */
         GLint logSize{ 0 };
         glGetProgramiv(id, GL_INFO_LOG_LENGTH, &logSize);
         if (logSize > 0) {
@@ -62,6 +77,10 @@ namespace silnith::wings::gl3
             linkLog = std::string{ log.get() };
         }
 
+        /*
+         * The GLSL program may not have linked correctly.  If linking failed,
+         * the program is not valid and cannot be used.
+         */
         GLint linkSuccess{ 0 };
         glGetProgramiv(id, GL_LINK_STATUS, &linkSuccess);
         switch (linkSuccess)
@@ -70,11 +89,21 @@ namespace silnith::wings::gl3
             break;
         case GL_FALSE:
         {
+            /*
+             * Since throwing an exception cancels construction of the C++
+             * object, the destructor will never be called.  Therefore we need
+             * to clean up the allocated program before throwing.
+             */
             glDeleteProgram(id);
             throw std::runtime_error{ linkLog };
         }
         default:
         {
+            /*
+             * The link status will either be GL_TRUE or GL_FALSE, so this
+             * case will never execute on a conforming OpenGL implementation.
+             * But the C++ compiler has no way to prove that.
+             */
             glDeleteProgram(id);
             std::ostringstream errorMessage{ "Unknown link status: "s };
             errorMessage << linkSuccess;
@@ -100,6 +129,10 @@ namespace silnith::wings::gl3
         GLuint constexpr colorNumber{ 0 };
         glBindFragDataLocation(id, colorNumber, fragmentData.c_str());
 
+        /*
+         * In order to create a GLSL program, compiled shaders must be attached
+         * to it and then the program linked.
+         */
         for (std::shared_ptr<VertexShader const> const& vertexShader : vertexShaders)
         {
             glAttachShader(id, vertexShader->getShader());
@@ -111,6 +144,10 @@ namespace silnith::wings::gl3
 
         glLinkProgram(id);
 
+        /*
+         * Once the program is linked, the shaders are no longer needed and may
+         * be detached.
+         */
         for (std::shared_ptr<VertexShader const> const& vertexShader : vertexShaders)
         {
             glDetachShader(id, vertexShader->getShader());
@@ -120,6 +157,13 @@ namespace silnith::wings::gl3
             glDetachShader(id, fragmentShader->getShader());
         }
 
+        /*
+         * Whether the link succeeded or failed, a log may be created.  The
+         * length of the log must be queried in order to know how much buffer
+         * space is needed to retrieve the log.  The length will include the
+         * terminating null character.  If the length is zero, there is nothing
+         * in the log.
+         */
         GLint logSize{ 0 };
         glGetProgramiv(id, GL_INFO_LOG_LENGTH, &logSize);
         if (logSize > 0) {
@@ -128,6 +172,10 @@ namespace silnith::wings::gl3
             linkLog = std::string{ log.get() };
         }
 
+        /*
+         * The GLSL program may not have linked correctly.  If linking failed,
+         * the program is not valid and cannot be used.
+         */
         GLint linkSuccess{ 0 };
         glGetProgramiv(id, GL_LINK_STATUS, &linkSuccess);
         switch (linkSuccess)
@@ -136,11 +184,21 @@ namespace silnith::wings::gl3
             break;
         case GL_FALSE:
         {
+            /*
+             * Since throwing an exception cancels construction of the C++
+             * object, the destructor will never be called.  Therefore we need
+             * to clean up the allocated program before throwing.
+             */
             glDeleteProgram(id);
             throw std::runtime_error{ linkLog };
         }
         default:
         {
+            /*
+             * The link status will either be GL_TRUE or GL_FALSE, so this
+             * case will never execute on a conforming OpenGL implementation.
+             * But the C++ compiler has no way to prove that.
+             */
             glDeleteProgram(id);
             std::ostringstream errorMessage{ "Unknown link status: "s };
             errorMessage << linkSuccess;
@@ -163,6 +221,9 @@ namespace silnith::wings::gl3
         GLint validationStatus{ 0 };
         glGetProgramiv(id, GL_VALIDATE_STATUS, &validationStatus);
 
+        /*
+         * The validation will replace the program info log with a new one.
+         */
         std::string validationLog{};
 
         GLint logSize{ 0 };
@@ -182,6 +243,11 @@ namespace silnith::wings::gl3
         }
         default:
         {
+            /*
+             * The validation status will either be GL_TRUE or GL_FALSE, so this
+             * case will never execute on a conforming OpenGL implementation.
+             * But the C++ compiler has no way to prove that.
+             */
             std::ostringstream errorMessage{ "Unknown validation status: "s };
             errorMessage << validationStatus;
             throw std::runtime_error{ errorMessage.str() };
@@ -196,6 +262,11 @@ namespace silnith::wings::gl3
 
     GLuint Program::getAttributeLocation(std::string const& name) const
     {
+        /*
+         * Attribute locations are specified as unsigned integers.
+         * But the query returns a signed integer so that a negative return
+         * value can be used to indicate an error.
+         */
         GLint const attributeLocation{ glGetAttribLocation(id, name.c_str()) };
         if (attributeLocation < 0)
         {
@@ -206,6 +277,11 @@ namespace silnith::wings::gl3
 
     GLint Program::getUniformLocation(std::string const& name) const
     {
+        /*
+         * Uniform locations are of type GLint, so no casting is necessary.
+         * Attempts to set a uniform variable using a location of -1 will be
+         * silently ignored.
+         */
         GLint const uniformLocation{ glGetUniformLocation(id, name.c_str()) };
         if (uniformLocation < 0)
         {
