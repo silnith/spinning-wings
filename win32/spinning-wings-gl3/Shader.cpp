@@ -94,16 +94,16 @@ mat4 scale(in vec3 factor) {
     };
 
     Shader::Shader(GLenum type, std::initializer_list<std::string> sources)
-        : id{ glCreateShader(type) },
+        : name{ glCreateShader(type) },
         compilationLog{}
     {
         assert((type == GL_VERTEX_SHADER)
             || (type == GL_GEOMETRY_SHADER)
             || (type == GL_FRAGMENT_SHADER));
 
-        if (id == 0)
+        if (name == 0)
         {
-            throw std::runtime_error{ "Failed to allocate shader." };
+            throw std::runtime_error{ "Failed to create shader object." };
         }
 
         // Limit scope of temporary variables.
@@ -115,33 +115,33 @@ mat4 scale(in vec3 factor) {
                 cSources.emplace_back(source.c_str());
             }
             GLsizei const cSourcesSize{ static_cast<GLsizei>(cSources.size()) };
-            glShaderSource(id, cSourcesSize, cSources.data(), nullptr);
+            glShaderSource(name, cSourcesSize, cSources.data(), nullptr);
         }
 
-        glCompileShader(id);
+        glCompileShader(name);
 
         GLint logSize{ 0 };
-        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &logSize);
+        glGetShaderiv(name, GL_INFO_LOG_LENGTH, &logSize);
         if (logSize > 0) {
             std::unique_ptr<GLchar[]> log{ std::make_unique<GLchar[]>(static_cast<std::size_t>(logSize)) };
-            glGetShaderInfoLog(id, static_cast<GLsizei>(logSize), nullptr, log.get());
+            glGetShaderInfoLog(name, static_cast<GLsizei>(logSize), nullptr, log.get());
             compilationLog = std::string{ log.get() };
         }
 
         GLint compilationSuccess{ 0 };
-        glGetShaderiv(id, GL_COMPILE_STATUS, &compilationSuccess);
+        glGetShaderiv(name, GL_COMPILE_STATUS, &compilationSuccess);
         switch (compilationSuccess)
         {
         case GL_TRUE:
             break;
         case GL_FALSE:
         {
-            glDeleteShader(id);
+            glDeleteShader(name);
             throw std::runtime_error{ compilationLog };
         }
         default:
         {
-            glDeleteShader(id);
+            glDeleteShader(name);
             std::ostringstream errorMessage{ "Unknown compilation status: "s };
             errorMessage << compilationSuccess;
             throw std::runtime_error{ errorMessage.str() };
@@ -154,12 +154,12 @@ mat4 scale(in vec3 factor) {
         /*
          * Passing zero to the delete function will be silently ignored.
          */
-        glDeleteShader(id);
+        glDeleteShader(name);
     }
 
-    GLuint Shader::getShader(void) const noexcept
+    GLuint Shader::GetName(void) const noexcept
     {
-        return id;
+        return name;
     }
 
 }

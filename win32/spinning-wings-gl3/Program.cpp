@@ -22,12 +22,12 @@ namespace silnith::wings::gl3
 
     Program::Program(std::initializer_list<std::shared_ptr<VertexShader const> > vertexShaders,
         std::initializer_list<std::string> capturedVaryings)
-        : id{ glCreateProgram() },
+        : name{ glCreateProgram() },
         linkLog{}
     {
-        if (id == 0)
+        if (name == 0)
         {
-            throw std::runtime_error{ "Failed to allocate GLSL program."s };
+            throw std::runtime_error{ "Failed to create GLSL program object."s };
         }
 
         // Limit scope of pointers to string sources.
@@ -39,7 +39,7 @@ namespace silnith::wings::gl3
             }
             GLsizei const count{ static_cast<GLsizei>(cPtrs.size()) };
             GLchar const** varyings{ cPtrs.data() };
-            glTransformFeedbackVaryings(id, count, varyings, GL_SEPARATE_ATTRIBS);
+            glTransformFeedbackVaryings(name, count, varyings, GL_SEPARATE_ATTRIBS);
         }
 
         /*
@@ -48,10 +48,10 @@ namespace silnith::wings::gl3
          */
         for (std::shared_ptr<VertexShader const> const& vertexShader : vertexShaders)
         {
-            glAttachShader(id, vertexShader->getShader());
+            glAttachShader(name, vertexShader->GetName());
         }
 
-        glLinkProgram(id);
+        glLinkProgram(name);
 
         /*
          * Once the program is linked, the shaders are no longer needed and may
@@ -59,7 +59,7 @@ namespace silnith::wings::gl3
          */
         for (std::shared_ptr<VertexShader const> const& vertexShader : vertexShaders)
         {
-            glDetachShader(id, vertexShader->getShader());
+            glDetachShader(name, vertexShader->GetName());
         }
 
         /*
@@ -70,10 +70,10 @@ namespace silnith::wings::gl3
          * in the log.
          */
         GLint logSize{ 0 };
-        glGetProgramiv(id, GL_INFO_LOG_LENGTH, &logSize);
+        glGetProgramiv(name, GL_INFO_LOG_LENGTH, &logSize);
         if (logSize > 0) {
             std::unique_ptr<GLchar[]> log{ std::make_unique<GLchar[]>(static_cast<std::size_t>(logSize)) };
-            glGetProgramInfoLog(id, static_cast<GLsizei>(logSize), nullptr, log.get());
+            glGetProgramInfoLog(name, static_cast<GLsizei>(logSize), nullptr, log.get());
             linkLog = std::string{ log.get() };
         }
 
@@ -82,7 +82,7 @@ namespace silnith::wings::gl3
          * the program is not valid and cannot be used.
          */
         GLint linkSuccess{ 0 };
-        glGetProgramiv(id, GL_LINK_STATUS, &linkSuccess);
+        glGetProgramiv(name, GL_LINK_STATUS, &linkSuccess);
         switch (linkSuccess)
         {
         case GL_TRUE:
@@ -94,7 +94,7 @@ namespace silnith::wings::gl3
              * object, the destructor will never be called.  Therefore we need
              * to clean up the allocated program before throwing.
              */
-            glDeleteProgram(id);
+            glDeleteProgram(name);
             throw std::runtime_error{ linkLog };
         }
         default:
@@ -104,7 +104,7 @@ namespace silnith::wings::gl3
              * case will never execute on a conforming OpenGL implementation.
              * But the C++ compiler has no way to prove that.
              */
-            glDeleteProgram(id);
+            glDeleteProgram(name);
             std::ostringstream errorMessage{ "Unknown link status: "s };
             errorMessage << linkSuccess;
             throw std::runtime_error{ errorMessage.str() };
@@ -116,11 +116,11 @@ namespace silnith::wings::gl3
         std::initializer_list<std::shared_ptr<VertexShader const> > vertexShaders,
         std::initializer_list<std::shared_ptr<FragmentShader const> > fragmentShaders,
         std::string const& fragmentData)
-        : id{ glCreateProgram() }, linkLog{}
+        : name{ glCreateProgram() }, linkLog{}
     {
-        if (id == 0)
+        if (name == 0)
         {
-            throw std::runtime_error{ "Failed to allocate GLSL program."s };
+            throw std::runtime_error{ "Failed to create GLSL program object."s };
         }
 
         /*
@@ -130,7 +130,7 @@ namespace silnith::wings::gl3
          * the indices of the parameters to glDrawBuffers.
          */
         GLuint constexpr colorNumber{ 0 };
-        glBindFragDataLocation(id, colorNumber, fragmentData.c_str());
+        glBindFragDataLocation(name, colorNumber, fragmentData.c_str());
 
         /*
          * In order to create a GLSL program, compiled shaders must be attached
@@ -138,14 +138,14 @@ namespace silnith::wings::gl3
          */
         for (std::shared_ptr<VertexShader const> const& vertexShader : vertexShaders)
         {
-            glAttachShader(id, vertexShader->getShader());
+            glAttachShader(name, vertexShader->GetName());
         }
         for (std::shared_ptr<FragmentShader const> const& fragmentShader : fragmentShaders)
         {
-            glAttachShader(id, fragmentShader->getShader());
+            glAttachShader(name, fragmentShader->GetName());
         }
 
-        glLinkProgram(id);
+        glLinkProgram(name);
 
         /*
          * Once the program is linked, the shaders are no longer needed and may
@@ -153,11 +153,11 @@ namespace silnith::wings::gl3
          */
         for (std::shared_ptr<VertexShader const> const& vertexShader : vertexShaders)
         {
-            glDetachShader(id, vertexShader->getShader());
+            glDetachShader(name, vertexShader->GetName());
         }
         for (std::shared_ptr<FragmentShader const> const& fragmentShader : fragmentShaders)
         {
-            glDetachShader(id, fragmentShader->getShader());
+            glDetachShader(name, fragmentShader->GetName());
         }
 
         /*
@@ -168,10 +168,10 @@ namespace silnith::wings::gl3
          * in the log.
          */
         GLint logSize{ 0 };
-        glGetProgramiv(id, GL_INFO_LOG_LENGTH, &logSize);
+        glGetProgramiv(name, GL_INFO_LOG_LENGTH, &logSize);
         if (logSize > 0) {
             std::unique_ptr<GLchar[]> log{ std::make_unique<GLchar[]>(static_cast<std::size_t>(logSize)) };
-            glGetProgramInfoLog(id, static_cast<GLsizei>(logSize), nullptr, log.get());
+            glGetProgramInfoLog(name, static_cast<GLsizei>(logSize), nullptr, log.get());
             linkLog = std::string{ log.get() };
         }
 
@@ -180,7 +180,7 @@ namespace silnith::wings::gl3
          * the program is not valid and cannot be used.
          */
         GLint linkSuccess{ 0 };
-        glGetProgramiv(id, GL_LINK_STATUS, &linkSuccess);
+        glGetProgramiv(name, GL_LINK_STATUS, &linkSuccess);
         switch (linkSuccess)
         {
         case GL_TRUE:
@@ -192,7 +192,7 @@ namespace silnith::wings::gl3
              * object, the destructor will never be called.  Therefore we need
              * to clean up the allocated program before throwing.
              */
-            glDeleteProgram(id);
+            glDeleteProgram(name);
             throw std::runtime_error{ linkLog };
         }
         default:
@@ -202,7 +202,7 @@ namespace silnith::wings::gl3
              * case will never execute on a conforming OpenGL implementation.
              * But the C++ compiler has no way to prove that.
              */
-            glDeleteProgram(id);
+            glDeleteProgram(name);
             std::ostringstream errorMessage{ "Unknown link status: "s };
             errorMessage << linkSuccess;
             throw std::runtime_error{ errorMessage.str() };
@@ -215,14 +215,14 @@ namespace silnith::wings::gl3
         /*
          * Passing zero to the delete function will be silently ignored.
          */
-        glDeleteProgram(id);
+        glDeleteProgram(name);
     }
 
     void Program::Validate(void) const
     {
-        glValidateProgram(id);
+        glValidateProgram(name);
         GLint validationStatus{ 0 };
-        glGetProgramiv(id, GL_VALIDATE_STATUS, &validationStatus);
+        glGetProgramiv(name, GL_VALIDATE_STATUS, &validationStatus);
 
         /*
          * The validation will replace the program info log with a new one.
@@ -230,10 +230,10 @@ namespace silnith::wings::gl3
         std::string validationLog{};
 
         GLint logSize{ 0 };
-        glGetProgramiv(id, GL_INFO_LOG_LENGTH, &logSize);
+        glGetProgramiv(name, GL_INFO_LOG_LENGTH, &logSize);
         if (logSize > 0) {
             std::unique_ptr<GLchar[]> log{ std::make_unique<GLchar[]>(static_cast<std::size_t>(logSize)) };
-            glGetProgramInfoLog(id, static_cast<GLsizei>(logSize), nullptr, log.get());
+            glGetProgramInfoLog(name, static_cast<GLsizei>(logSize), nullptr, log.get());
             validationLog = std::string{ log.get() };
         }
 
@@ -258,44 +258,44 @@ namespace silnith::wings::gl3
         }
     }
 
-    GLuint Program::getProgram(void) const noexcept
+    GLuint Program::GetName(void) const noexcept
     {
-        return id;
+        return name;
     }
 
-    GLuint Program::getAttributeLocation(std::string const& name) const
+    GLuint Program::getAttributeLocation(std::string const& attributeName) const
     {
         /*
          * Attribute locations are specified as unsigned integers.
          * But the query returns a signed integer so that a negative return
          * value can be used to indicate an error.
          */
-        GLint const attributeLocation{ glGetAttribLocation(id, name.c_str()) };
+        GLint const attributeLocation{ glGetAttribLocation(name, attributeName.c_str()) };
         if (attributeLocation < 0)
         {
-            throw std::runtime_error{ "Attribute "s + name + " not bound."s };
+            throw std::runtime_error{ "Attribute "s + attributeName + " not bound."s };
         }
         return static_cast<GLuint>(attributeLocation);
     }
 
-    GLint Program::getUniformLocation(std::string const& name) const
+    GLint Program::getUniformLocation(std::string const& uniformName) const
     {
         /*
          * Uniform locations are of type GLint, so no casting is necessary.
          * Attempts to set a uniform variable using a location of -1 will be
          * silently ignored.
          */
-        GLint const uniformLocation{ glGetUniformLocation(id, name.c_str()) };
+        GLint const uniformLocation{ glGetUniformLocation(name, uniformName.c_str()) };
         if (uniformLocation < 0)
         {
-            throw std::runtime_error{ "Uniform "s + name + " not bound."s };
+            throw std::runtime_error{ "Uniform "s + uniformName + " not bound."s };
         }
         return static_cast<GLint>(uniformLocation);
     }
 
     void Program::useProgram(void) const
     {
-        glUseProgram(id);
+        glUseProgram(name);
     }
 
 }

@@ -66,7 +66,7 @@ namespace silnith::wings::gl3
 		};
 		GLsizeiptr constexpr viewDataSize{ sizeof(GLfloat) * view.size() };
 
-		glBindBuffer(GL_UNIFORM_BUFFER, getId());
+		glBindBuffer(GL_UNIFORM_BUFFER, GetName());
 		/*
 		 * First we need to allocate storage space for the uniform buffer.
 		 */
@@ -168,7 +168,7 @@ namespace silnith::wings::gl3
 		//GLfloat const* bar{ glm::value_ptr(foo) };
 		GLsizeiptr constexpr projectionDataSize{ sizeof(GLfloat) * projection.size() };
 
-		glBindBuffer(GL_UNIFORM_BUFFER, getId());
+		glBindBuffer(GL_UNIFORM_BUFFER, GetName());
 		glBufferSubData(GL_UNIFORM_BUFFER, projectionOffset, projectionDataSize, projection.data());
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}

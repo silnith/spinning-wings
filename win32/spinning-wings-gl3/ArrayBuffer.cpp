@@ -24,7 +24,7 @@ namespace silnith::wings::gl3
         assert(data.size() == static_cast<std::size_t>(numComponentsPerVertex) * static_cast<std::size_t>(numVertices));
         GLsizeiptr const dataSize{ static_cast<GLsizeiptr>(data.size_bytes()) };
 
-        glBindBuffer(GL_ARRAY_BUFFER, getId());
+        glBindBuffer(GL_ARRAY_BUFFER, GetName());
         glBufferData(GL_ARRAY_BUFFER, dataSize, data.data(), usageHint);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
@@ -40,7 +40,7 @@ namespace silnith::wings::gl3
     {
         GLsizeiptr const dataSize{ static_cast<GLsizeiptr>(sizeof(GLfloat) * numComponentsPerVertex * numVertices) };
 
-        glBindBuffer(GL_ARRAY_BUFFER, getId());
+        glBindBuffer(GL_ARRAY_BUFFER, GetName());
         glBufferData(GL_ARRAY_BUFFER, dataSize, nullptr, usageHint);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
@@ -53,7 +53,7 @@ namespace silnith::wings::gl3
          * call to glVertexAttribPointer, the buffer can be unbound without
          * affecting the stored state of the vertex attribute pointer.
          */
-        glBindBuffer(GL_ARRAY_BUFFER, getId());
+        glBindBuffer(GL_ARRAY_BUFFER, GetName());
         glVertexAttribPointer(attributeLocation, numComponentsPerVertex, dataType, normalized, stride, offset);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }

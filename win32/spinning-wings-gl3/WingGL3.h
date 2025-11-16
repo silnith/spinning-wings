@@ -110,28 +110,6 @@ namespace silnith::wings::gl3
 		[[nodiscard]]
 		std::shared_ptr<ArrayBuffer> getEdgeColorBuffer(void) const noexcept;
 
-		/// <summary>
-		/// Returns the OpenGL vertex buffer identifier for this wing.
-		/// The vertex buffer will be populated using transform feedback.
-		/// </summary>
-		/// <returns>The OpenGL vertex buffer identifier.</returns>
-		[[nodiscard]]
-		GLuint getVertexBufferId(void) const noexcept;
-
-		/// <summary>
-		/// Returns the OpenGL color buffer identifier for this wing.
-		/// </summary>
-		/// <returns>The OpenGL color buffer identifier.</returns>
-		[[nodiscard]]
-		GLuint getColorBufferId(void) const noexcept;
-
-		/// <summary>
-		/// Returns the OpenGL edge color buffer identifier for this wing.
-		/// </summary>
-		/// <returns>The OpenGL edge color buffer identifier.</returns>
-		[[nodiscard]]
-		GLuint getEdgeColorBufferId(void) const noexcept;
-
 	private:
 		GLfloat const deltaAngle{ 15 };
 		GLfloat const deltaZ{ 0.5 };

@@ -43,19 +43,4 @@ namespace silnith::wings::gl3
 		return edgeColorBuffer;
 	}
 
-	GLuint Wing::getVertexBufferId(void) const noexcept
-	{
-		return vertexBuffer->getId();
-	}
-
-	GLuint Wing::getColorBufferId(void) const noexcept
-	{
-		return colorBuffer->getId();
-	}
-
-	GLuint Wing::getEdgeColorBufferId(void) const noexcept
-	{
-		return edgeColorBuffer->getId();
-	}
-
 }

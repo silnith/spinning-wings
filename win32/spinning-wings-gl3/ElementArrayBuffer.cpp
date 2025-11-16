@@ -18,14 +18,14 @@ namespace silnith::wings::gl3
     {
         GLsizeiptr const dataSize{ static_cast<GLsizeiptr>(indexData.size_bytes()) };
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, getId());
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GetName());
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, dataSize, indexData.data(), usageHint);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
     void ElementArrayBuffer::UseAsElementArray() const
     {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, getId());
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GetName());
     }
 
     GLsizei ElementArrayBuffer::getNumIndices(void) const

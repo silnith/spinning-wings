@@ -164,9 +164,9 @@ void main() {
         assert(vertexBuffer.getNumVertices() == wingGeometry->getNumVertices());
         assert(colorBuffer.getNumVertices() == wingGeometry->getNumVertices());
         assert(edgeColorBuffer.getNumVertices() == wingGeometry->getNumVertices());
-        glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, glPositionBindingPoint, vertexBuffer.getId());
-        glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, varyingWingColorBindingPoint, colorBuffer.getId());
-        glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, varyingEdgeColorBindingPoint, edgeColorBuffer.getId());
+        glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, glPositionBindingPoint, vertexBuffer.GetName());
+        glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, varyingWingColorBindingPoint, colorBuffer.GetName());
+        glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, varyingEdgeColorBindingPoint, edgeColorBuffer.GetName());
 
         glEnable(GL_RASTERIZER_DISCARD);
         glBeginTransformFeedback(GL_POINTS);

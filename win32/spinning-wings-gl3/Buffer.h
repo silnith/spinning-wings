@@ -39,17 +39,17 @@ namespace silnith::wings::gl3
 
     public:
         /// <summary>
-        /// Returns the buffer ID.
+        /// Returns the OpenGL name for the buffer object.
         /// </summary>
-        /// <returns>The buffer ID.</returns>
+        /// <returns>The buffer object name.</returns>
         [[nodiscard]]
-        GLuint getId(void) const;
+        GLuint GetName(void) const;
 
     private:
         /// <summary>
-        /// The OpenGL identifier for the buffer.
+        /// The OpenGL name for the buffer object.
         /// </summary>
-        GLuint id{ 0 };
+        GLuint name{ 0 };
     };
 
 }

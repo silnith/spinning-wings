@@ -105,18 +105,18 @@ void main() {
 		 * named uniform block is layed out, so that a buffer can be allocated
 		 * matching that layout.
 		 */
-		GLuint const programId{ getProgram() };
+		GLuint const programName{ GetName() };
 		/*
 		 * Get the location (index) of the uniform block.
 		 */
-		GLuint const blockIndex{ glGetUniformBlockIndex(programId, "ModelViewProjection") };
-		glUniformBlockBinding(programId, blockIndex, modelViewProjectionBindingIndex);
+		GLuint const blockIndex{ glGetUniformBlockIndex(programName, "ModelViewProjection") };
+		glUniformBlockBinding(programName, blockIndex, modelViewProjectionBindingIndex);
 
 		/*
 		 * Find the data size required for the uniform block.
 		 */
 		GLint modelViewProjectionUniformDataSize{ 0 };
-		glGetActiveUniformBlockiv(programId, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &modelViewProjectionUniformDataSize);
+		glGetActiveUniformBlockiv(programName, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &modelViewProjectionUniformDataSize);
 
 		/*
 		 * Find the locations (indices) of the components of the uniform block.
@@ -124,7 +124,7 @@ void main() {
 		GLsizei constexpr numUniforms{ 3 };
 		std::array<GLchar const*, numUniforms> constexpr names{ "model", "view", "projection" };
 		std::array<GLuint, numUniforms> uniformIndices{ 0, 0, 0 };
-		glGetUniformIndices(programId, numUniforms, names.data(), uniformIndices.data());
+		glGetUniformIndices(programName, numUniforms, names.data(), uniformIndices.data());
 
 		/*
 		 * For each index in the uniform block, find the data offset for that index.
@@ -132,7 +132,7 @@ void main() {
 		 * data for that component.
 		 */
 		std::array<GLint, numUniforms> uniformOffsets{ 0, 0, 0, };
-		glGetActiveUniformsiv(programId, numUniforms, uniformIndices.data(), GL_UNIFORM_OFFSET, uniformOffsets.data());
+		glGetActiveUniformsiv(programName, numUniforms, uniformIndices.data(), GL_UNIFORM_OFFSET, uniformOffsets.data());
 		static_assert(names[0] == "model");
 		GLintptr const modelOffset{ uniformOffsets[0] };
 		static_assert(names[1] == "view");
@@ -145,7 +145,7 @@ void main() {
 		 * Confirm that the uniform variables are of the correct type.
 		 */
 		std::array<GLint, numUniforms> uniformTypes{ 0, 0, 0, };
-		glGetActiveUniformsiv(programId, numUniforms, uniformIndices.data(), GL_UNIFORM_TYPE, uniformTypes.data());
+		glGetActiveUniformsiv(programName, numUniforms, uniformIndices.data(), GL_UNIFORM_TYPE, uniformTypes.data());
 		assert(uniformTypes[0] == GL_FLOAT_MAT4);
 		assert(uniformTypes[1] == GL_FLOAT_MAT4);
 		assert(uniformTypes[2] == GL_FLOAT_MAT4);
@@ -154,7 +154,7 @@ void main() {
 		 * The ModelViewProjectionUniformBuffer class will write the matrices as column-major.
 		 */
 		std::array<GLint, numUniforms> isRowMajor{ 0, 0, 0, };
-		glGetActiveUniformsiv(programId, numUniforms, uniformIndices.data(), GL_UNIFORM_IS_ROW_MAJOR, isRowMajor.data());
+		glGetActiveUniformsiv(programName, numUniforms, uniformIndices.data(), GL_UNIFORM_IS_ROW_MAJOR, isRowMajor.data());
 		assert(isRowMajor[0] == 0);
 		assert(isRowMajor[1] == 0);
 		assert(isRowMajor[2] == 0);
@@ -170,7 +170,7 @@ void main() {
 		/*
 		 * And finally, bind the buffer to the chosen binding point for the uniform block.
 		 */
-		glBindBufferBase(GL_UNIFORM_BUFFER, modelViewProjectionBindingIndex, modelViewProjectionUniformBuffer->getId());
+		glBindBufferBase(GL_UNIFORM_BUFFER, modelViewProjectionBindingIndex, modelViewProjectionUniformBuffer->GetName());
 	}
 
 	WingRenderProgram::~WingRenderProgram(void) noexcept

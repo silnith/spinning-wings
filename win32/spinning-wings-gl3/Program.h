@@ -65,30 +65,30 @@ namespace silnith::wings::gl3
         void Validate(void) const;
 
         /// <summary>
-        /// Returns the OpenGL name for the program.
+        /// Returns the OpenGL name for the program object.
         /// </summary>
-        /// <returns>The OpenGL identifier for the program.</returns>
+        /// <returns>The program object name.</returns>
         [[nodiscard]]
-        GLuint getProgram(void) const noexcept;
+        GLuint GetName(void) const noexcept;
 
         /// <summary>
         /// Returns the index of the generic vertex attribute that is bound to the
         /// specified attribute variable.
         /// </summary>
-        /// <param name="name">The name of the attribute.</param>
+        /// <param name="attributeName">The name of the attribute.</param>
         /// <returns>The generic attribute index.</returns>
         /// <exception cref="std::runtime_error">If the attribute name is not bound.</exception>
         [[nodiscard]]
-        GLuint getAttributeLocation(std::string const& name) const;
+        GLuint getAttributeLocation(std::string const& attributeName) const;
 
         /// <summary>
         /// Returns the location of the specified uniform variable.
         /// </summary>
-        /// <param name="name">The name of the uniform variable.</param>
+        /// <param name="uniformName">The name of the uniform variable.</param>
         /// <returns>The uniform location.</returns>
         /// <exception cref="std::runtime_error">If the uniform name is not bound.</exception>
         [[nodiscard]]
-        GLint getUniformLocation(std::string const& name) const;
+        GLint getUniformLocation(std::string const& uniformName) const;
 
         /// <summary>
         /// Installs the GLSL program as part of the current rendering state.
@@ -98,9 +98,9 @@ namespace silnith::wings::gl3
 
     private:
         /// <summary>
-        /// The OpenGL identifier for the program.
+        /// The OpenGL name for the program object.
         /// </summary>
-        GLuint const id{ 0 };
+        GLuint const name{ 0 };
 
         /// <summary>
         /// The log output from linking the shaders into a program.

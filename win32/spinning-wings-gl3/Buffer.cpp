@@ -8,7 +8,7 @@ namespace silnith::wings::gl3
 
     Buffer::Buffer(void)
     {
-        glGenBuffers(1, &id);
+        glGenBuffers(1, &name);
     }
 
     Buffer::~Buffer(void) noexcept
@@ -16,12 +16,12 @@ namespace silnith::wings::gl3
         /*
          * The delete function silently ignores zero and any values that are not buffers.
          */
-        glDeleteBuffers(1, &id);
+        glDeleteBuffers(1, &name);
     }
 
-    GLuint Buffer::getId(void) const
+    GLuint Buffer::GetName(void) const
     {
-        return id;
+        return name;
     }
 
 }
