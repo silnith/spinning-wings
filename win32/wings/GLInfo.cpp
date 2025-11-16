@@ -10,6 +10,7 @@
 
 namespace silnith::wings::gl
 {
+
     GLInfo::GLInfo(void)
     {
         GLubyte const* const glVersion{ glGetString(GL_VERSION) };

@@ -12,13 +12,8 @@ namespace silnith::wings
 	class Color
 	{
 	public:
-		Color(void) noexcept = default;
-		Color(Color const&) noexcept = default;
-		Color& operator=(Color const&) noexcept = default;
-		Color(Color&&) noexcept = default;
-		Color& operator=(Color&&) noexcept = default;
-		virtual ~Color(void) noexcept = default;
-	public:
+		Color(void) = default;
+
 		/// <summary>
 		/// Initializes a new color structure.
 		/// </summary>
@@ -30,10 +25,21 @@ namespace silnith::wings
 		/// <param name="r">the red component, in the range <c>[0, 1]</c></param>
 		/// <param name="g">the green component, in the range <c>[0, 1]</c></param>
 		/// <param name="b">the blue component, in the range <c>[0, 1]</c></param>
-		Color(T r, T g, T b) noexcept
+		explicit Color(T r, T g, T b) noexcept
 			: red{ r }, green{ g }, blue{ b }
 		{}
 
+#pragma region Rule of Five
+	public:
+		Color(Color const&) = default;
+		Color& operator=(Color const&) = default;
+		Color(Color&&) noexcept = default;
+		Color& operator=(Color&&) noexcept = default;
+		virtual ~Color(void) noexcept = default;
+
+#pragma endregion
+
+	public:
 		/// <summary>
 		/// Returns the red component.
 		/// </summary>

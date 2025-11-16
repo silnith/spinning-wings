@@ -28,19 +28,24 @@ namespace silnith::wings::gl
     {
     public:
         WingsView(void) = delete;
+
+        /// <summary>
+        /// Initializes the spinning wings.  This allocates the structures for
+        /// the wings and sets up the necessary GL features.
+        /// </summary>
+        /// <param name="glInfo">The queryable OpenGL information.</param>
+        explicit WingsView(GLInfo const& glInfo);
+
+#pragma region Rule of Five
+
+    public:
         WingsView(WingsView const&) = delete;
         WingsView& operator=(WingsView const&) = delete;
         WingsView(WingsView&&) noexcept = delete;
         WingsView& operator=(WingsView&&) noexcept = delete;
         ~WingsView(void) noexcept;
 
-    public:
-        /// <summary>
-        /// Initializes the spinning wings.  This allocates the structures for
-        /// the wings and sets up the necessary GL features.
-        /// </summary>
-        /// <param name="glInfo">The queryable OpenGL information.</param>
-        WingsView(GLInfo const& glInfo);
+#pragma endregion
 
     public:
         /// <summary>

@@ -26,25 +26,16 @@ namespace silnith::wings
 	/// <para>
 	/// All angles are in degrees.
 	/// </para>
+	/// <para>
+	/// This is a template rather than a normal class to avoid needing to pull
+	/// in the full OpenGL and Windows header files.
+	/// </para>
 	/// </remarks>
 	template<std::integral ID, std::floating_point T>
 	class Wing
 	{
 	public:
-		Wing(void) noexcept = default;
-		Wing(Wing const& wing) noexcept = default;
-		Wing& operator=(Wing const& wing) noexcept = default;
-		Wing(Wing&& wing) noexcept = default;
-		Wing& operator=(Wing&& wing) noexcept = default;
-		virtual ~Wing(void) noexcept = default;
-	public:
-		/// <summary>
-		/// Creates a new wing with the provided OpenGL display list identifier.
-		/// </summary>
-		/// <param name="displayList">The OpenGL display list identifier used for the rendering list for this wing.</param>
-		Wing(ID displayList) noexcept
-			: displayList{ displayList }
-		{}
+		explicit Wing(void) = default;
 
 		/// <summary>
 		/// Creates a new wing with the provided parameters.
@@ -59,7 +50,7 @@ namespace silnith::wings
 		/// <param name="yaw">The yaw of the wing.</param>
 		/// <param name="color">The color of the wing.</param>
 		/// <param name="edgeColor">The color of the edge of the wing.</param>
-		Wing(ID displayList,
+		explicit Wing(ID displayList,
 			T radius, T angle,
 			T deltaAngle, T deltaZ,
 			T roll, T pitch, T yaw,
@@ -71,6 +62,18 @@ namespace silnith::wings
 			color{ color }, edgeColor{ edgeColor }
 		{}
 
+#pragma region Rule of Five
+
+	public:
+		Wing(Wing const& wing) = default;
+		Wing& operator=(Wing const& wing) = default;
+		Wing(Wing&& wing) noexcept = default;
+		Wing& operator=(Wing&& wing) noexcept = default;
+		virtual ~Wing(void) noexcept = default;
+
+#pragma endregion
+
+	public:
 		/// <summary>
 		/// Returns the OpenGL display list identifier that renders this wing.
 		/// </summary>

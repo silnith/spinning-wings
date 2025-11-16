@@ -29,11 +29,17 @@ namespace silnith::wings::gl
     {
     public:
         GLInfo(void);
-        GLInfo(GLInfo const&) noexcept = default;
-        GLInfo& operator=(GLInfo const&) noexcept = default;
+
+#pragma region Rule of Five
+
+    public:
+        GLInfo(GLInfo const&) = default;
+        GLInfo& operator=(GLInfo const&) = default;
         GLInfo(GLInfo&&) noexcept = default;
         GLInfo& operator=(GLInfo&&) noexcept = default;
         ~GLInfo(void) noexcept = default;
+
+#pragma endregion
 
     public:
         /// <summary>

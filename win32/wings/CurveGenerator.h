@@ -15,31 +15,9 @@ namespace silnith::wings
 	template<std::floating_point T>
 	class CurveGenerator
 	{
-	public:
-		CurveGenerator(void) = delete;
-		CurveGenerator(CurveGenerator const& curveGenerator) = delete;
-		CurveGenerator& operator=(CurveGenerator const& curveGenerator) = delete;
-		CurveGenerator(CurveGenerator&& curveGenerator) = delete;
-		CurveGenerator& operator=(CurveGenerator&& curveGenerator) = delete;
-		virtual ~CurveGenerator(void) noexcept = default;
-	public:
-		/// <summary>
-		/// Creates a new curve generator.
-		/// </summary>
-		/// <param name="initialValue">the initial value of the curve</param>
-		/// <param name="minimumValue">the minimum value of the curve</param>
-		/// <param name="maximumValue">the maximum value of the curve</param>
-		/// <param name="valueWraps">whether curve values map from the maximum value to the minimum value</param>
-		/// <param name="maximumVelocity">the maximum velocity, or slope of the curve</param>
-		/// <param name="maximumAcceleration">the maximum acceleration for curve changes</param>
-		/// <param name="ticksPerAccelerationChange">the number of values to generate before the acceleration changes</param>
-		explicit CurveGenerator(T initialValue, T minimumValue, T maximumValue, bool valueWraps,
-			T maximumVelocity, T maximumAcceleration, unsigned int ticksPerAccelerationChange)
-			: minimumValue{ minimumValue }, maximumValue{ maximumValue }, valueWraps{ valueWraps },
-			maximumVelocity{ maximumVelocity }, maximumAcceleration{ maximumAcceleration }, ticksPerAccelerationChange{ ticksPerAccelerationChange },
-			value{ initialValue }
-		{}
+#pragma region Static Members
 
+	public:
 		/// <summary>
 		/// Returns a CurveGenerator for angles.
 		/// </summary>
@@ -67,6 +45,39 @@ namespace silnith::wings
 		{
 			return CurveGenerator<T>{ initialValue, 0, 1, false, maximumVelocity, maximumAcceleration, ticksPerAccelerationChange };
 		}
+
+#pragma endregion
+
+	public:
+		CurveGenerator(void) = delete;
+
+		/// <summary>
+		/// Creates a new curve generator.
+		/// </summary>
+		/// <param name="initialValue">the initial value of the curve</param>
+		/// <param name="minimumValue">the minimum value of the curve</param>
+		/// <param name="maximumValue">the maximum value of the curve</param>
+		/// <param name="valueWraps">whether curve values map from the maximum value to the minimum value</param>
+		/// <param name="maximumVelocity">the maximum velocity, or slope of the curve</param>
+		/// <param name="maximumAcceleration">the maximum acceleration for curve changes</param>
+		/// <param name="ticksPerAccelerationChange">the number of values to generate before the acceleration changes</param>
+		explicit CurveGenerator(T initialValue, T minimumValue, T maximumValue, bool valueWraps,
+			T maximumVelocity, T maximumAcceleration, unsigned int ticksPerAccelerationChange)
+			: minimumValue{ minimumValue }, maximumValue{ maximumValue }, valueWraps{ valueWraps },
+			maximumVelocity{ maximumVelocity }, maximumAcceleration{ maximumAcceleration }, ticksPerAccelerationChange{ ticksPerAccelerationChange },
+			value{ initialValue }
+		{}
+
+#pragma region Rule of Five
+
+	public:
+		CurveGenerator(CurveGenerator const& curveGenerator) = delete;
+		CurveGenerator& operator=(CurveGenerator const& curveGenerator) = delete;
+		CurveGenerator(CurveGenerator&& curveGenerator) noexcept = delete;
+		CurveGenerator& operator=(CurveGenerator&& curveGenerator) noexcept = delete;
+		virtual ~CurveGenerator(void) noexcept = default;
+
+#pragma endregion
 
 	public:
 		/// <summary>
