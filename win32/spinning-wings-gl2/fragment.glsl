@@ -12,6 +12,7 @@ void main() {
      * 
      * A fragment shader must write to gl_FragColor if the render target uses colors.
      * gl_FragDepth must be written if the depth buffer is enabled.
+     * If gl_FragDepth is not written, it will take the value of gl_FragCoord.z.
      */
     gl_FragColor = gl_Color;
     gl_FragDepth = gl_FragCoord.z;
