@@ -12,15 +12,20 @@ namespace silnith::wings::gl
 	/// </remarks>
 	class WingRenderer
 	{
+#pragma region Rule of Five
+
 	public:
-		WingRenderer(void) = default;
 		WingRenderer(WingRenderer const&) = delete;
 		WingRenderer& operator=(WingRenderer const&) = delete;
 		WingRenderer(WingRenderer&&) noexcept = delete;
 		WingRenderer& operator=(WingRenderer&&) noexcept = delete;
 		virtual ~WingRenderer(void) noexcept = default;
 
+#pragma endregion
+
 	public:
+		explicit WingRenderer(void) = default;
+
 		/// <summary>
 		/// Draws a single wing.  This is suitable for compiling
 		/// into a display list, or for immediate-mode rendering.

@@ -33,15 +33,23 @@ namespace silnith::wings::gl2
     /// </remarks>
     class WingsViewGL2
     {
+#pragma region Rule of Five
+
     public:
-        WingsViewGL2(void) = delete;
         WingsViewGL2(WingsViewGL2 const&) = delete;
         WingsViewGL2& operator=(WingsViewGL2 const&) = delete;
         WingsViewGL2(WingsViewGL2&&) noexcept = delete;
         WingsViewGL2& operator=(WingsViewGL2&&) noexcept = delete;
         ~WingsViewGL2(void) noexcept;
 
+#pragma endregion
+
     public:
+        /// <summary>
+        /// Default constructor is deleted.  A <c>GLInfo</c> is required to initialize properly.
+        /// </summary>
+        WingsViewGL2(void) = delete;
+
         /// <summary>
         /// Configures the OpenGL state machine for rendering the spinning wings animation.
         /// </summary>
@@ -144,6 +152,8 @@ namespace silnith::wings::gl2
         /// </summary>
         std::deque<Wing<GLuint, GLfloat> > wings{};
 
+#pragma region The Random Curve Generators
+
         /// <summary>
         /// The curve generator for the distance of the wing from the central axis.
         /// </summary>
@@ -211,6 +221,8 @@ namespace silnith::wings::gl2
         /// The curve generator for the blue component of the wing color.
         /// </summary>
         CurveGenerator<GLfloat> blueCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
+
+#pragma endregion
 
         /// <summary>
         /// The GLSL program for rendering.

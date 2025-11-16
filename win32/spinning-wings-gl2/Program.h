@@ -27,15 +27,23 @@ namespace silnith::wings::gl2
     /// </remarks>
     class Program
     {
+#pragma region Rule of Five
+
     public:
-        Program(void) = delete;
         Program(Program const&) = delete;
         Program& operator=(Program const&) = delete;
         Program(Program&&) noexcept = delete;
         Program& operator=(Program&&) noexcept = delete;
         virtual ~Program(void) noexcept;
 
+#pragma endregion
+
     public:
+        /// <summary>
+        /// Default constructor is deleted.  A program is not valid without any shaders.
+        /// </summary>
+        Program(void) = delete;
+
         /// <summary>
         /// Creates and links a program using the provided vertex and fragment shaders.
         /// </summary>

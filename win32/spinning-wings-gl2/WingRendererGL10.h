@@ -19,15 +19,20 @@ namespace silnith::wings::gl
 	/// </remarks>
 	class WingRendererGL10 : public WingRenderer
 	{
+#pragma region Rule of Five
+
 	public:
-		WingRendererGL10(void);
 		WingRendererGL10(WingRendererGL10 const&) = delete;
 		WingRendererGL10& operator=(WingRendererGL10 const&) = delete;
 		WingRendererGL10(WingRendererGL10&&) noexcept = delete;
 		WingRendererGL10& operator=(WingRendererGL10&&) noexcept = delete;
 		virtual ~WingRendererGL10(void) noexcept override;
 
+#pragma endregion
+
 	public:
+		explicit WingRendererGL10(void);
+
 		virtual void DrawWing(void) const override;
 
 	private:
