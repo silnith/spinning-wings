@@ -125,6 +125,9 @@ namespace silnith::wings::gl3
 
         /*
          * The color number allow rendering to multiple draw buffers.
+         * The default framebuffer is 0.
+         * If rendering to multiple framebuffers, the color numbers must match
+         * the indices of the parameters to glDrawBuffers.
          */
         GLuint constexpr colorNumber{ 0 };
         glBindFragDataLocation(id, colorNumber, fragmentData.c_str());
