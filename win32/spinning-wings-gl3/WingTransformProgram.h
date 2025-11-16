@@ -20,15 +20,25 @@ namespace silnith::wings::gl3
     /// </summary>
     class WingTransformProgram : public Program
     {
+#pragma region Rule of Five
+
     public:
-        WingTransformProgram(void) = delete;
         WingTransformProgram(WingTransformProgram const&) = delete;
         WingTransformProgram& operator=(WingTransformProgram const&) = delete;
         WingTransformProgram(WingTransformProgram&&) noexcept = delete;
         WingTransformProgram& operator=(WingTransformProgram&&) noexcept = delete;
         virtual ~WingTransformProgram(void) noexcept override;
 
+#pragma endregion
+
     public:
+        /// <summary>
+        /// Default constructor is deleted.  The transform program requires the
+        /// wing geometry and utility shaders that are shared between multiple
+        /// programs.
+        /// </summary>
+        WingTransformProgram(void) = delete;
+
         explicit WingTransformProgram(std::shared_ptr<WingGeometry> const& wingGeometry,
             std::shared_ptr<VertexShader const> const& rotateMatrixShader,
             std::shared_ptr<VertexShader const> const& translateMatrixShader);

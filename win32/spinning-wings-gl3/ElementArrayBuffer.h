@@ -23,15 +23,24 @@ namespace silnith::wings::gl3
     /// </remarks>
     class ElementArrayBuffer : public Buffer
     {
+#pragma region Rule of Five
+
     public:
-        ElementArrayBuffer(void) = delete;
         ElementArrayBuffer(ElementArrayBuffer const&) = delete;
         ElementArrayBuffer& operator=(ElementArrayBuffer const&) = delete;
         ElementArrayBuffer(ElementArrayBuffer&&) noexcept = delete;
         ElementArrayBuffer& operator=(ElementArrayBuffer&&) noexcept = delete;
         virtual ~ElementArrayBuffer(void) noexcept = default;
 
+#pragma endregion
+
     public:
+        /// <summary>
+        /// Default constructor is deleted.  An element array is invalid without
+        /// data to initialize it.
+        /// </summary>
+        ElementArrayBuffer(void) = delete;
+
         /// <summary>
         /// Allocates a buffer and initializes it to contain the provided data.
         /// </summary>

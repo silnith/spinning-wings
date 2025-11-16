@@ -22,22 +22,24 @@ namespace silnith::wings::gl3
     /// </remarks>
     class Buffer
     {
+#pragma region Rule of Five
+
     public:
-        /// <summary>
-        /// Constructs a new buffer object.  The buffer has no attached storage
-        /// until some is allocated using <c>glBufferData</c>.
-        /// </summary>
-        explicit Buffer(void);
         Buffer(Buffer const&) = delete;
         Buffer& operator=(Buffer const&) = delete;
         Buffer(Buffer&&) noexcept = delete;
         Buffer& operator=(Buffer&&) noexcept = delete;
-        /// <summary>
-        /// Deletes the buffer object.
-        /// </summary>
         virtual ~Buffer(void) noexcept;
 
+#pragma endregion
+
     public:
+        /// <summary>
+        /// Constructs a new buffer object.  The buffer has no attached storage
+        /// until some is allocated using <see cref="glBufferData"/>.
+        /// </summary>
+        explicit Buffer(void);
+
         /// <summary>
         /// Returns the OpenGL name for the buffer object.
         /// </summary>

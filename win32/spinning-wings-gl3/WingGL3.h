@@ -33,14 +33,23 @@ namespace silnith::wings::gl3
 	/// </remarks>
 	class Wing
 	{
+#pragma region Rule of Five
+
 	public:
-		Wing(void) noexcept = default;
-		Wing(Wing const& wing) noexcept = default;
-		Wing& operator=(Wing const& wing) noexcept = default;
+		Wing(Wing const& wing) = default;
+		Wing& operator=(Wing const& wing) = default;
 		Wing(Wing&& wing) noexcept = default;
 		Wing& operator=(Wing&& wing) noexcept = default;
 		virtual ~Wing(void) noexcept = default;
+
+#pragma endregion
+
 	public:
+		/// <summary>
+		/// Default constructor is required by the STL containers.
+		/// </summary>
+		explicit Wing(void) = default;
+
 		/// <summary>
 		/// Creates a new wing with the provided parameters.
 		/// </summary>
@@ -49,7 +58,7 @@ namespace silnith::wings::gl3
 		/// <param name="vertexBuffer">The vertex buffer to reuse for this wing.</param>
 		/// <param name="colorBuffer">The color buffer to reuse.</param>
 		/// <param name="edgeColorBuffer">The edge color buffer to reuse.</param>
-		Wing(GLfloat deltaAngle, GLfloat deltaZ,
+		explicit Wing(GLfloat deltaAngle, GLfloat deltaZ,
 			std::shared_ptr<ArrayBuffer> const& vertexBuffer,
 			std::shared_ptr<ArrayBuffer> const& colorBuffer,
 			std::shared_ptr<ArrayBuffer> const& edgeColorBuffer) noexcept;

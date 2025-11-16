@@ -18,15 +18,20 @@ namespace silnith::wings::gl3
     /// </summary>
     class WingGeometry
     {
+#pragma region Rule of Five
+
     public:
-        explicit WingGeometry(void);
         WingGeometry(WingGeometry const&) = delete;
         WingGeometry& operator=(WingGeometry const&) = delete;
         WingGeometry(WingGeometry&&) noexcept = delete;
         WingGeometry& operator=(WingGeometry&&) noexcept = delete;
         ~WingGeometry(void) noexcept = default;
 
+#pragma endregion
+
     public:
+        explicit WingGeometry(void);
+
         /// <summary>
         /// Returns the number of vertices in the wing.
         /// This is the number of (x, y, z, w) coordinate tuples, and is

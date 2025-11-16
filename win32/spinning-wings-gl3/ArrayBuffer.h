@@ -26,15 +26,25 @@ namespace silnith::wings::gl3
     /// </remarks>
     class ArrayBuffer : public Buffer
     {
+#pragma region Rule of Five
+
     public:
-        ArrayBuffer(void) = delete;
         ArrayBuffer(ArrayBuffer const&) = delete;
         ArrayBuffer& operator=(ArrayBuffer const&) = delete;
         ArrayBuffer(ArrayBuffer&&) noexcept = delete;
         ArrayBuffer& operator=(ArrayBuffer&&) noexcept = delete;
         virtual ~ArrayBuffer(void) noexcept override = default;
 
+#pragma endregion
+
     public:
+        /// <summary>
+        /// Default constructor is deleted.  An array buffer needs the number
+        /// of vertices and number of components per vertex in order to be
+        /// valid.
+        /// </summary>
+        ArrayBuffer(void) = delete;
+
         /// <summary>
         /// Constructs a buffer and initializes its contents with the provided
         /// data.

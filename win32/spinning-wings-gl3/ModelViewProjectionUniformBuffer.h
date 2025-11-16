@@ -31,15 +31,24 @@ namespace silnith::wings::gl3
 	/// </remarks>
     class ModelViewProjectionUniformBuffer : public Buffer
     {
+#pragma region Rule of Five
+
     public:
-        ModelViewProjectionUniformBuffer(void) = delete;
         ModelViewProjectionUniformBuffer(ModelViewProjectionUniformBuffer const&) = delete;
         ModelViewProjectionUniformBuffer& operator=(ModelViewProjectionUniformBuffer const&) = delete;
         ModelViewProjectionUniformBuffer(ModelViewProjectionUniformBuffer&&) noexcept = delete;
         ModelViewProjectionUniformBuffer& operator=(ModelViewProjectionUniformBuffer&&) noexcept = delete;
 		virtual ~ModelViewProjectionUniformBuffer(void) noexcept override = default;
 
+#pragma endregion
+
     public:
+        /// <summary>
+        /// Default constructor is deleted.  A uniform buffer is not valid
+        /// without knowing the offsets of its contents.
+        /// </summary>
+        ModelViewProjectionUniformBuffer(void) = delete;
+
 		/// <summary>
 		/// Constructs a new uniform buffer that stores the model, view, and
 		/// projection matrices expected by the uniform block of the

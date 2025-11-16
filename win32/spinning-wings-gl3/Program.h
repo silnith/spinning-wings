@@ -28,15 +28,23 @@ namespace silnith::wings::gl3
     /// </remarks>
     class Program
     {
+#pragma region Rule of Five
+
     public:
-        Program(void) noexcept = delete;
-        Program(Program const&) noexcept = delete;
-        Program& operator=(Program const&) noexcept = delete;
+        Program(Program const&) = delete;
+        Program& operator=(Program const&) = delete;
         Program(Program&&) noexcept = delete;
         Program& operator=(Program&&) noexcept = delete;
         virtual ~Program(void) noexcept;
 
+#pragma endregion
+
     public:
+        /// <summary>
+        /// Default constructor is deleted.  A program is not valid without any shaders.
+        /// </summary>
+        Program(void) = delete;
+
         /// <summary>
         /// Creates a GLSL program for transformation feedback.
         /// </summary>

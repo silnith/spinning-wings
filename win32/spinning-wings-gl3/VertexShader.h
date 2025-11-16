@@ -11,6 +11,7 @@
 
 namespace silnith::wings::gl3
 {
+
     /// <summary>
     /// Manages a single GLSL vertex shader.
     /// </summary>
@@ -21,6 +22,8 @@ namespace silnith::wings::gl3
     /// </remarks>
     class VertexShader : public Shader
     {
+#pragma region Static Members
+
     public:
         /// <summary>
         /// A convenience factory method for creating a vertex shader that
@@ -52,14 +55,25 @@ namespace silnith::wings::gl3
         /// <returns>A vertex shader that can be linked into a program.</returns>
         static std::shared_ptr<VertexShader const> MakeScaleMatrixShader(void);
 
+#pragma endregion
+
+#pragma region Rule of Five
+
     public:
-        VertexShader(void) noexcept = delete;
-        VertexShader(VertexShader const&) noexcept = delete;
-        VertexShader& operator=(VertexShader const&) noexcept = delete;
+        VertexShader(VertexShader const&) = delete;
+        VertexShader& operator=(VertexShader const&) = delete;
         VertexShader(VertexShader&&) noexcept = delete;
         VertexShader& operator=(VertexShader&&) noexcept = delete;
         virtual ~VertexShader(void) noexcept override = default;
+
+#pragma endregion
+
     public:
+        /// <summary>
+        /// Default constructor is deleted.  A shader is not valid without source code.
+        /// </summary>
+        VertexShader(void) = delete;
+
         /// <summary>
         /// Creates and compiles a vertex shader from the given GLSL sources.
         /// The source strings are concatenated with newlines appended to each.

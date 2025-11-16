@@ -26,6 +26,8 @@ namespace silnith::wings::gl3
     /// </remarks>
     class Shader
     {
+#pragma region Static Members
+
     public:
         /// <summary>
         /// The GLSL 1.50 version declaration corresponding to OpenGL 3.2.
@@ -76,13 +78,24 @@ namespace silnith::wings::gl3
         /// </summary>
         static std::string const scaleMatrixFunctionDefinition;
 
+#pragma endregion
+
+#pragma region Rule of Five
+
     public:
-        Shader(void) noexcept = delete;
-        Shader(Shader const&) noexcept = delete;
-        Shader& operator=(Shader const&) noexcept = delete;
+        Shader(Shader const&) = delete;
+        Shader& operator=(Shader const&) = delete;
         Shader(Shader&&) noexcept = delete;
         Shader& operator=(Shader&&) noexcept = delete;
         virtual ~Shader(void) noexcept;
+
+#pragma endregion
+
+    public:
+        /// <summary>
+        /// Default constructor is deleted.  A shader is not valid without source code.
+        /// </summary>
+        Shader(void) = delete;
 
     protected:
         /// <summary>

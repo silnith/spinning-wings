@@ -31,21 +31,23 @@ namespace silnith::wings::gl3
     /// </remarks>
     class WingsViewGL3
     {
+#pragma region Rule of Five
+
     public:
-        /// <summary>
-        /// Configures the OpenGL state machine for rendering the spinning wings animation.
-        /// </summary>
-        WingsViewGL3(void);
         WingsViewGL3(WingsViewGL3 const&) = delete;
         WingsViewGL3& operator=(WingsViewGL3 const&) = delete;
         WingsViewGL3(WingsViewGL3&&) noexcept = delete;
         WingsViewGL3& operator=(WingsViewGL3&&) noexcept = delete;
-        /// <summary>
-        /// Cleans up any resources allocated.
-        /// </summary>
         ~WingsViewGL3(void) noexcept = default;
 
+#pragma endregion
+
     public:
+        /// <summary>
+        /// Configures the OpenGL state machine for rendering the spinning wings animation.
+        /// </summary>
+        explicit WingsViewGL3(void);
+
         /// <summary>
         /// Advances the spinning wings animation by one frame.
         /// </summary>

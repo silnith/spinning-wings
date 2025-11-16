@@ -23,6 +23,8 @@ namespace silnith::wings::gl3
     /// </summary>
     class WingRenderProgram : public Program
     {
+#pragma region Static Members
+
     private:
         /// <summary>
         /// The uniform buffer binding index for the ModelViewProjection matrices.
@@ -41,15 +43,27 @@ namespace silnith::wings::gl3
         /// </remarks>
         static GLuint constexpr modelViewProjectionBindingIndex{ 0 };
 
+#pragma endregion
+
+#pragma region Rule of Five
+
     public:
-        WingRenderProgram(void) = delete;
         WingRenderProgram(WingRenderProgram const&) = delete;
         WingRenderProgram& operator=(WingRenderProgram const&) = delete;
         WingRenderProgram(WingRenderProgram&&) noexcept = delete;
         WingRenderProgram& operator=(WingRenderProgram&&) noexcept = delete;
         virtual ~WingRenderProgram(void) noexcept override;
 
+#pragma endregion
+
     public:
+        /// <summary>
+        /// Default constructor is deleted.  The render program requires the
+        /// wing geometry and utility shaders that are shared between multiple
+        /// programs.
+        /// </summary>
+        WingRenderProgram(void) = delete;
+
         explicit WingRenderProgram(std::shared_ptr<WingGeometry> const& wingGeometry,
             std::shared_ptr<VertexShader const> const& rotateMatrixShader,
             std::shared_ptr<VertexShader const> const& translateMatrixShader);
