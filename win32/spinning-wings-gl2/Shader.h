@@ -96,17 +96,17 @@ namespace silnith::wings::gl2
 
     public:
         /// <summary>
-        /// Returns the OpenGL name for the shader.
+        /// Returns the OpenGL name for the shader object.
         /// </summary>
-        /// <returns>The OpenGL identifier of the shader.</returns>
+        /// <returns>The shader object name.</returns>
         [[nodiscard]]
-        GLuint getShader(void) const noexcept;
+        GLuint GetName(void) const noexcept;
 
     private:
         /// <summary>
         /// The OpenGL identifier for the shader.
         /// </summary>
-        GLuint const id{ 0 };
+        GLuint const name{ 0 };
 
         /// <summary>
         /// The log output from compiling the shader.
