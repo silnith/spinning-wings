@@ -11,10 +11,17 @@
 
 namespace silnith::wings::gl3
 {
+
     /// <summary>
     /// Manages a GLSL program.  This is composed of shaders.
     /// </summary>
     /// <remarks>
+    /// <para>
+    /// The invariant established by this class is that the OpenGL program
+    /// object is allocated and successfully linked.  The input shaders are
+    /// only required for construction.  After the object is constructed, the
+    /// shaders are no longer required.
+    /// </para>
     /// <para>
     /// This is designed for OpenGL 3.2 or greater.
     /// </para>
@@ -28,6 +35,7 @@ namespace silnith::wings::gl3
         Program(Program&&) noexcept = delete;
         Program& operator=(Program&&) noexcept = delete;
         virtual ~Program(void) noexcept;
+
     public:
         /// <summary>
         /// Creates a GLSL program for transformation feedback.

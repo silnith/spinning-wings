@@ -11,6 +11,7 @@
 
 namespace silnith::wings::gl2
 {
+
     /// <summary>
     /// Manages a single GLSL vertex shader.
     /// </summary>
@@ -29,6 +30,11 @@ namespace silnith::wings::gl2
         /// should include the function declaration contained in
         /// <see cref="Shader::rotateMatrixFunctionDeclaration"/>.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The returned shader will not define a <c>main</c> function.
+        /// </para>
+        /// </remarks>
         /// <returns>A vertex shader that can be linked into a program.</returns>
         static std::shared_ptr<VertexShader const> MakeRotateMatrixShader(void);
 
@@ -39,6 +45,11 @@ namespace silnith::wings::gl2
         /// should include the function declaration contained in
         /// <see cref="Shader::translateMatrixFunctionDeclaration"/>.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The returned shader will not define a <c>main</c> function.
+        /// </para>
+        /// </remarks>
         /// <returns>A vertex shader that can be linked into a program.</returns>
         static std::shared_ptr<VertexShader const> MakeTranslateMatrixShader(void);
 
@@ -49,13 +60,18 @@ namespace silnith::wings::gl2
         /// should include the function declaration contained in
         /// <see cref="Shader::scaleMatrixFunctionDeclaration"/>.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The returned shader will not define a <c>main</c> function.
+        /// </para>
+        /// </remarks>
         /// <returns>A vertex shader that can be linked into a program.</returns>
         static std::shared_ptr<VertexShader const> MakeScaleMatrixShader(void);
 
     public:
-        VertexShader(void) noexcept = delete;
-        VertexShader(VertexShader const&) noexcept = delete;
-        VertexShader& operator=(VertexShader const&) noexcept = delete;
+        VertexShader(void) = delete;
+        VertexShader(VertexShader const&) = delete;
+        VertexShader& operator=(VertexShader const&) = delete;
         VertexShader(VertexShader&&) noexcept = delete;
         VertexShader& operator=(VertexShader&&) noexcept = delete;
         virtual ~VertexShader(void) noexcept override = default;

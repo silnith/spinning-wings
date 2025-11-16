@@ -7,6 +7,7 @@
 
 namespace silnith::wings::gl2
 {
+
     /// <summary>
     /// Manages a single GLSL fragment shader.
     /// </summary>
@@ -18,12 +19,13 @@ namespace silnith::wings::gl2
     class FragmentShader : public Shader
     {
     public:
-        FragmentShader(void) noexcept = delete;
-        FragmentShader(FragmentShader const&) noexcept = delete;
-        FragmentShader& operator=(FragmentShader const&) noexcept = delete;
+        FragmentShader(void) = delete;
+        FragmentShader(FragmentShader const&) = delete;
+        FragmentShader& operator=(FragmentShader const&) = delete;
         FragmentShader(FragmentShader&&) noexcept = delete;
         FragmentShader& operator=(FragmentShader&&) noexcept = delete;
         virtual ~FragmentShader(void) noexcept override = default;
+
     public:
         /// <summary>
         /// Creates and compiles a fragment shader from the given GLSL sources.

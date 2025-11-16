@@ -15,6 +15,12 @@ namespace silnith::wings::gl3
     /// indices into vertex arrays.  This is intended to be bound as an
     /// <c>ELEMENT_ARRAY_BUFFER</c> and used for <c>DrawElements</c>.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The invariant established by this class is that the buffer is allocated
+    /// and initialized with the provided list of indices.
+    /// </para>
+    /// </remarks>
     class ElementArrayBuffer : public Buffer
     {
     public:

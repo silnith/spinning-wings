@@ -8,11 +8,18 @@
 
 namespace silnith::wings::gl2
 {
+
     /// <summary>
     /// Manages a single GLSL shader.  Use the <c>FragmentShader</c>
     /// or <c>VertexShader</c> specializations instead.
     /// </summary>
     /// <remarks>
+    /// <para>
+    /// The invariant established by this class is that the shader is allocated
+    /// and successfully compiled from the source code.  The source code
+    /// strings are only required for the constructor, once the object is
+    /// constructed the input strings are no longer needed.
+    /// </para>
     /// <para>
     /// This requires OpenGL 2.0 or greater.
     /// </para>
@@ -70,12 +77,13 @@ namespace silnith::wings::gl2
         static std::string const scaleMatrixFunctionDefinition;
 
     public:
-        Shader(void) noexcept = delete;
-        Shader(Shader const&) noexcept = delete;
-        Shader& operator=(Shader const&) noexcept = delete;
+        Shader(void) = delete;
+        Shader(Shader const&) = delete;
+        Shader& operator=(Shader const&) = delete;
         Shader(Shader&&) noexcept = delete;
         Shader& operator=(Shader&&) noexcept = delete;
         virtual ~Shader(void) noexcept;
+
     protected:
         /// <summary>
         /// Creates and compiles a shader from the given GLSL sources.

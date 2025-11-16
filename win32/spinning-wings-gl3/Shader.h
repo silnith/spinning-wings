@@ -8,11 +8,18 @@
 
 namespace silnith::wings::gl3
 {
+
     /// <summary>
     /// Manages a single GLSL shader.  Use <c>FragmentShader</c>
     /// or <c>VertexShader</c> instead.
     /// </summary>
     /// <remarks>
+    /// <para>
+    /// The invariant established by this class is that the shader is allocated
+    /// and successfully compiled from the source code.  The source code
+    /// strings are only required for the constructor, once the object is
+    /// constructed the input strings are no longer needed.
+    /// </para>
     /// <para>
     /// This is designed for OpenGL 3.2 or greater.
     /// </para>
@@ -76,6 +83,7 @@ namespace silnith::wings::gl3
         Shader(Shader&&) noexcept = delete;
         Shader& operator=(Shader&&) noexcept = delete;
         virtual ~Shader(void) noexcept;
+
     protected:
         /// <summary>
         /// Creates and compiles a shader from the given GLSL sources.

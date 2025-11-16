@@ -7,6 +7,7 @@
 
 namespace silnith::wings::gl3
 {
+
     /// <summary>
     /// Manages a single GLSL fragment shader.
     /// </summary>
@@ -24,6 +25,7 @@ namespace silnith::wings::gl3
         FragmentShader(FragmentShader&&) noexcept = delete;
         FragmentShader& operator=(FragmentShader&&) noexcept = delete;
         virtual ~FragmentShader(void) noexcept override = default;
+
     public:
         /// <summary>
         /// Creates and compiles a fragment shader from the given GLSL sources.

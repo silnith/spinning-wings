@@ -11,6 +11,11 @@ namespace silnith::wings::gl3
     /// </summary>
     /// <remarks>
     /// <para>
+    /// The invariant established by this class is only that the buffer has a
+    /// valid OpenGL identifier.  No actual memory is allocated for the buffer.
+    /// For that, use one of the subclasses.
+    /// </para>
+    /// <para>
     /// Various utility classes designed to represent special-use buffers can
     /// use this as a base to handle the RAII part.
     /// </para>

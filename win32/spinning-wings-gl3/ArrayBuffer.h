@@ -17,6 +17,13 @@ namespace silnith::wings::gl3
     /// used as inputs for vertex shaders.  Vertex coordinates and color values
     /// are common examples.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The invariant established by this class is that the buffer has memory
+    /// allocated for a specific number of vertices with a specific number of
+    /// components per vertex.
+    /// </para>
+    /// </remarks>
     class ArrayBuffer : public Buffer
     {
     public:

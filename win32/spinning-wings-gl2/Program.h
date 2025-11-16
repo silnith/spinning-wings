@@ -10,10 +10,17 @@
 
 namespace silnith::wings::gl2
 {
+
     /// <summary>
     /// Manages a GLSL program.  This is composed of shaders.
     /// </summary>
     /// <remarks>
+    /// <para>
+    /// The invariant established by this class is that the OpenGL program
+    /// object is allocated and successfully linked.  The input shaders are
+    /// only required for construction.  After the object is constructed, the
+    /// shaders are no longer required.
+    /// </para>
     /// <para>
     /// This requires OpenGL 2.0 or greater.
     /// </para>
@@ -21,9 +28,9 @@ namespace silnith::wings::gl2
     class Program
     {
     public:
-        Program(void) noexcept = delete;
-        Program(Program const&) noexcept = delete;
-        Program& operator=(Program const&) noexcept = delete;
+        Program(void) = delete;
+        Program(Program const&) = delete;
+        Program& operator=(Program const&) = delete;
         Program(Program&&) noexcept = delete;
         Program& operator=(Program&&) noexcept = delete;
         virtual ~Program(void) noexcept;
