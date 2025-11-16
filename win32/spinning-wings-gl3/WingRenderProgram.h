@@ -45,17 +45,6 @@ namespace silnith::wings::gl3
 
 #pragma endregion
 
-#pragma region Rule of Five
-
-    public:
-        WingRenderProgram(WingRenderProgram const&) = delete;
-        WingRenderProgram& operator=(WingRenderProgram const&) = delete;
-        WingRenderProgram(WingRenderProgram&&) noexcept = delete;
-        WingRenderProgram& operator=(WingRenderProgram&&) noexcept = delete;
-        virtual ~WingRenderProgram(void) noexcept override;
-
-#pragma endregion
-
     public:
         /// <summary>
         /// Default constructor is deleted.  The render program requires the
@@ -68,6 +57,18 @@ namespace silnith::wings::gl3
             std::shared_ptr<VertexShader const> const& rotateMatrixShader,
             std::shared_ptr<VertexShader const> const& translateMatrixShader);
 
+#pragma region Rule of Five
+
+    public:
+        WingRenderProgram(WingRenderProgram const&) = delete;
+        WingRenderProgram& operator=(WingRenderProgram const&) = delete;
+        WingRenderProgram(WingRenderProgram&&) noexcept = delete;
+        WingRenderProgram& operator=(WingRenderProgram&&) noexcept = delete;
+        virtual ~WingRenderProgram(void) noexcept override;
+
+#pragma endregion
+
+    public:
         /// <summary>
         /// Renders the provided collection of wings.
         /// </summary>

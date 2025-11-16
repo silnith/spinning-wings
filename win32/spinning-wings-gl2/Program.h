@@ -27,17 +27,6 @@ namespace silnith::wings::gl2
     /// </remarks>
     class Program
     {
-#pragma region Rule of Five
-
-    public:
-        Program(Program const&) = delete;
-        Program& operator=(Program const&) = delete;
-        Program(Program&&) noexcept = delete;
-        Program& operator=(Program&&) noexcept = delete;
-        virtual ~Program(void) noexcept;
-
-#pragma endregion
-
     public:
         /// <summary>
         /// Default constructor is deleted.  A program is not valid without any shaders.
@@ -53,6 +42,18 @@ namespace silnith::wings::gl2
         explicit Program(std::initializer_list<std::shared_ptr<VertexShader const> > vertexShaders,
             std::initializer_list<std::shared_ptr<FragmentShader const> > fragmentShaders);
 
+#pragma region Rule of Five
+
+    public:
+        Program(Program const&) = delete;
+        Program& operator=(Program const&) = delete;
+        Program(Program&&) noexcept = delete;
+        Program& operator=(Program&&) noexcept = delete;
+        virtual ~Program(void) noexcept;
+
+#pragma endregion
+
+    public:
         /// <summary>
         /// Returns the OpenGL name for the program object.
         /// </summary>

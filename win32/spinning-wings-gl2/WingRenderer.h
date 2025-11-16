@@ -2,6 +2,7 @@
 
 namespace silnith::wings::gl
 {
+
 	/// <summary>
 	/// Interface for utility classes that draw a single wing.
 	/// </summary>
@@ -12,6 +13,9 @@ namespace silnith::wings::gl
 	/// </remarks>
 	class WingRenderer
 	{
+	public:
+		explicit WingRenderer(void) = default;
+
 #pragma region Rule of Five
 
 	public:
@@ -24,8 +28,6 @@ namespace silnith::wings::gl
 #pragma endregion
 
 	public:
-		explicit WingRenderer(void) = default;
-
 		/// <summary>
 		/// Draws a single wing.  This is suitable for compiling
 		/// into a display list, or for immediate-mode rendering.
@@ -40,4 +42,5 @@ namespace silnith::wings::gl
 		/// </remarks>
 		virtual void DrawWing(void) const = 0;
 	};
+
 }

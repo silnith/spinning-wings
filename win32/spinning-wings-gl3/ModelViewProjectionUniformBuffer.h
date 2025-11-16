@@ -31,17 +31,6 @@ namespace silnith::wings::gl3
 	/// </remarks>
     class ModelViewProjectionUniformBuffer : public Buffer
     {
-#pragma region Rule of Five
-
-    public:
-        ModelViewProjectionUniformBuffer(ModelViewProjectionUniformBuffer const&) = delete;
-        ModelViewProjectionUniformBuffer& operator=(ModelViewProjectionUniformBuffer const&) = delete;
-        ModelViewProjectionUniformBuffer(ModelViewProjectionUniformBuffer&&) noexcept = delete;
-        ModelViewProjectionUniformBuffer& operator=(ModelViewProjectionUniformBuffer&&) noexcept = delete;
-		virtual ~ModelViewProjectionUniformBuffer(void) noexcept override = default;
-
-#pragma endregion
-
     public:
         /// <summary>
         /// Default constructor is deleted.  A uniform buffer is not valid
@@ -63,6 +52,18 @@ namespace silnith::wings::gl3
 			GLintptr viewOffset,
 			GLintptr projectionOffset);
 
+#pragma region Rule of Five
+
+    public:
+        ModelViewProjectionUniformBuffer(ModelViewProjectionUniformBuffer const&) = delete;
+        ModelViewProjectionUniformBuffer& operator=(ModelViewProjectionUniformBuffer const&) = delete;
+        ModelViewProjectionUniformBuffer(ModelViewProjectionUniformBuffer&&) noexcept = delete;
+        ModelViewProjectionUniformBuffer& operator=(ModelViewProjectionUniformBuffer&&) noexcept = delete;
+		virtual ~ModelViewProjectionUniformBuffer(void) noexcept override = default;
+
+#pragma endregion
+
+    public:
 		/// <summary>
 		/// Sets up the orthographic projection that transforms modelview coordinates
 		/// into normalized device coordinates.

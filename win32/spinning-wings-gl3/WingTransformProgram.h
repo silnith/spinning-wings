@@ -20,17 +20,6 @@ namespace silnith::wings::gl3
     /// </summary>
     class WingTransformProgram : public Program
     {
-#pragma region Rule of Five
-
-    public:
-        WingTransformProgram(WingTransformProgram const&) = delete;
-        WingTransformProgram& operator=(WingTransformProgram const&) = delete;
-        WingTransformProgram(WingTransformProgram&&) noexcept = delete;
-        WingTransformProgram& operator=(WingTransformProgram&&) noexcept = delete;
-        virtual ~WingTransformProgram(void) noexcept override;
-
-#pragma endregion
-
     public:
         /// <summary>
         /// Default constructor is deleted.  The transform program requires the
@@ -43,6 +32,18 @@ namespace silnith::wings::gl3
             std::shared_ptr<VertexShader const> const& rotateMatrixShader,
             std::shared_ptr<VertexShader const> const& translateMatrixShader);
 
+#pragma region Rule of Five
+
+    public:
+        WingTransformProgram(WingTransformProgram const&) = delete;
+        WingTransformProgram& operator=(WingTransformProgram const&) = delete;
+        WingTransformProgram(WingTransformProgram&&) noexcept = delete;
+        WingTransformProgram& operator=(WingTransformProgram&&) noexcept = delete;
+        virtual ~WingTransformProgram(void) noexcept override;
+
+#pragma endregion
+
+    public:
         /// <summary>
         /// Allocates a buffer object to serve as the recipient of the
         /// transform feedback program.  The buffer will be of sufficient size

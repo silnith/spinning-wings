@@ -33,17 +33,6 @@ namespace silnith::wings::gl3
 	/// </remarks>
 	class Wing
 	{
-#pragma region Rule of Five
-
-	public:
-		Wing(Wing const& wing) = default;
-		Wing& operator=(Wing const& wing) = default;
-		Wing(Wing&& wing) noexcept = default;
-		Wing& operator=(Wing&& wing) noexcept = default;
-		virtual ~Wing(void) noexcept = default;
-
-#pragma endregion
-
 	public:
 		/// <summary>
 		/// Default constructor is required by the STL containers.
@@ -63,6 +52,18 @@ namespace silnith::wings::gl3
 			std::shared_ptr<ArrayBuffer> const& colorBuffer,
 			std::shared_ptr<ArrayBuffer> const& edgeColorBuffer) noexcept;
 
+#pragma region Rule of Five
+
+	public:
+		Wing(Wing const& wing) = default;
+		Wing& operator=(Wing const& wing) = default;
+		Wing(Wing&& wing) noexcept = default;
+		Wing& operator=(Wing&& wing) noexcept = default;
+		virtual ~Wing(void) noexcept = default;
+
+#pragma endregion
+
+	public:
 		/// <summary>
 		/// Returns the additional angle around the central axis that each subsequent wing should be rendered.
 		/// </summary>

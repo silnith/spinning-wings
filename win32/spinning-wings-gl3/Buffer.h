@@ -22,6 +22,13 @@ namespace silnith::wings::gl3
     /// </remarks>
     class Buffer
     {
+    public:
+        /// <summary>
+        /// Constructs a new buffer object.  The buffer has no attached storage
+        /// until some is allocated using <see cref="glBufferData"/>.
+        /// </summary>
+        explicit Buffer(void);
+
 #pragma region Rule of Five
 
     public:
@@ -34,12 +41,6 @@ namespace silnith::wings::gl3
 #pragma endregion
 
     public:
-        /// <summary>
-        /// Constructs a new buffer object.  The buffer has no attached storage
-        /// until some is allocated using <see cref="glBufferData"/>.
-        /// </summary>
-        explicit Buffer(void);
-
         /// <summary>
         /// Returns the OpenGL name for the buffer object.
         /// </summary>

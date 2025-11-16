@@ -28,17 +28,6 @@ namespace silnith::wings::gl3
     /// </remarks>
     class Program
     {
-#pragma region Rule of Five
-
-    public:
-        Program(Program const&) = delete;
-        Program& operator=(Program const&) = delete;
-        Program(Program&&) noexcept = delete;
-        Program& operator=(Program&&) noexcept = delete;
-        virtual ~Program(void) noexcept;
-
-#pragma endregion
-
     public:
         /// <summary>
         /// Default constructor is deleted.  A program is not valid without any shaders.
@@ -66,6 +55,18 @@ namespace silnith::wings::gl3
             std::initializer_list<std::shared_ptr<FragmentShader const> > fragmentShaders,
             std::string const& fragmentData);
 
+#pragma region Rule of Five
+
+    public:
+        Program(Program const&) = delete;
+        Program& operator=(Program const&) = delete;
+        Program(Program&&) noexcept = delete;
+        Program& operator=(Program&&) noexcept = delete;
+        virtual ~Program(void) noexcept;
+
+#pragma endregion
+
+    public:
         /// <summary>
         /// Validate that the GLSL program can execute given the current GL state.
         /// </summary>

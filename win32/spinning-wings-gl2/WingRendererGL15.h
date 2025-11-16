@@ -18,6 +18,9 @@ namespace silnith::wings::gl
 	/// </remarks>
 	class WingRendererGL15 : public WingRenderer
 	{
+	public:
+		explicit WingRendererGL15(void);
+
 #pragma region Rule of Five
 
 	public:
@@ -30,8 +33,6 @@ namespace silnith::wings::gl
 #pragma endregion
 
 	public:
-		explicit WingRendererGL15(void);
-
 		virtual void DrawWing(void) const override;
 
 	private:

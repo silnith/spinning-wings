@@ -26,17 +26,6 @@ namespace silnith::wings::gl3
     /// </remarks>
     class ArrayBuffer : public Buffer
     {
-#pragma region Rule of Five
-
-    public:
-        ArrayBuffer(ArrayBuffer const&) = delete;
-        ArrayBuffer& operator=(ArrayBuffer const&) = delete;
-        ArrayBuffer(ArrayBuffer&&) noexcept = delete;
-        ArrayBuffer& operator=(ArrayBuffer&&) noexcept = delete;
-        virtual ~ArrayBuffer(void) noexcept override = default;
-
-#pragma endregion
-
     public:
         /// <summary>
         /// Default constructor is deleted.  An array buffer needs the number
@@ -65,6 +54,18 @@ namespace silnith::wings::gl3
         /// <param name="usageHint">A hint to the GL about how the data will be used.</param>
         explicit ArrayBuffer(GLint numComponentsPerVertex, GLsizei numVertices, GLenum usageHint);
 
+#pragma region Rule of Five
+
+    public:
+        ArrayBuffer(ArrayBuffer const&) = delete;
+        ArrayBuffer& operator=(ArrayBuffer const&) = delete;
+        ArrayBuffer(ArrayBuffer&&) noexcept = delete;
+        ArrayBuffer& operator=(ArrayBuffer&&) noexcept = delete;
+        virtual ~ArrayBuffer(void) noexcept override = default;
+
+#pragma endregion
+
+    public:
         /// <summary>
         /// Makes this buffer the active buffer for the specified vertex
         /// attribute location.

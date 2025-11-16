@@ -33,6 +33,18 @@ namespace silnith::wings::gl2
     /// </remarks>
     class WingsViewGL2
     {
+    public:
+        /// <summary>
+        /// Default constructor is deleted.  A <c>GLInfo</c> is required to initialize properly.
+        /// </summary>
+        WingsViewGL2(void) = delete;
+
+        /// <summary>
+        /// Configures the OpenGL state machine for rendering the spinning wings animation.
+        /// </summary>
+        /// <param name="glInfo">The queryable OpenGL information.</param>
+        explicit WingsViewGL2(silnith::wings::gl::GLInfo const& glInfo);
+
 #pragma region Rule of Five
 
     public:
@@ -45,17 +57,6 @@ namespace silnith::wings::gl2
 #pragma endregion
 
     public:
-        /// <summary>
-        /// Default constructor is deleted.  A <c>GLInfo</c> is required to initialize properly.
-        /// </summary>
-        WingsViewGL2(void) = delete;
-
-        /// <summary>
-        /// Configures the OpenGL state machine for rendering the spinning wings animation.
-        /// </summary>
-        /// <param name="glInfo">The queryable OpenGL information.</param>
-        WingsViewGL2(silnith::wings::gl::GLInfo const& glInfo);
-
         /// <summary>
         /// Advances the spinning wings animation by one frame.
         /// </summary>
@@ -291,4 +292,5 @@ namespace silnith::wings::gl2
         /// <seealso cref="glslProgram"/>
         GLuint rollPitchYawAttribLocation{ 0 };
     };
+
 }

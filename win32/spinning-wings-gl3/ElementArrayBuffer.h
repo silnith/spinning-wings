@@ -23,17 +23,6 @@ namespace silnith::wings::gl3
     /// </remarks>
     class ElementArrayBuffer : public Buffer
     {
-#pragma region Rule of Five
-
-    public:
-        ElementArrayBuffer(ElementArrayBuffer const&) = delete;
-        ElementArrayBuffer& operator=(ElementArrayBuffer const&) = delete;
-        ElementArrayBuffer(ElementArrayBuffer&&) noexcept = delete;
-        ElementArrayBuffer& operator=(ElementArrayBuffer&&) noexcept = delete;
-        virtual ~ElementArrayBuffer(void) noexcept = default;
-
-#pragma endregion
-
     public:
         /// <summary>
         /// Default constructor is deleted.  An element array is invalid without
@@ -48,6 +37,18 @@ namespace silnith::wings::gl3
         /// <param name="usageHint">A hint to the GL about how the data will be used.</param>
         explicit ElementArrayBuffer(std::span<GLuint const> indexData, GLenum usageHint);
 
+#pragma region Rule of Five
+
+    public:
+        ElementArrayBuffer(ElementArrayBuffer const&) = delete;
+        ElementArrayBuffer& operator=(ElementArrayBuffer const&) = delete;
+        ElementArrayBuffer(ElementArrayBuffer&&) noexcept = delete;
+        ElementArrayBuffer& operator=(ElementArrayBuffer&&) noexcept = delete;
+        virtual ~ElementArrayBuffer(void) noexcept = default;
+
+#pragma endregion
+
+    public:
         /// <summary>
         /// Makes this buffer the active buffer for <c>GL_ELEMENT_ARRAY_BUFFER</c>.
         /// </summary>

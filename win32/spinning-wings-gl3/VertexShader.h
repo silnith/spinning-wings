@@ -57,17 +57,6 @@ namespace silnith::wings::gl3
 
 #pragma endregion
 
-#pragma region Rule of Five
-
-    public:
-        VertexShader(VertexShader const&) = delete;
-        VertexShader& operator=(VertexShader const&) = delete;
-        VertexShader(VertexShader&&) noexcept = delete;
-        VertexShader& operator=(VertexShader&&) noexcept = delete;
-        virtual ~VertexShader(void) noexcept override = default;
-
-#pragma endregion
-
     public:
         /// <summary>
         /// Default constructor is deleted.  A shader is not valid without source code.
@@ -81,6 +70,18 @@ namespace silnith::wings::gl3
         /// <param name="sources">The source strings to concatenate.</param>
         /// <exception cref="std::runtime_error">If an error occurs creating the shader object in the OpenGL state machine.</exception>
         explicit VertexShader(std::initializer_list<std::string> sources);
+
+#pragma region Rule of Five
+
+    public:
+        VertexShader(VertexShader const&) = delete;
+        VertexShader& operator=(VertexShader const&) = delete;
+        VertexShader(VertexShader&&) noexcept = delete;
+        VertexShader& operator=(VertexShader&&) noexcept = delete;
+        virtual ~VertexShader(void) noexcept override = default;
+
+#pragma endregion
+
     };
 
 }
