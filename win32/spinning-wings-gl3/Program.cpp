@@ -30,8 +30,11 @@ namespace silnith::wings::gl3
             throw std::runtime_error{ "Failed to create GLSL program object."s };
         }
 
-        // Limit scope of pointers to string sources.
         {
+            /*
+             * Since this is largely demonstration code, I have gone out of my
+             * way to make the variable types explicit and precise.
+             */
             std::vector<GLchar const*> cPtrs{};
             for (std::string const& capturedVarying : capturedVaryings)
             {

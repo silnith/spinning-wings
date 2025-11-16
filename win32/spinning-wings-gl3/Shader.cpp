@@ -97,6 +97,10 @@ mat4 scale(in vec3 factor) {
         : name{ glCreateShader(type) },
         compilationLog{}
     {
+        /*
+         * OpenGL 3.0 defines vertex shaders, geometry shaders, and fragment
+         * shaders.
+         */
         assert((type == GL_VERTEX_SHADER)
             || (type == GL_GEOMETRY_SHADER)
             || (type == GL_FRAGMENT_SHADER));
@@ -106,8 +110,15 @@ mat4 scale(in vec3 factor) {
             throw std::runtime_error{ "Failed to create shader object." };
         }
 
-        // Limit scope of temporary variables.
+        /*
+         * In order to create a GLSL shader, source code must be provided as
+         * as strings.
+         */
         {
+            /*
+             * Since this is largely demonstration code, I have gone out of my
+             * way to make the variable types explicit and precise.
+             */
             std::vector<GLchar const*> cSources{};
             cSources.reserve(sources.size());
             for (std::string const& source : sources)
@@ -116,10 +127,20 @@ mat4 scale(in vec3 factor) {
             }
             GLsizei const cSourcesSize{ static_cast<GLsizei>(cSources.size()) };
             glShaderSource(name, cSourcesSize, cSources.data(), nullptr);
+            /*
+             * The call to glShaderSource copies the strings into GL memory.
+             */
         }
 
         glCompileShader(name);
 
+        /*
+         * Whether the compilation succeeded or failed, a log may be created.
+         * The length of the log must be queried in order to know how much
+         * buffer space is needed to retrieve the log.  The length will
+         * include the terminating null character.  If the length is zero,
+         * there is nothing in the log.
+         */
         GLint logSize{ 0 };
         glGetShaderiv(name, GL_INFO_LOG_LENGTH, &logSize);
         if (logSize > 0) {
@@ -128,6 +149,10 @@ mat4 scale(in vec3 factor) {
             compilationLog = std::string{ log.get() };
         }
 
+        /*
+         * The GLSL shader may not have compiled correctly.  If compilation
+         * failed, the shader is not valid and cannot be used.
+         */
         GLint compilationSuccess{ 0 };
         glGetShaderiv(name, GL_COMPILE_STATUS, &compilationSuccess);
         switch (compilationSuccess)
@@ -136,11 +161,21 @@ mat4 scale(in vec3 factor) {
             break;
         case GL_FALSE:
         {
+            /*
+             * Since throwing an exception cancels construction of the C++
+             * object, the destructor will never be called.  Therefore we need
+             * to clean up the allocated shader before throwing.
+             */
             glDeleteShader(name);
             throw std::runtime_error{ compilationLog };
         }
         default:
         {
+            /*
+             * The compilation status will either be GL_TRUE or GL_FALSE, so
+             * this case will never execute on a conforming OpenGL
+             * implementation.  But the C++ compiler has no way to prove that.
+             */
             glDeleteShader(name);
             std::ostringstream errorMessage{ "Unknown compilation status: "s };
             errorMessage << compilationSuccess;
