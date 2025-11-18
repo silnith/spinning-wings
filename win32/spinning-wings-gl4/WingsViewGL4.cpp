@@ -360,11 +360,6 @@ void main() {
 
 	void CleanupOpenGLState(void)
 	{
-		for (Wing const& wing : wings)
-		{
-			GLuint const transformFeedbackObject{ wing.getTransformFeedbackObject() };
-			glDeleteTransformFeedbacks(1, &transformFeedbackObject);
-		}
 		wings.clear();
 
 		glDeleteBuffers(1, &modelViewProjectionUniformBuffer);
@@ -403,7 +398,7 @@ void main() {
 		std::shared_ptr<ArrayBuffer const> wingVertexBuffer{ nullptr };
 		std::shared_ptr<ArrayBuffer const> wingColorBuffer{ nullptr };
 		std::shared_ptr<ArrayBuffer const> wingEdgeColorBuffer{ nullptr };
-		GLuint wingTransformFeedbackObject{ 0 };
+		std::shared_ptr<TransformFeedback const> wingTransformFeedbackObject{ nullptr };
 		if (wings.empty() || wings.size() < numWings)
 		{
 			wingVertexBuffer = wingGeometry->CreateBuffer(4);
@@ -412,12 +407,11 @@ void main() {
 
 			wingEdgeColorBuffer = wingGeometry->CreateBuffer(3);
 
-			glGenTransformFeedbacks(1, &wingTransformFeedbackObject);
-			glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, wingTransformFeedbackObject);
-			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, wingVertexBuffer->GetName());
-			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, wingColorBuffer->GetName());
-			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 2, wingEdgeColorBuffer->GetName());
-			glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
+			wingTransformFeedbackObject = std::make_shared<TransformFeedback const>(std::initializer_list<std::shared_ptr<ArrayBuffer const> >{
+				wingVertexBuffer,
+				wingColorBuffer,
+				wingEdgeColorBuffer,
+			});
 		}
 		else
 		{
@@ -448,7 +442,7 @@ void main() {
 
 		glBindVertexArray(wingTransformVertexArray);
 
-		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, wingTransformFeedbackObject);
+		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, wingTransformFeedbackObject->GetName());
 
 		glEnable(GL_RASTERIZER_DISCARD);
 		glBeginTransformFeedback(GL_POINTS);

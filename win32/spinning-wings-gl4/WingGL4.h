@@ -7,6 +7,7 @@
 
 #include "Color.h"
 #include "ArrayBuffer.h"
+#include "TransformFeedback.h"
 
 namespace silnith::wings::gl4
 {
@@ -50,7 +51,7 @@ namespace silnith::wings::gl4
 		explicit Wing(std::shared_ptr<ArrayBuffer const> vertexBuffer,
 			std::shared_ptr<ArrayBuffer const> colorBuffer,
 			std::shared_ptr<ArrayBuffer const> edgeColorBuffer,
-			GLuint transformFeedbackObject,
+			std::shared_ptr<TransformFeedback const> transformFeedbackObject,
 			GLfloat deltaAngle, GLfloat deltaZ) noexcept
 			: vertexBuffer{ vertexBuffer }, colorBuffer{ colorBuffer }, edgeColorBuffer{ edgeColorBuffer },
 			transformFeedbackObject{ transformFeedbackObject },
@@ -101,7 +102,7 @@ namespace silnith::wings::gl4
 		/// </summary>
 		/// <returns>The OpenGL transform feedback object identifier.</returns>
 		[[nodiscard]]
-		inline GLuint getTransformFeedbackObject(void) const noexcept
+		inline std::shared_ptr<TransformFeedback const> getTransformFeedbackObject(void) const noexcept
 		{
 			return transformFeedbackObject;
 		}
@@ -130,7 +131,7 @@ namespace silnith::wings::gl4
 		std::shared_ptr<ArrayBuffer const> vertexBuffer{ nullptr };
 		std::shared_ptr<ArrayBuffer const> colorBuffer{ nullptr };
 		std::shared_ptr<ArrayBuffer const> edgeColorBuffer{ nullptr };
-		GLuint const transformFeedbackObject{ 0 };
+		std::shared_ptr<TransformFeedback const> transformFeedbackObject{ nullptr };
 		GLfloat const deltaAngle{ 15 };
 		GLfloat const deltaZ{ 0.5 };
 	};
