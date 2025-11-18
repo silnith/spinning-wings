@@ -185,6 +185,12 @@ namespace silnith::wings::gl4
 				Shader::translateMatrixFunctionDefinition,
 			})
 		};
+		std::shared_ptr<VertexShader const> scaleMatrixShader{
+			std::make_shared<VertexShader const>(std::initializer_list<std::string>{
+				Shader::versionDeclaration,
+				Shader::scaleMatrixFunctionDefinition,
+			})
+		};
 		std::initializer_list<std::shared_ptr<VertexShader const> > transformVertexShaders{
 			std::make_shared<VertexShader const>(std::initializer_list<std::string>{
 				Shader::versionDeclaration,
