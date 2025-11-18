@@ -175,6 +175,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="VertexShader.h" />
+    <ClInclude Include="WingGeometry.h" />
     <ClInclude Include="WingGL4.h" />
     <ClInclude Include="WingsViewGL4.h" />
   </ItemGroup>
@@ -187,6 +188,7 @@
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SpinningWingsGL4.cpp" />
     <ClCompile Include="VertexShader.cpp" />
+    <ClCompile Include="WingGeometry.cpp" />
     <ClCompile Include="WingGL4.cpp" />
     <ClCompile Include="WingsViewGL4.cpp" />
   </ItemGroup>

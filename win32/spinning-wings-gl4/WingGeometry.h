@@ -1,0 +1,130 @@
+#pragma once
+
+#include <Windows.h>
+#include <GL/glew.h>
+
+#include <array>
+#include <memory>
+
+#include "ArrayBuffer.h"
+#include "ElementArrayBuffer.h"
+
+namespace silnith::wings::gl4
+{
+
+    /// <summary>
+    /// An encapsulated central location for handling the wing geometry and
+    /// various buffers that hold it.
+    /// </summary>
+    class WingGeometry
+    {
+    public:
+        explicit WingGeometry(void);
+
+#pragma region Rule of Five
+
+    public:
+        WingGeometry(WingGeometry const&) = delete;
+        WingGeometry& operator=(WingGeometry const&) = delete;
+        WingGeometry(WingGeometry&&) noexcept = delete;
+        WingGeometry& operator=(WingGeometry&&) noexcept = delete;
+        ~WingGeometry(void) noexcept = default;
+
+#pragma endregion
+
+    public:
+        /// <summary>
+        /// Allocates a buffer object to serve as the recipient of a transform
+        /// feedback program.  The buffer will be of sufficient size and
+        /// configured with the appropriate format to receive generic vertex
+        /// attributes with the specified number of components.
+        /// </summary>
+        /// <param name="numComponentsPerVertex">The number of components per vertex that will be received.</param>
+        /// <returns>A pre-allocated empty buffer for receiving transformed vertex attributes.</returns>
+        std::shared_ptr<ArrayBuffer> CreateBuffer(GLint numComponentsPerVertex) const;
+
+        /// <summary>
+        /// Returns the number of vertices in the wing.
+        /// This is the number of (x, y, z, w) coordinate tuples, and is
+        /// independent of how they are connected into primitives.
+        /// </summary>
+        /// <returns>The total number of vertices that make up a wing.</returns>
+        [[nodiscard]]
+        GLsizei getNumVertices(void) const;
+
+        /// <summary>
+        /// Uses the original, untransformed wing vertex coordinates for the
+        /// specified vertex attribute location.
+        /// </summary>
+        /// <param name="attributeLocation">The index of the generic vertex attribute.</param>
+        void UseForVertexAttribute(GLuint attributeLocation) const;
+
+        /// <summary>
+        /// Use the indices into the wing vertex coordinate buffers as the
+        /// <c>GL_ELEMENT_ARRAY_BUFFER</c>.
+        /// </summary>
+        void UseElementArrayBuffer(void) const;
+
+        /// <summary>
+        /// Draws the wing as a cloud of unconnected points.
+        /// This is used for the wing transformation GLSL program running under
+        /// transform feedback to transform the vertices for later rendering.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// This expects that <see cref="UseForVertexAttribute"/> be called to
+        /// set the source of vertex coordinates, or another buffer used that
+        /// contains the same number of vertices.
+        /// </para>
+        /// </remarks>
+        void RenderAsPoints(void) const;
+
+        /// <summary>
+        /// Draws the wing as solid polygons.
+        /// This is used for the final rendering to the screen.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// This expects that <see cref="UseForVertexAttribute"/> be called to
+        /// set the source of vertex coordinates, or another buffer used that
+        /// contains the same number of vertices.
+        /// </para>
+        /// <para>
+        /// This also expects that the index buffer be bound using
+        /// <see cref="UseElementArrayBuffer"/>.
+        /// </para>
+        /// </remarks>
+        /// <seealso cref="UseElementArrayBuffer"/>
+        void RenderAsPolygons(void) const;
+
+        /// <summary>
+        /// Draws the wing as an outline.
+        /// This is used for the final rendering to the screen.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// This expects that <see cref="UseForVertexAttribute"/> be called to
+        /// set the source of vertex coordinates, or another buffer used that
+        /// contains the same number of vertices.
+        /// </para>
+        /// <para>
+        /// This also expects that the index buffer be bound using
+        /// <see cref="UseElementArrayBuffer"/>.
+        /// </para>
+        /// </remarks>
+        /// <seealso cref="UseElementArrayBuffer"/>
+        void RenderAsOutline(void) const;
+
+    private:
+        /// <summary>
+        /// The original untransformed vertex coordinates.
+        /// </summary>
+        ArrayBuffer const vertexArrayBuffer;
+
+        /// <summary>
+        /// The indices into <see cref="vertexArrayBuffer"/> that are assembled into primitives.
+        /// </summary>
+        ElementArrayBuffer const elementArrayBuffer;
+    };
+
+}
