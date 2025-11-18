@@ -132,12 +132,12 @@ void main() {
 
     std::shared_ptr<ArrayBuffer> WingTransformProgram::CreateVertexBuffer() const
     {
-        return std::make_shared<ArrayBuffer>(numCapturedCoordinatesPerVertex, wingGeometry->getNumVertices(), GL_DYNAMIC_COPY);
+        return wingGeometry->CreateBuffer(numCapturedCoordinatesPerVertex);
     }
 
     std::shared_ptr<ArrayBuffer> WingTransformProgram::CreateColorBuffer() const
     {
-        return std::make_shared<ArrayBuffer>(numCapturedColorComponentsPerVertex, wingGeometry->getNumVertices(), GL_DYNAMIC_COPY);
+        return wingGeometry->CreateBuffer(numCapturedColorComponentsPerVertex);
     }
 
     void WingTransformProgram::TransformWing(GLfloat radius, GLfloat angle,

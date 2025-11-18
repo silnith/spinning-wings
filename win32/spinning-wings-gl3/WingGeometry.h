@@ -34,6 +34,16 @@ namespace silnith::wings::gl3
 
     public:
         /// <summary>
+        /// Allocates a buffer object to serve as the recipient of a transform
+        /// feedback program.  The buffer will be of sufficient size and
+        /// configured with the appropriate format to receive generic vertex
+        /// attributes with the specified number of components.
+        /// </summary>
+        /// <param name="numComponentsPerVertex">The number of components per vertex that will be received.</param>
+        /// <returns>A pre-allocated empty buffer for receiving transformed vertex attributes.</returns>
+        std::shared_ptr<ArrayBuffer> CreateBuffer(GLint numComponentsPerVertex) const;
+
+        /// <summary>
         /// Returns the number of vertices in the wing.
         /// This is the number of (x, y, z, w) coordinate tuples, and is
         /// independent of how they are connected into primitives.
