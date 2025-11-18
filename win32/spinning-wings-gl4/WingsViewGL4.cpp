@@ -13,6 +13,9 @@
 #include "CurveGenerator.h"
 #include "WingGL4.h"
 
+#include "ArrayBuffer.h"
+#include "ElementArrayBuffer.h"
+
 #include "FragmentShader.h"
 #include "Program.h"
 #include "VertexShader.h"
@@ -52,11 +55,11 @@ namespace silnith::wings::gl4
 	/// The initial untransformed vertices for a single quad.
 	/// After binding, enable using <c>glVertexAttribPointer(..., 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0)</c>.
 	/// </summary>
-	GLuint originalVertexBuffer{ 0 };
+	std::shared_ptr<ArrayBuffer const> originalVertexBuffer{ nullptr };
 	/// <summary>
 	/// The indices into <c>originalVertexBuffer</c>.
 	/// </summary>
-	GLuint wingIndexBuffer{ 0 };
+	std::shared_ptr<ElementArrayBuffer const> wingIndexBuffer{ nullptr };
 	/// <summary>
 	/// The vertex array used for transform feedback.
 	/// This maintains the state of the enabled vertex attributes.
@@ -153,24 +156,16 @@ namespace silnith::wings::gl4
 				-1, -1,
 				1, -1,
 			};
-			GLsizeiptr constexpr quadVerticesDataSize{ sizeof(GLfloat) * quadVertices.size() };
 
-			glGenBuffers(1, &originalVertexBuffer);
-			glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
-			glBufferData(GL_ARRAY_BUFFER, quadVerticesDataSize, quadVertices.data(), GL_STATIC_DRAW);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			originalVertexBuffer = std::make_shared<ArrayBuffer const>(2, numVertices, quadVertices, GL_STATIC_DRAW);
 		}
 
 		{
 			std::array<GLuint, numIndices> constexpr quadIndices{
 				0, 1, 2, 3,
 			};
-			GLsizeiptr constexpr quadIndicesDataSize{ sizeof(GLuint) * quadIndices.size() };
 
-			glGenBuffers(1, &wingIndexBuffer);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndicesDataSize, quadIndices.data(), GL_STATIC_DRAW);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			wingIndexBuffer = std::make_shared<ElementArrayBuffer const>(quadIndices, GL_STATIC_DRAW);
 		}
 
 		std::shared_ptr<VertexShader const> rotateMatrixShader{
@@ -246,9 +241,7 @@ void main() {
 		glGenVertexArrays(1, &wingTransformVertexArray);
 		glBindVertexArray(wingTransformVertexArray);
 		glEnableVertexAttribArray(vertexAttributeLocation);
-		glBindBuffer(GL_ARRAY_BUFFER, originalVertexBuffer);
-		glVertexAttribPointer(vertexAttributeLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		originalVertexBuffer->UseForVertexAttribute(vertexAttributeLocation);
 		glBindVertexArray(0);
 
 		std::initializer_list<std::shared_ptr<VertexShader const> > renderVertexShaders{
@@ -315,7 +308,7 @@ void main() {
 		glBindVertexArray(renderVertexArray);
 		glEnableVertexAttribArray(renderProgram->getAttributeLocation("vertex"s));
 		glEnableVertexAttribArray(renderProgram->getAttributeLocation("color"s));
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wingIndexBuffer);
+		wingIndexBuffer->UseAsElementArray();
 		glBindVertexArray(0);
 
 		glReleaseShaderCompiler();
@@ -411,8 +404,8 @@ void main() {
 		glDeleteVertexArrays(1, &renderVertexArray);
 		glDeleteVertexArrays(1, &wingTransformVertexArray);
 
-		glDeleteBuffers(1, &wingIndexBuffer);
-		glDeleteBuffers(1, &originalVertexBuffer);
+		wingIndexBuffer = nullptr;
+		originalVertexBuffer = nullptr;
 
 		wingTransformProgram.reset();
 		renderProgram.reset();
