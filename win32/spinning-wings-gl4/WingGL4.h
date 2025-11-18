@@ -31,7 +31,6 @@ namespace silnith::wings::gl4
 	/// All angles are in degrees.
 	/// </para>
 	/// </remarks>
-	template<typename ID, typename T>
 	class Wing
 	{
 	public:
@@ -51,8 +50,8 @@ namespace silnith::wings::gl4
 		explicit Wing(std::shared_ptr<ArrayBuffer const> vertexBuffer,
 			std::shared_ptr<ArrayBuffer const> colorBuffer,
 			std::shared_ptr<ArrayBuffer const> edgeColorBuffer,
-			ID transformFeedbackObject,
-			T deltaAngle, T deltaZ) noexcept
+			GLuint transformFeedbackObject,
+			GLfloat deltaAngle, GLfloat deltaZ) noexcept
 			: vertexBuffer{ vertexBuffer }, colorBuffer{ colorBuffer }, edgeColorBuffer{ edgeColorBuffer },
 			transformFeedbackObject{ transformFeedbackObject },
 			deltaAngle{ deltaAngle }, deltaZ{ deltaZ }
@@ -102,7 +101,7 @@ namespace silnith::wings::gl4
 		/// </summary>
 		/// <returns>The OpenGL transform feedback object identifier.</returns>
 		[[nodiscard]]
-		inline ID getTransformFeedbackObject(void) const noexcept
+		inline GLuint getTransformFeedbackObject(void) const noexcept
 		{
 			return transformFeedbackObject;
 		}
@@ -112,7 +111,7 @@ namespace silnith::wings::gl4
 		/// </summary>
 		/// <returns>The additional angle that the wing gains as it recedes into history.</returns>
 		[[nodiscard]]
-		inline T getDeltaAngle(void) const noexcept
+		inline GLfloat getDeltaAngle(void) const noexcept
 		{
 			return deltaAngle;
 		}
@@ -122,7 +121,7 @@ namespace silnith::wings::gl4
 		/// </summary>
 		/// <returns>The additional hight that the wing gains as it recedes into history.</returns>
 		[[nodiscard]]
-		inline T getDeltaZ(void) const noexcept
+		inline GLfloat getDeltaZ(void) const noexcept
 		{
 			return deltaZ;
 		}
@@ -131,9 +130,9 @@ namespace silnith::wings::gl4
 		std::shared_ptr<ArrayBuffer const> vertexBuffer{ nullptr };
 		std::shared_ptr<ArrayBuffer const> colorBuffer{ nullptr };
 		std::shared_ptr<ArrayBuffer const> edgeColorBuffer{ nullptr };
-		ID const transformFeedbackObject{ 0 };
-		T const deltaAngle{ 15 };
-		T const deltaZ{ 0.5 };
+		GLuint const transformFeedbackObject{ 0 };
+		GLfloat const deltaAngle{ 15 };
+		GLfloat const deltaZ{ 0.5 };
 	};
 
 }

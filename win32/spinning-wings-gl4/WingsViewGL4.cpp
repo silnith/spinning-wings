@@ -27,15 +27,13 @@ using namespace std::literals::string_literals;
 namespace silnith::wings::gl4
 {
 
-	typedef std::deque<Wing<GLuint, GLfloat> > wing_list;
-
 	std::size_t constexpr numWings{ 40 };
 
 	// TODO: Investigate glObjectLabel
 	GLint glMajorVersion{ 1 };
 	GLint glMinorVersion{ 0 };
 
-	wing_list wings{};
+	std::deque<Wing> wings{};
 
 	CurveGenerator<GLfloat> radiusCurve{ 10.0f, -15.0f, 15.0f, false, 0.1f, 0.01f, 150 };
 	CurveGenerator<GLfloat> angleCurve{ CurveGenerator<GLfloat>::createGeneratorForAngles(0.0f, 2.0f, 0.05f, 120) };
@@ -362,7 +360,7 @@ void main() {
 
 	void CleanupOpenGLState(void)
 	{
-		for (wing_list::const_reference wing : wings)
+		for (Wing const& wing : wings)
 		{
 			GLuint const transformFeedbackObject{ wing.getTransformFeedbackObject() };
 			glDeleteTransformFeedbacks(1, &transformFeedbackObject);
@@ -428,14 +426,10 @@ void main() {
 			 * the various buffers for the newly-created wing.  The old data
 			 * will be overwritten.
 			 */
-			// This block is simply so lastWing goes out of scope before the pop_back.
-			{
-				wing_list::const_reference lastWing{ wings.back() };
-				wingVertexBuffer = lastWing.getVertexBuffer();
-				wingColorBuffer = lastWing.getColorBuffer();
-				wingEdgeColorBuffer = lastWing.getEdgeColorBuffer();
-				wingTransformFeedbackObject = lastWing.getTransformFeedbackObject();
-			}
+			wingVertexBuffer = wings.back().getVertexBuffer();
+			wingColorBuffer = wings.back().getColorBuffer();
+			wingEdgeColorBuffer = wings.back().getEdgeColorBuffer();
+			wingTransformFeedbackObject = wings.back().getTransformFeedbackObject();
 			wings.pop_back();
 		}
 
@@ -477,7 +471,7 @@ void main() {
 
 		GLfloat deltaZ{ 0 };
 		GLfloat deltaAngle{ 0 };
-		for (wing_list::const_reference wing : wings) {
+		for (Wing const& wing : wings) {
 			deltaZ += wing.getDeltaZ();
 			deltaAngle += wing.getDeltaAngle();
 
@@ -495,7 +489,7 @@ void main() {
 		glDepthFunc(GL_LEQUAL);
 		glDepthMask(GL_FALSE);
 		glEnable(GL_BLEND);
-		for (wing_list::const_reference wing : wings) {
+		for (Wing const& wing : wings) {
 			deltaZ += wing.getDeltaZ();
 			deltaAngle += wing.getDeltaAngle();
 
