@@ -288,8 +288,8 @@ void main() {
 		};
 		std::initializer_list<std::shared_ptr<FragmentShader const> > renderFragmentShaders{
 			std::make_shared<FragmentShader const>(std::initializer_list<std::string>{
-				R"shaderText(#version 410
-
+				Shader::versionDeclaration,
+				R"shaderText(
 smooth in vec4 varyingColor;
 
 out vec4 fragmentColor;
