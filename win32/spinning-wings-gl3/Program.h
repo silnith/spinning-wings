@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 
 #include <initializer_list>
+#include <memory>
 #include <string>
 
 #include "FragmentShader.h"
