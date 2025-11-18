@@ -204,14 +204,14 @@ in vec4 vertex;
 
 smooth out vec3 varyingWingColor;
 smooth out vec3 varyingEdgeColor;
+
+const vec3 xAxis = vec3(1, 0, 0);
+const vec3 yAxis = vec3(0, 1, 0);
+const vec3 zAxis = vec3(0, 0, 1);
 )shaderText"s,
 				Shader::rotateMatrixFunctionDeclaration,
 				Shader::translateMatrixFunctionDeclaration,
 				R"shaderText(
-const vec3 xAxis = vec3(1, 0, 0);
-const vec3 yAxis = vec3(0, 1, 0);
-const vec3 zAxis = vec3(0, 0, 1);
-
 void main() {
     float radius = radiusAngle[0];
     float angle = radiusAngle[1];
@@ -267,14 +267,14 @@ in vec4 vertex;
 in vec4 color;
 
 smooth out vec4 varyingColor;
+
+const vec3 xAxis = vec3(1, 0, 0);
+const vec3 yAxis = vec3(0, 1, 0);
+const vec3 zAxis = vec3(0, 0, 1);
 )shaderText"s,
 				Shader::rotateMatrixFunctionDeclaration,
 				Shader::translateMatrixFunctionDeclaration,
 				R"shaderText(
-const vec3 xAxis = vec3(1, 0, 0);
-const vec3 yAxis = vec3(0, 1, 0);
-const vec3 zAxis = vec3(0, 0, 1);
-
 void main() {
     float deltaAngle = deltaZ[0];
     float deltaZ = deltaZ[1];
