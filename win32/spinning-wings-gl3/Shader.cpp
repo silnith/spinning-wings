@@ -27,13 +27,13 @@ layout(shared, column_major) uniform;
 
     std::string const Shader::rotateMatrixFunctionDeclaration{
         R"shaderText(
-mat4 rotate(in float angle, in vec3 axis);
+mat4 rotate(const in float angle, const in vec3 axis);
 )shaderText"
     };
 
     std::string const Shader::rotateMatrixFunctionDefinition{
         R"shaderText(
-mat4 rotate(in float angle, in vec3 axis) {
+mat4 rotate(const in float angle, const in vec3 axis) {
     // OpenGL has always specified angles in degrees.
     // Trigonometric functions operate on radians.
     float c = cos(radians(angle));
@@ -60,13 +60,13 @@ mat4 rotate(in float angle, in vec3 axis) {
 
     std::string const Shader::translateMatrixFunctionDeclaration{
         R"shaderText(
-mat4 translate(in vec3 move);
+mat4 translate(const in vec3 move);
 )shaderText"
     };
 
     std::string const Shader::translateMatrixFunctionDefinition{
         R"shaderText(
-mat4 translate(in vec3 move) {
+mat4 translate(const in vec3 move) {
     mat4 trans = mat4(1.0);
     trans[3].xyz = move;
     return trans;
@@ -76,13 +76,13 @@ mat4 translate(in vec3 move) {
 
     std::string const Shader::scaleMatrixFunctionDeclaration{
         R"shaderText(
-mat4 scale(in vec3 factor);
+mat4 scale(const in vec3 factor);
 )shaderText"
     };
 
     std::string const Shader::scaleMatrixFunctionDefinition{
         R"shaderText(
-mat4 scale(in vec3 factor) {
+mat4 scale(const in vec3 factor) {
     mat4 result;
     result[0][0] = factor.x;
     result[1][1] = factor.y;
