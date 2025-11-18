@@ -173,10 +173,22 @@ namespace silnith::wings::gl4
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
+		std::shared_ptr<VertexShader const> rotateMatrixShader{
+			std::make_shared<VertexShader const>(std::initializer_list<std::string>{
+				Shader::versionDeclaration,
+				Shader::rotateMatrixFunctionDefinition,
+			})
+		};
+		std::shared_ptr<VertexShader const> translateMatrixShader{
+			std::make_shared<VertexShader const>(std::initializer_list<std::string>{
+				Shader::versionDeclaration,
+				Shader::translateMatrixFunctionDefinition,
+			})
+		};
 		std::initializer_list<std::shared_ptr<VertexShader const> > transformVertexShaders{
 			std::make_shared<VertexShader const>(std::initializer_list<std::string>{
-				R"shaderText(#version 410
-
+				Shader::versionDeclaration,
+				R"shaderText(
 uniform vec2 radiusAngle;
 uniform vec3 rollPitchYaw;
 uniform vec3 color;
@@ -212,9 +224,9 @@ void main() {
     gl_Position = wingTransformation * vertex;
 }
 )shaderText"s,
-				Shader::rotateMatrixFunctionDefinition,
-				Shader::translateMatrixFunctionDefinition,
 			}),
+			rotateMatrixShader,
+			translateMatrixShader,
 		};
 		wingTransformProgram = std::make_unique<Program>(
 			transformVertexShaders,
@@ -235,8 +247,8 @@ void main() {
 
 		std::initializer_list<std::shared_ptr<VertexShader const> > renderVertexShaders{
 			std::make_shared<VertexShader const>(std::initializer_list<std::string>{
-				R"shaderText(#version 410
-
+				Shader::versionDeclaration,
+				R"shaderText(
 uniform ModelViewProjection {
     mat4 model;
     mat4 view;
@@ -270,9 +282,9 @@ void main() {
                   * vertex;
 }
 )shaderText"s,
-				Shader::rotateMatrixFunctionDefinition,
-				Shader::translateMatrixFunctionDefinition,
 			}),
+			rotateMatrixShader,
+			translateMatrixShader,
 		};
 		std::initializer_list<std::shared_ptr<FragmentShader const> > renderFragmentShaders{
 			std::make_shared<FragmentShader const>(std::initializer_list<std::string>{
