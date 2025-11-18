@@ -71,7 +71,7 @@ namespace silnith::wings::gl4
         /// Validate that the GLSL program can execute given the current GL state.
         /// </summary>
         /// <exception cref="std::runtime_error">If not.</exception>
-        //void Validate(void) const;
+        void Validate(void) const;
 
         /// <summary>
         /// Returns the OpenGL name for the program object.

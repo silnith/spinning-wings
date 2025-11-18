@@ -235,6 +235,46 @@ namespace silnith::wings::gl4
         glDeleteProgram(name);
     }
 
+    void Program::Validate(void) const
+    {
+        glValidateProgram(name);
+        GLint validationStatus{ 0 };
+        glGetProgramiv(name, GL_VALIDATE_STATUS, &validationStatus);
+
+        /*
+         * The validation will replace the program info log with a new one.
+         */
+        std::string validationLog{};
+
+        GLint logSize{ 0 };
+        glGetProgramiv(name, GL_INFO_LOG_LENGTH, &logSize);
+        if (logSize > 0) {
+            std::unique_ptr<GLchar[]> log{ std::make_unique<GLchar[]>(static_cast<std::size_t>(logSize)) };
+            glGetProgramInfoLog(name, static_cast<GLsizei>(logSize), nullptr, log.get());
+            validationLog = std::string{ log.get() };
+        }
+
+        switch (validationStatus)
+        {
+        case GL_TRUE: break;
+        case GL_FALSE:
+        {
+            throw std::runtime_error{ validationLog };
+        }
+        default:
+        {
+            /*
+             * The validation status will either be GL_TRUE or GL_FALSE, so this
+             * case will never execute on a conforming OpenGL implementation.
+             * But the C++ compiler has no way to prove that.
+             */
+            std::ostringstream errorMessage{ "Unknown validation status: "s };
+            errorMessage << validationStatus;
+            throw std::runtime_error{ errorMessage.str() };
+        }
+        }
+    }
+
     GLuint Program::GetName(void) const noexcept
     {
         return name;
