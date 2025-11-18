@@ -173,9 +173,8 @@ namespace silnith::wings::gl4
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
-
-		wingTransformProgram = std::make_unique<Program>(
-			VertexShader{
+		std::initializer_list<std::shared_ptr<VertexShader const> > transformVertexShaders{
+			std::make_shared<VertexShader const>(std::initializer_list<std::string>{
 				R"shaderText(#version 410
 
 uniform vec2 radiusAngle;
@@ -215,7 +214,10 @@ void main() {
 )shaderText"s,
 				Shader::rotateMatrixFunctionDefinition,
 				Shader::translateMatrixFunctionDefinition,
-			},
+			}),
+		};
+		wingTransformProgram = std::make_unique<Program>(
+			transformVertexShaders,
 			std::initializer_list<std::string>{
 				"gl_Position"s,
 				"varyingWingColor"s,
@@ -231,8 +233,8 @@ void main() {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 
-		renderProgram = std::make_unique<Program>(
-			VertexShader{
+		std::initializer_list<std::shared_ptr<VertexShader const> > renderVertexShaders{
+			std::make_shared<VertexShader const>(std::initializer_list<std::string>{
 				R"shaderText(#version 410
 
 uniform ModelViewProjection {
@@ -270,8 +272,10 @@ void main() {
 )shaderText"s,
 				Shader::rotateMatrixFunctionDefinition,
 				Shader::translateMatrixFunctionDefinition,
-			},
-			FragmentShader{
+			}),
+		};
+		std::initializer_list<std::shared_ptr<FragmentShader const> > renderFragmentShaders{
+			std::make_shared<FragmentShader const>(std::initializer_list<std::string>{
 				R"shaderText(#version 410
 
 smooth in vec4 varyingColor;
@@ -282,7 +286,11 @@ void main() {
     fragmentColor = varyingColor;
 }
 )shaderText"s,
-			},
+			}),
+		};
+		renderProgram = std::make_unique<Program>(
+			renderVertexShaders,
+			renderFragmentShaders,
 			"fragmentColor"
 		);
 		glGenVertexArrays(1, &renderVertexArray);
@@ -296,7 +304,7 @@ void main() {
 
 		GLsizei dataSize{ 0 };
 		{
-			GLuint const programId{ renderProgram->getProgram() };
+			GLuint const programId{ renderProgram->GetName() };
 			GLuint const blockIndex{ glGetUniformBlockIndex(programId, "ModelViewProjection")};
 			glUniformBlockBinding(programId, blockIndex, modelViewProjectionBindingIndex);
 
@@ -409,10 +417,10 @@ void main() {
 		GLfloat const green{ greenCurve.getNextValue() };
 		GLfloat const blue{ blueCurve.getNextValue() };
 
-		glProgramUniform2f(wingTransformProgram->getProgram(), wingTransformProgram->getUniformLocation("radiusAngle"s), radius, angle);
-		glProgramUniform3f(wingTransformProgram->getProgram(), wingTransformProgram->getUniformLocation("rollPitchYaw"s), roll, pitch, yaw);
-		glProgramUniform3f(wingTransformProgram->getProgram(), wingTransformProgram->getUniformLocation("color"s), red, green, blue);
-		//glProgramUniform3f(wingTransformProgram->getProgram(), wingTransformProgram->getUniformLocation("edgeColor"s), 1, 1, 1);
+		glProgramUniform2f(wingTransformProgram->GetName(), wingTransformProgram->getUniformLocation("radiusAngle"s), radius, angle);
+		glProgramUniform3f(wingTransformProgram->GetName(), wingTransformProgram->getUniformLocation("rollPitchYaw"s), roll, pitch, yaw);
+		glProgramUniform3f(wingTransformProgram->GetName(), wingTransformProgram->getUniformLocation("color"s), red, green, blue);
+		//glProgramUniform3f(wingTransformProgram->GetName(), wingTransformProgram->getUniformLocation("edgeColor"s), 1, 1, 1);
 
 		GLuint wingVertexBuffer{ 0 };
 		GLuint wingColorBuffer{ 0 };
