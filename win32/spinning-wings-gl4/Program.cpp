@@ -38,11 +38,11 @@ namespace silnith::wings::gl4
             glTransformFeedbackVaryings(id, static_cast<GLsizei>(cPtrs.size()), cPtrs.data(), GL_SEPARATE_ATTRIBS);
         }
 
-        glAttachShader(id, vertexShader.getShader());
+        glAttachShader(id, vertexShader.GetName());
 
         glLinkProgram(id);
 
-        glDetachShader(id, vertexShader.getShader());
+        glDetachShader(id, vertexShader.GetName());
 
         GLint logSize{ 0 };
         glGetProgramiv(id, GL_INFO_LOG_LENGTH, &logSize);
@@ -93,13 +93,13 @@ namespace silnith::wings::gl4
     {
         glBindFragDataLocation(id, 0, fragmentData.c_str());
 
-        glAttachShader(id, vertexShader.getShader());
-        glAttachShader(id, fragmentShader.getShader());
+        glAttachShader(id, vertexShader.GetName());
+        glAttachShader(id, fragmentShader.GetName());
 
         glLinkProgram(id);
 
-        glDetachShader(id, fragmentShader.getShader());
-        glDetachShader(id, vertexShader.getShader());
+        glDetachShader(id, fragmentShader.GetName());
+        glDetachShader(id, vertexShader.GetName());
 
         GLint logSize{ 0 };
         glGetProgramiv(id, GL_INFO_LOG_LENGTH, &logSize);

@@ -173,48 +173,6 @@ namespace silnith::wings::gl4
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
-		std::string const rotateMatrixFunctionDeclaration{
-			R"shaderText(
-mat4 rotate(in float angle, in vec3 axis) {
-    // OpenGL has always specified angles in degrees.
-    // Trigonometric functions operate on radians.
-    float c = cos(radians(angle));
-    float s = sin(radians(angle));
-
-    mat3 initial = outerProduct(axis, axis)
-                   * (1 - c);
-    mat3 c_part = mat3(c);
-    mat3 s_part = mat3(0, axis.z, -axis.y,
-                       -axis.z, 0, axis.x,
-                       axis.y, -axis.x, 0)
-                  * s;
-    mat3 temp = initial + c_part + s_part;
-
-    mat4 rotation = mat4(1.0);
-    rotation[0].xyz = temp[0];
-    rotation[1].xyz = temp[1];
-    rotation[2].xyz = temp[2];
-
-    return rotation;
-}
-)shaderText"s
-		};
-		std::string const translateMatrixFunctionDeclaration{
-			R"shaderText(
-mat4 translate(in vec3 move) {
-    mat4 trans = mat4(1.0);
-    trans[3].xyz = move;
-    return trans;
-}
-)shaderText"s
-		};
-		std::string const scaleMatrixFunctionDeclaration{
-			R"shaderText(
-mat4 scale(in vec3 factor) {
-    return mat4(vec4(factor, 1));
-}
-)shaderText"s
-		};
 
 		wingTransformProgram = std::make_unique<Program>(
 			VertexShader{
@@ -229,10 +187,10 @@ in vec4 vertex;
 
 smooth out vec3 varyingWingColor;
 smooth out vec3 varyingEdgeColor;
-
-mat4 rotate(in float angle, in vec3 axis);
-mat4 translate(in vec3 move);
-
+)shaderText"s,
+				Shader::rotateMatrixFunctionDeclaration,
+				Shader::translateMatrixFunctionDeclaration,
+				R"shaderText(
 const vec3 xAxis = vec3(1, 0, 0);
 const vec3 yAxis = vec3(0, 1, 0);
 const vec3 zAxis = vec3(0, 0, 1);
@@ -255,8 +213,8 @@ void main() {
     gl_Position = wingTransformation * vertex;
 }
 )shaderText"s,
-				rotateMatrixFunctionDeclaration,
-				translateMatrixFunctionDeclaration,
+				Shader::rotateMatrixFunctionDefinition,
+				Shader::translateMatrixFunctionDefinition,
 			},
 			std::initializer_list<std::string>{
 				"gl_Position"s,
@@ -289,10 +247,10 @@ in vec4 vertex;
 in vec4 color;
 
 smooth out vec4 varyingColor;
-
-mat4 rotate(in float angle, in vec3 axis);
-mat4 translate(in vec3 move);
-
+)shaderText"s,
+				Shader::rotateMatrixFunctionDeclaration,
+				Shader::translateMatrixFunctionDeclaration,
+				R"shaderText(
 const vec3 xAxis = vec3(1, 0, 0);
 const vec3 yAxis = vec3(0, 1, 0);
 const vec3 zAxis = vec3(0, 0, 1);
@@ -310,8 +268,8 @@ void main() {
                   * vertex;
 }
 )shaderText"s,
-				rotateMatrixFunctionDeclaration,
-				translateMatrixFunctionDeclaration,
+				Shader::rotateMatrixFunctionDefinition,
+				Shader::translateMatrixFunctionDefinition,
 			},
 			FragmentShader{
 				R"shaderText(#version 410
