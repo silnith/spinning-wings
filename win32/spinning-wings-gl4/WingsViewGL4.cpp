@@ -364,15 +364,10 @@ void main() {
 	{
 		for (wing_list::const_reference wing : wings)
 		{
-			GLuint const vertexBuffer{ wing.getVertexBuffer() };
-			GLuint const colorBuffer{ wing.getColorBuffer() };
-			GLuint const edgeColorBuffer{ wing.getEdgeColorBuffer() };
 			GLuint const transformFeedbackObject{ wing.getTransformFeedbackObject() };
 			glDeleteTransformFeedbacks(1, &transformFeedbackObject);
-			glDeleteBuffers(1, &edgeColorBuffer);
-			glDeleteBuffers(1, &colorBuffer);
-			glDeleteBuffers(1, &vertexBuffer);
 		}
+		wings.clear();
 
 		glDeleteBuffers(1, &modelViewProjectionUniformBuffer);
 
@@ -407,32 +402,23 @@ void main() {
 		glProgramUniform3f(wingTransformProgram->GetName(), wingTransformProgram->getUniformLocation("color"s), red, green, blue);
 		//glProgramUniform3f(wingTransformProgram->GetName(), wingTransformProgram->getUniformLocation("edgeColor"s), 1, 1, 1);
 
-		GLuint wingVertexBuffer{ 0 };
-		GLuint wingColorBuffer{ 0 };
-		GLuint wingEdgeColorBuffer{ 0 };
+		std::shared_ptr<ArrayBuffer const> wingVertexBuffer{ nullptr };
+		std::shared_ptr<ArrayBuffer const> wingColorBuffer{ nullptr };
+		std::shared_ptr<ArrayBuffer const> wingEdgeColorBuffer{ nullptr };
 		GLuint wingTransformFeedbackObject{ 0 };
 		if (wings.empty() || wings.size() < numWings)
 		{
-			glGenBuffers(1, &wingVertexBuffer);
-			glBindBuffer(GL_ARRAY_BUFFER, wingVertexBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * wingGeometry->getNumVertices(), nullptr, GL_DYNAMIC_COPY);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			wingVertexBuffer = wingGeometry->CreateBuffer(4);
 
-			glGenBuffers(1, &wingColorBuffer);
-			glBindBuffer(GL_ARRAY_BUFFER, wingColorBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * wingGeometry->getNumVertices(), nullptr, GL_DYNAMIC_COPY);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			wingColorBuffer = wingGeometry->CreateBuffer(3);
 
-			glGenBuffers(1, &wingEdgeColorBuffer);
-			glBindBuffer(GL_ARRAY_BUFFER, wingEdgeColorBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * wingGeometry->getNumVertices(), nullptr, GL_DYNAMIC_COPY);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			wingEdgeColorBuffer = wingGeometry->CreateBuffer(3);
 
 			glGenTransformFeedbacks(1, &wingTransformFeedbackObject);
 			glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, wingTransformFeedbackObject);
-			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, wingVertexBuffer);
-			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, wingColorBuffer);
-			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 2, wingEdgeColorBuffer);
+			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, wingVertexBuffer->GetName());
+			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, wingColorBuffer->GetName());
+			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 2, wingEdgeColorBuffer->GetName());
 			glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
 		}
 		else
@@ -497,13 +483,9 @@ void main() {
 
 			glUniform2f(renderProgram->getUniformLocation("deltaZ"s), deltaAngle, deltaZ);
 
-			glBindBuffer(GL_ARRAY_BUFFER, wing.getVertexBuffer());
-			glVertexAttribPointer(vertexAttribLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			wing.getVertexBuffer()->UseForVertexAttribute(vertexAttribLocation);
 
-			glBindBuffer(GL_ARRAY_BUFFER, wing.getColorBuffer());
-			glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			wing.getColorBuffer()->UseForVertexAttribute(colorAttribLocation);
 
 			wingGeometry->RenderAsPolygons();
 		}
@@ -519,13 +501,9 @@ void main() {
 
 			glUniform2f(renderProgram->getUniformLocation("deltaZ"s), deltaAngle, deltaZ);
 
-			glBindBuffer(GL_ARRAY_BUFFER, wing.getVertexBuffer());
-			glVertexAttribPointer(vertexAttribLocation, 4, GL_FLOAT, GL_FALSE, 0, 0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			wing.getVertexBuffer()->UseForVertexAttribute(vertexAttribLocation);
 
-			glBindBuffer(GL_ARRAY_BUFFER, wing.getEdgeColorBuffer());
-			glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			wing.getEdgeColorBuffer()->UseForVertexAttribute(colorAttribLocation);
 
 			wingGeometry->RenderAsOutline();
 		}
