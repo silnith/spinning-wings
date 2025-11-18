@@ -369,8 +369,8 @@ void main() {
 
 		wingGeometry = nullptr;
 
-		wingTransformProgram.reset();
-		renderProgram.reset();
+		wingTransformProgram = nullptr;
+		renderProgram = nullptr;
 	}
 
 	void AdvanceAnimation(void)
