@@ -3,6 +3,10 @@
 #include <Windows.h>
 #include <GL/glew.h>
 
+#include <array>
+#include <memory>
+#include <string>
+
 #include "Buffer.h"
 
 namespace silnith::wings::gl3
@@ -31,6 +35,44 @@ namespace silnith::wings::gl3
 	/// </remarks>
     class ModelViewProjectionUniformBuffer : public Buffer
     {
+#pragma region Static Members
+
+    public:
+        /// <summary>
+        /// The GLSL declaration of the <c>ModelViewProjection</c> named uniform
+        /// block.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Every shader that wants to use this uniform buffer should include
+        /// this declaration.  The default memory layout is <c>shared</c>,
+        /// which means every program that includes this can map to the same
+        /// uniform buffer binding point and read the uniform variables from
+        /// the same buffer.
+        /// </para>
+        /// </remarks>
+        static std::string const uniformBlockDeclaration;
+
+        /// <summary>
+        /// Create and initialize a new uniform buffer by querying the memory
+        /// layout of the provide program object.  The program must include
+        /// <see cref="uniformBlockDeclaration"/> in its shader source code,
+        /// and must reference it so that the uniform is considered active.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// This implicitly calls <see cref="UseForProgram"/> for the program
+        /// in addition to creating the uniform buffer and binding it to the
+        /// shared binding point.
+        /// </para>
+        /// </remarks>
+        /// <param name="programName">The OpenGL name for the program object.</param>
+        /// <returns>A newly-allocated uniform buffer.</returns>
+        /// <exception cref="std::runtime_error">If there was any problem creating the buffer.</exception>
+        static std::shared_ptr<ModelViewProjectionUniformBuffer> MakeBuffer(GLuint programName, GLuint bindingPoint);
+
+#pragma endregion
+
     public:
         /// <summary>
         /// Default constructor is deleted.  A uniform buffer is not valid
@@ -43,11 +85,14 @@ namespace silnith::wings::gl3
 		/// projection matrices expected by the uniform block of the
 		/// <see cref="WingRenderProgram"/>.
 		/// </summary>
+        /// <param name="bindingPoint">The index of the global binding point that this buffer will use.</param>
 		/// <param name="dataSize">The buffer size needed for the entire uniform block.</param>
 		/// <param name="modelOffset">The offset within the buffer of the <c>model</c> matrix.</param>
 		/// <param name="viewOffset">The offset within the buffer of the <c>view</c> matrix.</param>
 		/// <param name="projectionOffset">The offset within the buffer of the <c>projection</c> matrix.</param>
-		explicit ModelViewProjectionUniformBuffer(GLsizei dataSize,
+		explicit ModelViewProjectionUniformBuffer(
+            GLuint bindingPoint,
+            GLsizei dataSize,
 			GLintptr modelOffset,
 			GLintptr viewOffset,
 			GLintptr projectionOffset);
@@ -59,21 +104,66 @@ namespace silnith::wings::gl3
         ModelViewProjectionUniformBuffer& operator=(ModelViewProjectionUniformBuffer const&) = delete;
         ModelViewProjectionUniformBuffer(ModelViewProjectionUniformBuffer&&) noexcept = delete;
         ModelViewProjectionUniformBuffer& operator=(ModelViewProjectionUniformBuffer&&) noexcept = delete;
-		virtual ~ModelViewProjectionUniformBuffer(void) noexcept override = default;
+		virtual ~ModelViewProjectionUniformBuffer(void) noexcept override;
 
 #pragma endregion
 
     public:
-		/// <summary>
-		/// Sets up the orthographic projection that transforms modelview coordinates
-		/// into normalized device coordinates.
-		/// This takes into account the aspect ratio of the viewport.
-		/// </summary>
-		/// <param name="width">The viewport width.</param>
-		/// <param name="height">The viewport height.</param>
-        void SetProjectionMatrix(GLfloat width, GLfloat height);
+        /// <summary>
+        /// Returns the index into the array of uniform buffer binding points
+        /// that this buffer is bound to.
+        /// </summary>
+        /// <returns>The global binding point for this buffer.</returns>
+        GLuint getBindingPoint(void) const noexcept;
+
+        /// <summary>
+        /// Maps the uniform block in the named program to use this buffer for
+        /// its contents.  The program must include <see cref="uniformBlockDeclaration"/>
+        /// in its source code.
+        /// </summary>
+        /// <param name="programName">The OpenGL name for the program object.</param>
+        /// <exception cref="std::runtime_error">If the program did not include <see cref="uniformBlockDeclaration"/>.</exception>
+        void UseForProgram(GLuint programName) const;
+
+        /// <summary>
+        /// Replaces the current model matrix in the buffer with the new value.
+        /// The matrix must be stored in column-major order.
+        /// </summary>
+        /// <param name="modelMatrix">The new value for the model matrix.</param>
+        void SetModelMatrix(std::array<GLfloat, 4 * 4> const& modelMatrix) const;
+
+        /// <summary>
+        /// Replaces the current view matrix in the buffer with the new value.
+        /// The matrix must be stored in column-major order.
+        /// </summary>
+        /// <param name="modelMatrix">The new value for the view matrix.</param>
+        void SetViewMatrix(std::array<GLfloat, 4 * 4> const& viewMatrix) const;
+
+        /// <summary>
+        /// Replaces the current projection matrix in the buffer with the new value.
+        /// The matrix must be stored in column-major order.
+        /// </summary>
+        /// <param name="modelMatrix">The new value for the projection matrix.</param>
+        void SetProjectionMatrix(std::array<GLfloat, 4 * 4> const& projectionMatrix) const;
 
     private:
+        /// <summary>
+        /// The binding point that this buffer will be bound to.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Multiple GLSL programs can use a single uniform buffer.
+        /// Since the index of the uniform block can vary between programs,
+        /// there is a global array of uniform buffer binding points, and each
+        /// program can specify the mapping from its individual uniform block
+        /// index to the global uniform buffer binding point.
+        /// </para>
+        /// <para>
+        /// This value is the global binding point that this buffer is bound to.
+        /// </para>
+        /// </remarks>
+        GLuint const bindingPoint{ 0 };
+
         /// <summary>
         /// The offset into the uniform buffer where the model matrix is.
         /// </summary>

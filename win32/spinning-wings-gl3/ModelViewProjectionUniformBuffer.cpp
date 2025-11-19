@@ -1,11 +1,10 @@
 #include <Windows.h>
 #include <GL/glew.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include <array>
+#include <memory>
+#include <stdexcept>
+#include <string>
 
 #include <cassert>
 
@@ -14,11 +13,102 @@
 namespace silnith::wings::gl3
 {
 
-	ModelViewProjectionUniformBuffer::ModelViewProjectionUniformBuffer(GLsizei dataSize,
+	std::string const ModelViewProjectionUniformBuffer::uniformBlockDeclaration{
+		R"shaderText(
+uniform ModelViewProjection {
+    mat4 model;
+    mat4 view;
+    mat4 projection;
+};
+)shaderText"
+	};
+
+	static GLsizei constexpr numUniforms{ 3 };
+	static std::array<GLchar const*, numUniforms> constexpr uniformVariableNames{ "model", "view", "projection" };
+	static constexpr GLchar const* uniformBlockName{ "ModelViewProjection" };
+
+	std::shared_ptr<ModelViewProjectionUniformBuffer> ModelViewProjectionUniformBuffer::MakeBuffer(GLuint programName, GLuint bindingPoint)
+	{
+		/*
+		 * Find the locations (indices) of the components of the uniform block.
+		 */
+		std::array<GLuint, numUniforms> uniformIndices{ 0, 0, 0 };
+		glGetUniformIndices(programName, numUniforms, uniformVariableNames.data(), uniformIndices.data());
+
+		/*
+		 * For each index in the uniform block, find the data offset for that index.
+		 * This, finally, is the data offset we need to write to in order to set the
+		 * data for that component.
+		 */
+		std::array<GLint, numUniforms> uniformOffsets{ 0, 0, 0, };
+		glGetActiveUniformsiv(programName, numUniforms, uniformIndices.data(), GL_UNIFORM_OFFSET, uniformOffsets.data());
+		static_assert(uniformVariableNames[0] == "model");
+		GLintptr const modelOffset{ uniformOffsets[0] };
+		static_assert(uniformVariableNames[1] == "view");
+		GLintptr const viewOffset{ uniformOffsets[1] };
+		static_assert(uniformVariableNames[2] == "projection");
+		GLintptr const projectionOffset{ uniformOffsets[2] };
+
+#if !defined(NDEBUG)
+		/*
+		 * Confirm that the uniform variables are of the correct type.
+		 */
+		std::array<GLint, numUniforms> uniformTypes{ 0, 0, 0, };
+		glGetActiveUniformsiv(programName, numUniforms, uniformIndices.data(), GL_UNIFORM_TYPE, uniformTypes.data());
+		assert(uniformTypes[0] == GL_FLOAT_MAT4);
+		assert(uniformTypes[1] == GL_FLOAT_MAT4);
+		assert(uniformTypes[2] == GL_FLOAT_MAT4);
+
+		/*
+		 * The ModelViewProjectionUniformBuffer class will write the matrices as column-major.
+		 */
+		std::array<GLint, numUniforms> isRowMajor{ 0, 0, 0, };
+		glGetActiveUniformsiv(programName, numUniforms, uniformIndices.data(), GL_UNIFORM_IS_ROW_MAJOR, isRowMajor.data());
+		assert(isRowMajor[0] == 0);
+		assert(isRowMajor[1] == 0);
+		assert(isRowMajor[2] == 0);
+#endif
+
+		/*
+		 * Get the location (index) of the uniform block.
+		 */
+		GLuint const blockIndex{ glGetUniformBlockIndex(programName, uniformBlockName) };
+		if (blockIndex == GL_INVALID_INDEX)
+		{
+			throw std::runtime_error{ std::string{ uniformBlockName } + " is not an active uniform block for the program object." };
+		}
+
+		/*
+		 * Map the local index for the named uniform block to the
+		 * global binding point that the buffer is bound to.
+		 */
+		glUniformBlockBinding(programName, blockIndex, bindingPoint);
+
+		/*
+		 * Find the data size required for the uniform block.
+		 */
+		GLint modelViewProjectionUniformDataSize{ 0 };
+		glGetActiveUniformBlockiv(programName, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &modelViewProjectionUniformDataSize);
+
+		/*
+		 * Allocate a buffer that can be bound for the uniform block.  Whatever
+		 * is written to this buffer will be available in the GLSL program as
+		 * the named uniform variables.
+		 */
+		return std::make_shared<ModelViewProjectionUniformBuffer>(
+			bindingPoint,
+			modelViewProjectionUniformDataSize,
+			modelOffset, viewOffset, projectionOffset);
+	}
+
+	ModelViewProjectionUniformBuffer::ModelViewProjectionUniformBuffer(
+		GLuint bindingPoint,
+		GLsizei dataSize,
 		GLintptr modelOffset,
 		GLintptr viewOffset,
 		GLintptr projectionOffset)
 		: Buffer{},
+		bindingPoint{ bindingPoint },
 		modelOffset{ modelOffset },
 		viewOffset{ viewOffset },
 		projectionOffset{ projectionOffset }
@@ -36,37 +126,13 @@ namespace silnith::wings::gl3
 		GLsizeiptr constexpr identityDataSize{ sizeof(GLfloat) * identity.size() };
 
 		/*
-		 * Set up the initial camera position.
+		 * This serves double-duty.  It binds this buffer as the currently
+		 * active uniform buffer, so subsequent buffer data will go into this
+		 * buffer.  It also binds this buffer to the specified uniform buffer
+		 * binding point, so program objects can map their local uniform
+		 * indices to the shared binding point.
 		 */
-		glm::mat4 const view2{ glm::lookAt(
-			glm::vec3{ 0, 50, 50 },
-			glm::vec3{ 0, 0, 13 },
-			glm::vec3{ 0, 0, 1 }) };
-
-		std::array<GLfloat, 4 * 4> const view{
-			view2[0][0],
-			view2[0][1],
-			view2[0][2],
-			view2[0][3],
-
-			view2[1][0],
-			view2[1][1],
-			view2[1][2],
-			view2[1][3],
-
-			view2[2][0],
-			view2[2][1],
-			view2[2][2],
-			view2[2][3],
-
-			view2[3][0],
-			view2[3][1],
-			view2[3][2],
-			view2[3][3],
-		};
-		GLsizeiptr constexpr viewDataSize{ sizeof(GLfloat) * view.size() };
-
-		glBindBuffer(GL_UNIFORM_BUFFER, GetName());
+		glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, GetName());
 		/*
 		 * First we need to allocate storage space for the uniform buffer.
 		 */
@@ -76,100 +142,78 @@ namespace silnith::wings::gl3
 		 * Each component is initialized separately.
 		 */
 		glBufferSubData(GL_UNIFORM_BUFFER, modelOffset, identityDataSize, identity.data());
-		glBufferSubData(GL_UNIFORM_BUFFER, viewOffset, viewDataSize, view.data());
-		//glBufferSubData(GL_UNIFORM_BUFFER, viewOffset, viewDataSize, glm::value_ptr(view2));
+		glBufferSubData(GL_UNIFORM_BUFFER, viewOffset, identityDataSize, identity.data());
 		/*
 		 * The projection matrix is initialized here to the identity matrix.
 		 * It will be replaced with the real projection matrix later when the window is resized.
 		 */
 		glBufferSubData(GL_UNIFORM_BUFFER, projectionOffset, identityDataSize, identity.data());
+		/*
+		 * Note that this only clears the binding of the generic uniform buffer
+		 * which is used for providing data.  It does not disturb the global
+		 * uniform buffer binding point, so programs that map their local
+		 * uniform block index to the global binding point will still work.
+		 */
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
-	void ModelViewProjectionUniformBuffer::SetProjectionMatrix(GLfloat width, GLfloat height)
+	ModelViewProjectionUniformBuffer::~ModelViewProjectionUniformBuffer(void) noexcept
 	{
 		/*
-		 * These multipliers account for the aspect ratio of the window, so that
-		 * the rendering does not distort.  The conditional is so that the larger
-		 * number is always divided by the smaller, resulting in a multiplier no
-		 * less than one.  This way, the viewing area is always expanded rather than
-		 * contracted, and the expected viewing frustum is never clipped.
+		 * Clear the binding of this buffer in the global array of uniform
+		 * buffer binding points.
 		 */
-		GLfloat xmult{ 1.0 };
-		GLfloat ymult{ 1.0 };
-		if (width > height)
+		glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, 0);
+	}
+
+	GLuint ModelViewProjectionUniformBuffer::getBindingPoint(void) const noexcept
+	{
+		return bindingPoint;
+	}
+
+	void ModelViewProjectionUniformBuffer::UseForProgram(GLuint programName) const
+	{
+		/*
+		 * Get the location (index) of the uniform block.
+		 */
+		GLuint const blockIndex{ glGetUniformBlockIndex(programName, uniformBlockName) };
+		if (blockIndex == GL_INVALID_INDEX)
 		{
-			xmult = width / height;
-		}
-		else
-		{
-			ymult = height / width;
+			throw std::runtime_error{ std::string{ uniformBlockName } + " is not an active uniform block for the program object." };
 		}
 
 		/*
-		 * The view frustum was hand-selected to match the parameters to the
-		 * curve generators and the initial camera position.
+		 * Map the local index for the named uniform block to the
+		 * global binding point that the buffer is bound to.
 		 */
-		GLfloat constexpr defaultLeft{ -20 };
-		GLfloat constexpr defaultRight{ 20 };
-		GLfloat constexpr defaultBottom{ -20 };
-		GLfloat constexpr defaultTop{ 20 };
-		GLfloat constexpr defaultNear{ 35 };
-		GLfloat constexpr defaultFar{ 105 };
+		glUniformBlockBinding(programName, blockIndex, bindingPoint);
 
-		GLfloat const left{ defaultLeft * xmult };
-		GLfloat const right{ defaultRight * xmult };
-		GLfloat const bottom{ defaultBottom * ymult };
-		GLfloat const top{ defaultTop * ymult };
-		GLfloat const nearZ{ defaultNear };
-		GLfloat const farZ{ defaultFar };
+	}
 
-		GLfloat const viewWidth{ right - left };
-		GLfloat const viewHeight{ top - bottom };
-		GLfloat const viewDepth{ farZ - nearZ };
-
-		assert(viewWidth > 0);
-		assert(viewHeight > 0);
-		assert(viewDepth > 0);
-
-		/*
-		 * Set up the projection matrix.
-		 * The projection matrix is only used for the viewing frustum.
-		 * Things like camera position belong in the modelview matrix.
-		 */
-		std::array<GLfloat, 4 * 4> const projection{
-			// column 0
-			static_cast<GLfloat>(2) / viewWidth,
-			0,
-			0,
-			0,
-
-			// column 1
-			0,
-			static_cast<GLfloat>(2) / viewHeight,
-			0,
-			0,
-
-			// column 2
-			0,
-			0,
-			static_cast<GLfloat>(-2) / viewDepth,
-			0,
-
-			// column 3
-			-(right + left) / viewWidth,
-			-(top + bottom) / viewHeight,
-			-(farZ + nearZ) / viewDepth,
-			static_cast<GLfloat>(1),
-		};
-		//glm::mat4 const foo{ glm::ortho(defaultLeft * xmult, defaultRight * xmult,
-		//	defaultBottom * ymult, defaultTop * ymult,
-		//	defaultNear, defaultFar) };
-		//GLfloat const* bar{ glm::value_ptr(foo) };
-		GLsizeiptr constexpr projectionDataSize{ sizeof(GLfloat) * projection.size() };
+	void ModelViewProjectionUniformBuffer::SetModelMatrix(std::array<GLfloat, 4 * 4> const& modelMatrix) const
+	{
+		GLsizeiptr const dataSize{ static_cast<GLsizeiptr>(sizeof(GLfloat) * modelMatrix.size()) };
 
 		glBindBuffer(GL_UNIFORM_BUFFER, GetName());
-		glBufferSubData(GL_UNIFORM_BUFFER, projectionOffset, projectionDataSize, projection.data());
+		glBufferSubData(GL_UNIFORM_BUFFER, modelOffset, dataSize, modelMatrix.data());
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	}
+
+	void ModelViewProjectionUniformBuffer::SetViewMatrix(std::array<GLfloat, 4 * 4> const& viewMatrix) const
+	{
+		GLsizeiptr const dataSize{ static_cast<GLsizeiptr>(sizeof(GLfloat) * viewMatrix.size()) };
+
+		glBindBuffer(GL_UNIFORM_BUFFER, GetName());
+		glBufferSubData(GL_UNIFORM_BUFFER, viewOffset, dataSize, viewMatrix.data());
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	}
+
+	void ModelViewProjectionUniformBuffer::SetProjectionMatrix(std::array<GLfloat, 4 * 4> const& projectionMatrix) const
+	{
+		GLsizeiptr const dataSize{ static_cast<GLsizeiptr>(sizeof(GLfloat) * projectionMatrix.size()) };
+
+		glBindBuffer(GL_UNIFORM_BUFFER, GetName());
+		glBufferSubData(GL_UNIFORM_BUFFER, projectionOffset, dataSize, projectionMatrix.data());
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 

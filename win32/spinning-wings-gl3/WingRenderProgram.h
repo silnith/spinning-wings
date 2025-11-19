@@ -5,7 +5,6 @@
 
 #include <deque>
 #include <memory>
-#include <string>
 
 #include "Program.h"
 
@@ -99,7 +98,7 @@ namespace silnith::wings::gl3
         /// before all of the required parameters are known.
         /// </para>
         /// </remarks>
-        std::unique_ptr<ModelViewProjectionUniformBuffer> modelViewProjectionUniformBuffer{ nullptr };
+        std::shared_ptr<ModelViewProjectionUniformBuffer> modelViewProjectionUniformBuffer{ nullptr };
 
         /// <summary>
         /// The vertex array object that stores all the rendering state for

@@ -7,8 +7,11 @@
 
 #include <array>
 #include <deque>
+#include <initializer_list>
 #include <memory>
 #include <string>
+
+#include <cassert>
 
 #include "WingRenderProgram.h"
 
@@ -34,13 +37,8 @@ namespace silnith::wings::gl3
 			std::initializer_list<std::shared_ptr<VertexShader const> >{
 				std::make_shared<VertexShader const>(std::initializer_list<std::string>{
 					Shader::versionDeclaration,
+					ModelViewProjectionUniformBuffer::uniformBlockDeclaration,
 					R"shaderText(
-uniform ModelViewProjection {
-    mat4 model;
-    mat4 view;
-    mat4 projection;
-};
-
 uniform vec2 deltaZ = vec2(15, 0.5);
 
 in vec4 vertex;
@@ -101,76 +99,43 @@ void main() {
 		glBindVertexArray(0);
 
 		/*
-		 * All of the following code is to query the GLSL program for how the
-		 * named uniform block is layed out, so that a buffer can be allocated
-		 * matching that layout.
-		 */
-		GLuint const programName{ GetName() };
-		/*
-		 * Get the location (index) of the uniform block.
-		 */
-		GLuint const blockIndex{ glGetUniformBlockIndex(programName, "ModelViewProjection") };
-		glUniformBlockBinding(programName, blockIndex, modelViewProjectionBindingIndex);
-
-		/*
-		 * Find the data size required for the uniform block.
-		 */
-		GLint modelViewProjectionUniformDataSize{ 0 };
-		glGetActiveUniformBlockiv(programName, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &modelViewProjectionUniformDataSize);
-
-		/*
-		 * Find the locations (indices) of the components of the uniform block.
-		 */
-		GLsizei constexpr numUniforms{ 3 };
-		std::array<GLchar const*, numUniforms> constexpr names{ "model", "view", "projection" };
-		std::array<GLuint, numUniforms> uniformIndices{ 0, 0, 0 };
-		glGetUniformIndices(programName, numUniforms, names.data(), uniformIndices.data());
-
-		/*
-		 * For each index in the uniform block, find the data offset for that index.
-		 * This, finally, is the data offset we need to write to in order to set the
-		 * data for that component.
-		 */
-		std::array<GLint, numUniforms> uniformOffsets{ 0, 0, 0, };
-		glGetActiveUniformsiv(programName, numUniforms, uniformIndices.data(), GL_UNIFORM_OFFSET, uniformOffsets.data());
-		static_assert(names[0] == "model");
-		GLintptr const modelOffset{ uniformOffsets[0] };
-		static_assert(names[1] == "view");
-		GLintptr const viewOffset{ uniformOffsets[1] };
-		static_assert(names[2] == "projection");
-		GLintptr const projectionOffset{ uniformOffsets[2] };
-
-#if !defined(NDEBUG)
-		/*
-		 * Confirm that the uniform variables are of the correct type.
-		 */
-		std::array<GLint, numUniforms> uniformTypes{ 0, 0, 0, };
-		glGetActiveUniformsiv(programName, numUniforms, uniformIndices.data(), GL_UNIFORM_TYPE, uniformTypes.data());
-		assert(uniformTypes[0] == GL_FLOAT_MAT4);
-		assert(uniformTypes[1] == GL_FLOAT_MAT4);
-		assert(uniformTypes[2] == GL_FLOAT_MAT4);
-
-		/*
-		 * The ModelViewProjectionUniformBuffer class will write the matrices as column-major.
-		 */
-		std::array<GLint, numUniforms> isRowMajor{ 0, 0, 0, };
-		glGetActiveUniformsiv(programName, numUniforms, uniformIndices.data(), GL_UNIFORM_IS_ROW_MAJOR, isRowMajor.data());
-		assert(isRowMajor[0] == 0);
-		assert(isRowMajor[1] == 0);
-		assert(isRowMajor[2] == 0);
-#endif
-
-		/*
 		 * Allocate a buffer that can be bound for the uniform block.  Whatever
 		 * is written to this buffer will be available in the GLSL program as
 		 * the named uniform variables.
 		 */
-		modelViewProjectionUniformBuffer = std::make_unique<ModelViewProjectionUniformBuffer>(modelViewProjectionUniformDataSize, modelOffset, viewOffset, projectionOffset);
+		modelViewProjectionUniformBuffer = ModelViewProjectionUniformBuffer::MakeBuffer(GetName(), modelViewProjectionBindingIndex);
 
 		/*
-		 * And finally, bind the buffer to the chosen binding point for the uniform block.
+		 * Set up the initial camera position.
 		 */
-		glBindBufferBase(GL_UNIFORM_BUFFER, modelViewProjectionBindingIndex, modelViewProjectionUniformBuffer->GetName());
+		glm::mat4 const view2{ glm::lookAt(
+			glm::vec3{ 0, 50, 50 },
+			glm::vec3{ 0, 0, 13 },
+			glm::vec3{ 0, 0, 1 }) };
+
+		std::array<GLfloat, 4 * 4> const view{
+			view2[0][0],
+			view2[0][1],
+			view2[0][2],
+			view2[0][3],
+
+			view2[1][0],
+			view2[1][1],
+			view2[1][2],
+			view2[1][3],
+
+			view2[2][0],
+			view2[2][1],
+			view2[2][2],
+			view2[2][3],
+
+			view2[3][0],
+			view2[3][1],
+			view2[3][2],
+			view2[3][3],
+		};
+
+		modelViewProjectionUniformBuffer->SetViewMatrix(view);
 	}
 
 	WingRenderProgram::~WingRenderProgram(void) noexcept
@@ -242,7 +207,86 @@ void main() {
 
 	void WingRenderProgram::Resize(GLfloat const width, GLfloat const height) const
 	{
-		modelViewProjectionUniformBuffer->SetProjectionMatrix(width, height);
+		/*
+		 * These multipliers account for the aspect ratio of the window, so that
+		 * the rendering does not distort.  The conditional is so that the larger
+		 * number is always divided by the smaller, resulting in a multiplier no
+		 * less than one.  This way, the viewing area is always expanded rather than
+		 * contracted, and the expected viewing frustum is never clipped.
+		 */
+		GLfloat xmult{ 1.0 };
+		GLfloat ymult{ 1.0 };
+		if (width > height)
+		{
+			xmult = width / height;
+		}
+		else
+		{
+			ymult = height / width;
+		}
+
+		/*
+		 * The view frustum was hand-selected to match the parameters to the
+		 * curve generators and the initial camera position.
+		 */
+		GLfloat constexpr defaultLeft{ -20 };
+		GLfloat constexpr defaultRight{ 20 };
+		GLfloat constexpr defaultBottom{ -20 };
+		GLfloat constexpr defaultTop{ 20 };
+		GLfloat constexpr defaultNear{ 35 };
+		GLfloat constexpr defaultFar{ 105 };
+
+		GLfloat const left{ defaultLeft * xmult };
+		GLfloat const right{ defaultRight * xmult };
+		GLfloat const bottom{ defaultBottom * ymult };
+		GLfloat const top{ defaultTop * ymult };
+		GLfloat const nearZ{ defaultNear };
+		GLfloat const farZ{ defaultFar };
+
+		GLfloat const viewWidth{ right - left };
+		GLfloat const viewHeight{ top - bottom };
+		GLfloat const viewDepth{ farZ - nearZ };
+
+		assert(viewWidth > 0);
+		assert(viewHeight > 0);
+		assert(viewDepth > 0);
+
+		/*
+		 * Set up the projection matrix.
+		 * The projection matrix is only used for the viewing frustum.
+		 * Things like camera position belong in the modelview matrix.
+		 */
+		std::array<GLfloat, 4 * 4> const projection{
+			// column 0
+			static_cast<GLfloat>(2) / viewWidth,
+			0,
+			0,
+			0,
+
+			// column 1
+			0,
+			static_cast<GLfloat>(2) / viewHeight,
+			0,
+			0,
+
+			// column 2
+			0,
+			0,
+			static_cast<GLfloat>(-2) / viewDepth,
+			0,
+
+			// column 3
+			-(right + left) / viewWidth,
+			-(top + bottom) / viewHeight,
+			-(farZ + nearZ) / viewDepth,
+			static_cast<GLfloat>(1),
+		};
+		//glm::mat4 const foo{ glm::ortho(defaultLeft * xmult, defaultRight * xmult,
+		//	defaultBottom * ymult, defaultTop * ymult,
+		//	defaultNear, defaultFar) };
+		//GLfloat const* bar{ glm::value_ptr(foo) };
+
+		modelViewProjectionUniformBuffer->SetProjectionMatrix(projection);
 	}
 
 }
