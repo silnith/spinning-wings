@@ -119,22 +119,13 @@ namespace silnith::wings::gl4
 		wingGeometry = std::make_shared<WingGeometry const>();
 
 		std::shared_ptr<VertexShader const> rotateMatrixShader{
-			std::make_shared<VertexShader const>(std::initializer_list<std::string>{
-				Shader::versionDeclaration,
-				Shader::rotateMatrixFunctionDefinition,
-			})
+			VertexShader::MakeRotateMatrixShader()
 		};
 		std::shared_ptr<VertexShader const> translateMatrixShader{
-			std::make_shared<VertexShader const>(std::initializer_list<std::string>{
-				Shader::versionDeclaration,
-				Shader::translateMatrixFunctionDefinition,
-			})
+			VertexShader::MakeTranslateMatrixShader()
 		};
 		std::shared_ptr<VertexShader const> scaleMatrixShader{
-			std::make_shared<VertexShader const>(std::initializer_list<std::string>{
-				Shader::versionDeclaration,
-				Shader::scaleMatrixFunctionDefinition,
-			})
+			VertexShader::MakeScaleMatrixShader()
 		};
 		std::initializer_list<std::shared_ptr<VertexShader const> > transformVertexShaders{
 			std::make_shared<VertexShader const>(std::initializer_list<std::string>{
