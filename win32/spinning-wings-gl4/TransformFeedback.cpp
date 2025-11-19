@@ -6,7 +6,8 @@
 namespace silnith::wings::gl4
 {
 
-    TransformFeedback::TransformFeedback(void) : name{ 0 }
+    TransformFeedback::TransformFeedback(void)
+        : name{ 0 }
     {
         glGenTransformFeedbacks(1, &name);
     }
@@ -20,6 +21,7 @@ namespace silnith::wings::gl4
         {
             glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, index++, buffer->GetName());
         }
+        glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, 0);
         glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
     }
 
