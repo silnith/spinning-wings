@@ -17,6 +17,7 @@
 
 #include "ArrayBuffer.h"
 #include "ElementArrayBuffer.h"
+#include "ModelViewProjectionUniformBuffer.h"
 
 #include "FragmentShader.h"
 #include "Program.h"
@@ -65,7 +66,7 @@ namespace silnith::wings::gl4
 	/// <summary>
 	/// The uniform buffer for the ModelViewProjection matrices.
 	/// </summary>
-	GLuint modelViewProjectionUniformBuffer{ 0 };
+	std::shared_ptr<ModelViewProjectionUniformBuffer const> modelViewProjectionUniformBuffer{ nullptr };
 	/// <summary>
 	/// The uniform buffer binding index for the ModelViewProjection matrices.
 	/// </summary>
@@ -82,22 +83,6 @@ namespace silnith::wings::gl4
 	/// </para>
 	/// </remarks>
 	GLuint constexpr modelViewProjectionBindingIndex{ 0 };
-
-	/// <summary>
-	/// The offset into the uniform buffer where the model matrix is.
-	/// </summary>
-	/// <seealso cref="modelViewProjectionUniformBuffer"/>
-	GLintptr modelOffset{ 0 };
-	/// <summary>
-	/// The offset into the uniform buffer where the view matrix is.
-	/// </summary>
-	/// <seealso cref="modelViewProjectionUniformBuffer"/>
-	GLintptr viewOffset{ 0 };
-	/// <summary>
-	/// The offset into the uniform buffer where the projection matrix is.
-	/// </summary>
-	/// <seealso cref="modelViewProjectionUniformBuffer"/>
-	GLintptr projectionOffset{ 0 };
 
 	void InitializeOpenGLState(void)
 	{
@@ -126,14 +111,6 @@ namespace silnith::wings::gl4
 		glEnable(GL_LINE_SMOOTH);
 		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 		glLineWidth(1.0);
-
-		/*
-		 * Set up the initial camera position.
-		 */
-		glm::mat4 const view2{ glm::lookAt(
-			glm::vec3{ 0, 50, 50 },
-			glm::vec3{ 0, 0, 13 },
-			glm::vec3{ 0, 0, 1 }) };
 
 		/*
 		 * Set up the pieces needed to render one single
@@ -220,13 +197,8 @@ void main() {
 		std::initializer_list<std::shared_ptr<VertexShader const> > renderVertexShaders{
 			std::make_shared<VertexShader const>(std::initializer_list<std::string>{
 				Shader::versionDeclaration,
+				ModelViewProjectionUniformBuffer::uniformBlockDeclaration,
 				R"shaderText(
-uniform ModelViewProjection {
-    mat4 model;
-    mat4 view;
-    mat4 projection;
-};
-
 uniform vec2 deltaZ = vec2(15, 0.5);
 
 in vec4 vertex;
@@ -286,46 +258,13 @@ void main() {
 
 		glReleaseShaderCompiler();
 
-		GLsizei dataSize{ 0 };
-		{
-			GLuint const programId{ renderProgram->GetName() };
-			GLuint const blockIndex{ glGetUniformBlockIndex(programId, "ModelViewProjection")};
-			glUniformBlockBinding(programId, blockIndex, modelViewProjectionBindingIndex);
-
-			{
-				GLsizei constexpr numUniforms{ 3 };
-				std::array<GLchar const*, numUniforms> constexpr names{ "model", "view", "projection" };
-				std::array<GLuint, numUniforms> uniformIndices{ 0, 0, 0 };
-				glGetUniformIndices(programId, numUniforms, names.data(), uniformIndices.data());
-
-				std::array<GLint, numUniforms> uniformOffsets{ 0, 0, 0, };
-				glGetActiveUniformsiv(programId, numUniforms, uniformIndices.data(), GL_UNIFORM_OFFSET, uniformOffsets.data());
-				modelOffset = uniformOffsets[0];
-				viewOffset = uniformOffsets[1];
-				projectionOffset = uniformOffsets[2];
-			}
-
-			{
-				GLint modelViewProjectionUniformDataSize{ 0 };
-				glGetActiveUniformBlockiv(programId, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &modelViewProjectionUniformDataSize);
-				dataSize = modelViewProjectionUniformDataSize;
-			}
-		}
-
-		glGenBuffers(1, &modelViewProjectionUniformBuffer);
-		glBindBufferBase(GL_UNIFORM_BUFFER, modelViewProjectionBindingIndex, modelViewProjectionUniformBuffer);
-
 		/*
-		 * The C++ syntax makes this look like it is row-major, but OpenGL will read it as column-major.
-		 * However, that is irrelevant because the identity matrix is its own transposition.
+		 * Set up the initial camera position.
 		 */
-		std::array<GLfloat, 16> constexpr identity{
-			1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			0, 0, 0, 1,
-		};
-		GLsizeiptr constexpr identityDataSize{ sizeof(GLfloat) * identity.size() };
+		glm::mat4 const view2{ glm::lookAt(
+			glm::vec3{ 0, 50, 50 },
+			glm::vec3{ 0, 0, 13 },
+			glm::vec3{ 0, 0, 1 }) };
 
 		std::array<GLfloat, 16> const view{
 			view2[0][0],
@@ -348,21 +287,17 @@ void main() {
 			view2[3][2],
 			view2[3][3],
 		};
-		GLsizeiptr constexpr viewDataSize{ sizeof(GLfloat) * view.size() };
 
-		glBindBuffer(GL_UNIFORM_BUFFER, modelViewProjectionUniformBuffer);
-		glBufferData(GL_UNIFORM_BUFFER, dataSize, nullptr, GL_STATIC_DRAW);
-		glBufferSubData(GL_UNIFORM_BUFFER, modelOffset, identityDataSize, identity.data());
-		glBufferSubData(GL_UNIFORM_BUFFER, viewOffset, viewDataSize, view.data());
-		glBufferSubData(GL_UNIFORM_BUFFER, projectionOffset, identityDataSize, identity.data());
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		modelViewProjectionUniformBuffer = ModelViewProjectionUniformBuffer::MakeBuffer(renderProgram->GetName(), modelViewProjectionBindingIndex);
+
+		modelViewProjectionUniformBuffer->SetViewMatrix(view);
 	}
 
 	void CleanupOpenGLState(void)
 	{
 		wings.clear();
 
-		glDeleteBuffers(1, &modelViewProjectionUniformBuffer);
+		modelViewProjectionUniformBuffer = nullptr;
 
 		glDeleteVertexArrays(1, &renderVertexArray);
 		glDeleteVertexArrays(1, &wingTransformVertexArray);
@@ -587,11 +522,8 @@ void main() {
 			-(farZ + nearZ) / viewDepth,
 			static_cast<GLfloat>(1),
 		};
-		GLsizeiptr constexpr projectionDataSize{ sizeof(GLfloat) * projection.size() };
 
-		glBindBuffer(GL_UNIFORM_BUFFER, modelViewProjectionUniformBuffer);
-		glBufferSubData(GL_UNIFORM_BUFFER, projectionOffset, projectionDataSize, projection.data());
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		modelViewProjectionUniformBuffer->SetProjectionMatrix(projection);
 	}
 
 	void Resize(GLsizei width, GLsizei height)

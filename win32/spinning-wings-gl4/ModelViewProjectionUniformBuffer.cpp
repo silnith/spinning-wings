@@ -10,7 +10,7 @@
 
 #include "ModelViewProjectionUniformBuffer.h"
 
-namespace silnith::wings::gl3
+namespace silnith::wings::gl4
 {
 
 	std::string const ModelViewProjectionUniformBuffer::uniformBlockDeclaration{
@@ -27,7 +27,7 @@ uniform ModelViewProjection {
 	static constexpr GLchar const* uniformBlockName{ "ModelViewProjection" };
 	static std::array<GLchar const*, numUniforms> constexpr uniformVariableNames{ "model", "view", "projection" };
 
-	std::shared_ptr<ModelViewProjectionUniformBuffer> ModelViewProjectionUniformBuffer::MakeBuffer(GLuint programName, GLuint bindingPoint)
+	std::shared_ptr<ModelViewProjectionUniformBuffer const> ModelViewProjectionUniformBuffer::MakeBuffer(GLuint programName, GLuint bindingPoint)
 	{
 		/*
 		 * Find the locations (indices) of the components of the uniform block.
@@ -95,7 +95,7 @@ uniform ModelViewProjection {
 		 * is written to this buffer will be available in the GLSL program as
 		 * the named uniform variables.
 		 */
-		return std::make_shared<ModelViewProjectionUniformBuffer>(
+		return std::make_shared<ModelViewProjectionUniformBuffer const>(
 			bindingPoint,
 			modelViewProjectionUniformDataSize,
 			modelOffset, viewOffset, projectionOffset);
