@@ -25,9 +25,9 @@ uniform ModelViewProjection {
 
 	static GLsizei constexpr numUniforms{ 3 };
 	static constexpr GLchar const* uniformBlockName{ "ModelViewProjection" };
-	static std::array<GLchar const*, numUniforms> constexpr uniformVariableNames{ "model", "view", "projection" };
+	static std::array<GLchar const* const, numUniforms> constexpr uniformVariableNames{ "model", "view", "projection" };
 
-	std::shared_ptr<ModelViewProjectionUniformBuffer> ModelViewProjectionUniformBuffer::MakeBuffer(GLuint programName, GLuint bindingPoint)
+	std::shared_ptr<ModelViewProjectionUniformBuffer const> ModelViewProjectionUniformBuffer::MakeBuffer(GLuint programName, GLuint bindingPoint)
 	{
 		/*
 		 * Find the locations (indices) of the components of the uniform block.
@@ -95,7 +95,7 @@ uniform ModelViewProjection {
 		 * is written to this buffer will be available in the GLSL program as
 		 * the named uniform variables.
 		 */
-		return std::make_shared<ModelViewProjectionUniformBuffer>(
+		return std::make_shared<ModelViewProjectionUniformBuffer const>(
 			bindingPoint,
 			modelViewProjectionUniformDataSize,
 			modelOffset, viewOffset, projectionOffset);
@@ -117,7 +117,7 @@ uniform ModelViewProjection {
 		 * The C++ syntax makes this look like it is row-major, but OpenGL will read it as column-major.
 		 * However, that is irrelevant because the identity matrix is its own transposition.
 		 */
-		std::array<GLfloat, 16> constexpr identity{
+		std::array<GLfloat const, 16> constexpr identity{
 			1, 0, 0, 0,
 			0, 1, 0, 0,
 			0, 0, 1, 0,
@@ -190,7 +190,7 @@ uniform ModelViewProjection {
 
 	}
 
-	void ModelViewProjectionUniformBuffer::SetModelMatrix(std::array<GLfloat, 4 * 4> const& modelMatrix) const
+	void ModelViewProjectionUniformBuffer::SetModelMatrix(std::array<GLfloat const, 4 * 4> const& modelMatrix) const
 	{
 		GLsizeiptr const dataSize{ static_cast<GLsizeiptr>(sizeof(GLfloat) * modelMatrix.size()) };
 
@@ -199,7 +199,7 @@ uniform ModelViewProjection {
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
-	void ModelViewProjectionUniformBuffer::SetViewMatrix(std::array<GLfloat, 4 * 4> const& viewMatrix) const
+	void ModelViewProjectionUniformBuffer::SetViewMatrix(std::array<GLfloat const, 4 * 4> const& viewMatrix) const
 	{
 		GLsizeiptr const dataSize{ static_cast<GLsizeiptr>(sizeof(GLfloat) * viewMatrix.size()) };
 
@@ -208,7 +208,7 @@ uniform ModelViewProjection {
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
-	void ModelViewProjectionUniformBuffer::SetProjectionMatrix(std::array<GLfloat, 4 * 4> const& projectionMatrix) const
+	void ModelViewProjectionUniformBuffer::SetProjectionMatrix(std::array<GLfloat const, 4 * 4> const& projectionMatrix) const
 	{
 		GLsizeiptr const dataSize{ static_cast<GLsizeiptr>(sizeof(GLfloat) * projectionMatrix.size()) };
 

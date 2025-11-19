@@ -69,7 +69,7 @@ namespace silnith::wings::gl3
         /// <param name="programName">The OpenGL name for the program object.</param>
         /// <returns>A newly-allocated uniform buffer.</returns>
         /// <exception cref="std::runtime_error">If there was any problem creating the buffer.</exception>
-        static std::shared_ptr<ModelViewProjectionUniformBuffer> MakeBuffer(GLuint programName, GLuint bindingPoint);
+        static std::shared_ptr<ModelViewProjectionUniformBuffer const> MakeBuffer(GLuint programName, GLuint bindingPoint);
 
 #pragma endregion
 
@@ -130,21 +130,21 @@ namespace silnith::wings::gl3
         /// The matrix must be stored in column-major order.
         /// </summary>
         /// <param name="modelMatrix">The new value for the model matrix.</param>
-        void SetModelMatrix(std::array<GLfloat, 4 * 4> const& modelMatrix) const;
+        void SetModelMatrix(std::array<GLfloat const, 4 * 4> const& modelMatrix) const;
 
         /// <summary>
         /// Replaces the current view matrix in the buffer with the new value.
         /// The matrix must be stored in column-major order.
         /// </summary>
         /// <param name="modelMatrix">The new value for the view matrix.</param>
-        void SetViewMatrix(std::array<GLfloat, 4 * 4> const& viewMatrix) const;
+        void SetViewMatrix(std::array<GLfloat const, 4 * 4> const& viewMatrix) const;
 
         /// <summary>
         /// Replaces the current projection matrix in the buffer with the new value.
         /// The matrix must be stored in column-major order.
         /// </summary>
         /// <param name="modelMatrix">The new value for the projection matrix.</param>
-        void SetProjectionMatrix(std::array<GLfloat, 4 * 4> const& projectionMatrix) const;
+        void SetProjectionMatrix(std::array<GLfloat const, 4 * 4> const& projectionMatrix) const;
 
     private:
         /// <summary>

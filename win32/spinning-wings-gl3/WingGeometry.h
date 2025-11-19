@@ -41,7 +41,7 @@ namespace silnith::wings::gl3
         /// </summary>
         /// <param name="numComponentsPerVertex">The number of components per vertex that will be received.</param>
         /// <returns>A pre-allocated empty buffer for receiving transformed vertex attributes.</returns>
-        std::shared_ptr<ArrayBuffer> CreateBuffer(GLint numComponentsPerVertex) const;
+        std::shared_ptr<ArrayBuffer const> CreateBuffer(GLint numComponentsPerVertex) const;
 
         /// <summary>
         /// Returns the number of vertices in the wing.

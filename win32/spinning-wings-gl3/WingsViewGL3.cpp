@@ -57,9 +57,12 @@ namespace silnith::wings::gl3
 		std::shared_ptr<VertexShader const> translateMatrixShader{
 			VertexShader::MakeTranslateMatrixShader()
 		};
-		wingGeometry = std::make_shared<WingGeometry>();
-		wingTransformProgram = std::make_unique<WingTransformProgram>(wingGeometry, rotateMatrixShader, translateMatrixShader);
-		wingRenderProgram = std::make_unique<WingRenderProgram>(wingGeometry, rotateMatrixShader, translateMatrixShader);
+		std::shared_ptr<VertexShader const> scaleMatrixShader{
+			VertexShader::MakeScaleMatrixShader()
+		};
+		wingGeometry = std::make_shared<WingGeometry const>();
+		wingTransformProgram = std::make_unique<WingTransformProgram const>(wingGeometry, rotateMatrixShader, translateMatrixShader);
+		wingRenderProgram = std::make_unique<WingRenderProgram const>(wingGeometry, rotateMatrixShader, translateMatrixShader);
 	}
 
 	void WingsViewGL3::AdvanceAnimation(void)
@@ -79,9 +82,9 @@ namespace silnith::wings::gl3
 		GLfloat const green{ greenCurve.getNextValue() };
 		GLfloat const blue{ blueCurve.getNextValue() };
 
-		std::shared_ptr<ArrayBuffer> vertexBuffer{ nullptr };
-		std::shared_ptr<ArrayBuffer> colorBuffer{ nullptr };
-		std::shared_ptr<ArrayBuffer> edgeColorBuffer{ nullptr };
+		std::shared_ptr<ArrayBuffer const> vertexBuffer{ nullptr };
+		std::shared_ptr<ArrayBuffer const> colorBuffer{ nullptr };
+		std::shared_ptr<ArrayBuffer const> edgeColorBuffer{ nullptr };
 		if (wings.empty() || wings.size() < numWings)
 		{
 			vertexBuffer = wingTransformProgram->CreateVertexBuffer();

@@ -48,9 +48,9 @@ namespace silnith::wings::gl3
 		/// <param name="colorBuffer">The color buffer to reuse.</param>
 		/// <param name="edgeColorBuffer">The edge color buffer to reuse.</param>
 		explicit Wing(GLfloat deltaAngle, GLfloat deltaZ,
-			std::shared_ptr<ArrayBuffer> const& vertexBuffer,
-			std::shared_ptr<ArrayBuffer> const& colorBuffer,
-			std::shared_ptr<ArrayBuffer> const& edgeColorBuffer) noexcept;
+			std::shared_ptr<ArrayBuffer const> const& vertexBuffer,
+			std::shared_ptr<ArrayBuffer const> const& colorBuffer,
+			std::shared_ptr<ArrayBuffer const> const& edgeColorBuffer) noexcept;
 
 #pragma region Rule of Five
 
@@ -90,7 +90,7 @@ namespace silnith::wings::gl3
 		/// </remarks>
 		/// <returns>A shared pointer to the buffer.</returns>
 		[[nodiscard]]
-		std::shared_ptr<ArrayBuffer> getVertexBuffer(void) const noexcept;
+		std::shared_ptr<ArrayBuffer const> getVertexBuffer(void) const noexcept;
 
 		/// <summary>
 		/// Returns the color buffer.  This is only used to hand off ownership
@@ -104,7 +104,7 @@ namespace silnith::wings::gl3
 		/// </remarks>
 		/// <returns>A shared pointer to the buffer.</returns>
 		[[nodiscard]]
-		std::shared_ptr<ArrayBuffer> getColorBuffer(void) const noexcept;
+		std::shared_ptr<ArrayBuffer const> getColorBuffer(void) const noexcept;
 
 		/// <summary>
 		/// Returns the edge color buffer.  This is only used to hand off ownership
@@ -118,14 +118,14 @@ namespace silnith::wings::gl3
 		/// </remarks>
 		/// <returns>A shared pointer to the buffer.</returns>
 		[[nodiscard]]
-		std::shared_ptr<ArrayBuffer> getEdgeColorBuffer(void) const noexcept;
+		std::shared_ptr<ArrayBuffer const> getEdgeColorBuffer(void) const noexcept;
 
 	private:
 		GLfloat const deltaAngle{ 15 };
 		GLfloat const deltaZ{ 0.5 };
-		std::shared_ptr<ArrayBuffer> vertexBuffer{ nullptr };
-		std::shared_ptr<ArrayBuffer> colorBuffer{ nullptr };
-		std::shared_ptr<ArrayBuffer> edgeColorBuffer{ nullptr };
+		std::shared_ptr<ArrayBuffer const> vertexBuffer{ nullptr };
+		std::shared_ptr<ArrayBuffer const> colorBuffer{ nullptr };
+		std::shared_ptr<ArrayBuffer const> edgeColorBuffer{ nullptr };
 	};
 
 }

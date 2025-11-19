@@ -52,7 +52,7 @@ namespace silnith::wings::gl3
     constexpr char const* capturedVaryingTwo{ "varyingEdgeColor" };
     // TODO: Find a way to static_assert these match the initializer list passed to the superclass constructor.
 
-    WingTransformProgram::WingTransformProgram(std::shared_ptr<WingGeometry> const& wingGeometry,
+    WingTransformProgram::WingTransformProgram(std::shared_ptr<WingGeometry const> const& wingGeometry,
         std::shared_ptr<VertexShader const> const& rotateMatrixShader,
         std::shared_ptr<VertexShader const> const& translateMatrixShader)
         : Program{
@@ -130,12 +130,12 @@ void main() {
         glDeleteVertexArrays(1, &vertexArray);
     }
 
-    std::shared_ptr<ArrayBuffer> WingTransformProgram::CreateVertexBuffer() const
+    std::shared_ptr<ArrayBuffer const> WingTransformProgram::CreateVertexBuffer() const
     {
         return wingGeometry->CreateBuffer(numCapturedCoordinatesPerVertex);
     }
 
-    std::shared_ptr<ArrayBuffer> WingTransformProgram::CreateColorBuffer() const
+    std::shared_ptr<ArrayBuffer const> WingTransformProgram::CreateColorBuffer() const
     {
         return wingGeometry->CreateBuffer(numCapturedColorComponentsPerVertex);
     }

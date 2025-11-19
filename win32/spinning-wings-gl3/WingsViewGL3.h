@@ -172,18 +172,18 @@ namespace silnith::wings::gl3
         /// <summary>
         /// The various buffers that hold the wing geometry.
         /// </summary>
-        std::shared_ptr<WingGeometry> wingGeometry{ nullptr };
+        std::shared_ptr<WingGeometry const> wingGeometry{ nullptr };
 
         /// <summary>
         /// The GLSL program for transforming each wing and capturing the
         /// transformed geometry using transform feedback.
         /// </summary>
-        std::unique_ptr<WingTransformProgram> wingTransformProgram{ nullptr };
+        std::unique_ptr<WingTransformProgram const> wingTransformProgram{ nullptr };
 
         /// <summary>
         /// The GLSL program for rendering the wings.
         /// </summary>
-        std::unique_ptr<WingRenderProgram> wingRenderProgram{ nullptr };
+        std::unique_ptr<WingRenderProgram const> wingRenderProgram{ nullptr };
     };
 
 }

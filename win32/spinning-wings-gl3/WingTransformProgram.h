@@ -28,7 +28,7 @@ namespace silnith::wings::gl3
         /// </summary>
         WingTransformProgram(void) = delete;
 
-        explicit WingTransformProgram(std::shared_ptr<WingGeometry> const& wingGeometry,
+        explicit WingTransformProgram(std::shared_ptr<WingGeometry const> const& wingGeometry,
             std::shared_ptr<VertexShader const> const& rotateMatrixShader,
             std::shared_ptr<VertexShader const> const& translateMatrixShader);
 
@@ -50,7 +50,7 @@ namespace silnith::wings::gl3
         /// and configured with the appropriate format to receive vertex coordinates.
         /// </summary>
         /// <returns>A pre-allocated empty buffer for receiving transformed vertex coordinates.</returns>
-        std::shared_ptr<ArrayBuffer> CreateVertexBuffer() const;
+        std::shared_ptr<ArrayBuffer const> CreateVertexBuffer() const;
 
         /// <summary>
         /// Allocates a buffer object to serve as the recipient of the
@@ -58,7 +58,7 @@ namespace silnith::wings::gl3
         /// and configured with the appropriate format to receive color values.
         /// </summary>
         /// <returns>A pre-allocated empty buffer for receiving transformed color values.</returns>
-        std::shared_ptr<ArrayBuffer> CreateColorBuffer() const;
+        std::shared_ptr<ArrayBuffer const> CreateColorBuffer() const;
 
         /// <summary>
         /// Generates the transformed vertex data for a new wing.
@@ -88,7 +88,7 @@ namespace silnith::wings::gl3
         /// <summary>
         /// A pointer to the wing geometry object.
         /// </summary>
-        std::shared_ptr<WingGeometry> wingGeometry{ nullptr };
+        std::shared_ptr<WingGeometry const> wingGeometry{ nullptr };
 
         /// <summary>
         /// The vertex array object that captures the <see cref="GL_ARRAY_BUFFER"/>

@@ -44,9 +44,9 @@ namespace silnith::wings::gl3
         // TODO: Find a way to static_assert that all indices point to valid vertices.
     }
 
-    std::shared_ptr<ArrayBuffer> WingGeometry::CreateBuffer(GLint numComponentsPerVertex) const
+    std::shared_ptr<ArrayBuffer const> WingGeometry::CreateBuffer(GLint numComponentsPerVertex) const
     {
-        return std::make_shared<ArrayBuffer>(numComponentsPerVertex, getNumVertices(), GL_DYNAMIC_COPY);
+        return std::make_shared<ArrayBuffer const>(numComponentsPerVertex, getNumVertices(), GL_DYNAMIC_COPY);
     }
 
     GLsizei WingGeometry::getNumVertices(void) const

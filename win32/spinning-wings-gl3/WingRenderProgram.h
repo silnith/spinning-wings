@@ -52,7 +52,7 @@ namespace silnith::wings::gl3
         /// </summary>
         WingRenderProgram(void) = delete;
 
-        explicit WingRenderProgram(std::shared_ptr<WingGeometry> const& wingGeometry,
+        explicit WingRenderProgram(std::shared_ptr<WingGeometry const> const& wingGeometry,
             std::shared_ptr<VertexShader const> const& rotateMatrixShader,
             std::shared_ptr<VertexShader const> const& translateMatrixShader);
 
@@ -87,7 +87,7 @@ namespace silnith::wings::gl3
         /// <summary>
         /// A pointer to the wing geometry object.
         /// </summary>
-        std::shared_ptr<WingGeometry> wingGeometry{ nullptr };
+        std::shared_ptr<WingGeometry const> wingGeometry{ nullptr };
 
         /// <summary>
         /// The uniform buffer for the ModelViewProjection matrices.
@@ -98,7 +98,7 @@ namespace silnith::wings::gl3
         /// before all of the required parameters are known.
         /// </para>
         /// </remarks>
-        std::shared_ptr<ModelViewProjectionUniformBuffer> modelViewProjectionUniformBuffer{ nullptr };
+        std::shared_ptr<ModelViewProjectionUniformBuffer const> modelViewProjectionUniformBuffer{ nullptr };
 
         /// <summary>
         /// The vertex array object that stores all the rendering state for

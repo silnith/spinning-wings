@@ -30,7 +30,7 @@ using namespace std::literals::string_literals;
 namespace silnith::wings::gl3
 {
 
-	WingRenderProgram::WingRenderProgram(std::shared_ptr<WingGeometry> const& wingGeometry,
+	WingRenderProgram::WingRenderProgram(std::shared_ptr<WingGeometry const> const& wingGeometry,
 		std::shared_ptr<VertexShader const> const& rotateMatrixShader,
 		std::shared_ptr<VertexShader const> const& translateMatrixShader) :
 		Program{
@@ -113,7 +113,7 @@ void main() {
 			glm::vec3{ 0, 0, 13 },
 			glm::vec3{ 0, 0, 1 }) };
 
-		std::array<GLfloat, 4 * 4> const view{
+		std::array<GLfloat const, 4 * 4> const view{
 			view2[0][0],
 			view2[0][1],
 			view2[0][2],
@@ -256,7 +256,7 @@ void main() {
 		 * The projection matrix is only used for the viewing frustum.
 		 * Things like camera position belong in the modelview matrix.
 		 */
-		std::array<GLfloat, 4 * 4> const projection{
+		std::array<GLfloat const, 4 * 4> const projection{
 			// column 0
 			static_cast<GLfloat>(2) / viewWidth,
 			0,
