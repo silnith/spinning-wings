@@ -180,6 +180,7 @@
     <ClInclude Include="WingGeometry.h" />
     <ClInclude Include="WingGL4.h" />
     <ClInclude Include="WingsViewGL4.h" />
+    <ClInclude Include="WingTransformFeedback.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ArrayBuffer.cpp" />
@@ -195,6 +196,7 @@
     <ClCompile Include="WingGeometry.cpp" />
     <ClCompile Include="WingGL4.cpp" />
     <ClCompile Include="WingsViewGL4.cpp" />
+    <ClCompile Include="WingTransformFeedback.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="spinning-wings-gl4.rc" />

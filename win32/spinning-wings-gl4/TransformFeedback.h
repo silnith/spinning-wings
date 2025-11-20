@@ -3,11 +3,6 @@
 #include <Windows.h>
 #include <GL/glew.h>
 
-#include <initializer_list>
-#include <memory>
-
-#include "ArrayBuffer.h"
-
 namespace silnith::wings::gl4
 {
 
@@ -27,19 +22,6 @@ namespace silnith::wings::gl4
         /// </summary>
         explicit TransformFeedback(void);
 
-        /// <summary>
-        /// Constructs a transform feedback object that writes output into the
-        /// provided list of output buffers, in order.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// The list of buffers must match the captured varying variables
-        /// specified when the <see cref="Program"/> object is created.
-        /// </para>
-        /// </remarks>
-        /// <param name="buffers">The array buffers into which transform feedback output will be written.</param>
-        explicit TransformFeedback(std::initializer_list<std::shared_ptr<ArrayBuffer const> > buffers);
-
 #pragma region Rule of Five
 
     public:
@@ -47,7 +29,7 @@ namespace silnith::wings::gl4
         TransformFeedback& operator=(TransformFeedback const&) = delete;
         TransformFeedback(TransformFeedback&&) noexcept = delete;
         TransformFeedback& operator=(TransformFeedback&&) noexcept = delete;
-        ~TransformFeedback(void) noexcept;
+        virtual ~TransformFeedback(void) noexcept;
 
 #pragma endregion
 

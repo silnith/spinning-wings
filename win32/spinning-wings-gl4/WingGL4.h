@@ -7,7 +7,7 @@
 
 #include "Color.h"
 #include "ArrayBuffer.h"
-#include "TransformFeedback.h"
+#include "WingTransformFeedback.h"
 
 namespace silnith::wings::gl4
 {
@@ -43,18 +43,12 @@ namespace silnith::wings::gl4
 		/// <summary>
 		/// Creates a new wing with the provided parameters.
 		/// </summary>
-		/// <param name="vertexBuffer">The OpenGL vertex buffer for this wing.</param>
-		/// <param name="colorBuffer">The OpenGL color buffer identifier.</param>
-		/// <param name="edgeColorBuffer">The OpenGL edge color buffer identifier.</param>
 		/// <param name="deltaAngle">The additional angle around the central axis as the wing recedes into history.</param>
 		/// <param name="deltaZ">The additional height along the central axis as the wing recedes into history.</param>
-		explicit Wing(std::shared_ptr<ArrayBuffer const> vertexBuffer,
-			std::shared_ptr<ArrayBuffer const> colorBuffer,
-			std::shared_ptr<ArrayBuffer const> edgeColorBuffer,
-			std::shared_ptr<TransformFeedback const> transformFeedbackObject,
+		explicit Wing(
+			std::shared_ptr<WingTransformFeedback const> transformFeedbackObject,
 			GLfloat deltaAngle, GLfloat deltaZ) noexcept
-			: vertexBuffer{ vertexBuffer }, colorBuffer{ colorBuffer }, edgeColorBuffer{ edgeColorBuffer },
-			transformFeedbackObject{ transformFeedbackObject },
+			: transformFeedbackObject{ transformFeedbackObject },
 			deltaAngle{ deltaAngle }, deltaZ{ deltaZ }
 		{}
 
@@ -67,42 +61,11 @@ namespace silnith::wings::gl4
 
 	public:
 		/// <summary>
-		/// Returns the OpenGL vertex buffer identifier for this wing.
-		/// The vertex buffer will be populated using transform feedback.
-		/// </summary>
-		/// <returns>The OpenGL vertex buffer identifier.</returns>
-		[[nodiscard]]
-		inline std::shared_ptr<ArrayBuffer const> getVertexBuffer(void) const noexcept
-		{
-			return vertexBuffer;
-		}
-
-		/// <summary>
-		/// Returns the OpenGL color buffer identifier for this wing.
-		/// </summary>
-		/// <returns>The OpenGL color buffer identifier.</returns>
-		[[nodiscard]]
-		inline std::shared_ptr<ArrayBuffer const> getColorBuffer(void) const noexcept
-		{
-			return colorBuffer;
-		}
-
-		/// <summary>
-		/// Returns the OpenGL edge color buffer identifier for this wing.
-		/// </summary>
-		/// <returns>The OpenGL edge color buffer identifier.</returns>
-		[[nodiscard]]
-		inline std::shared_ptr<ArrayBuffer const> getEdgeColorBuffer(void) const noexcept
-		{
-			return edgeColorBuffer;
-		}
-
-		/// <summary>
 		/// Returns the OpenGL transform feedback object identifier for this wing.
 		/// </summary>
 		/// <returns>The OpenGL transform feedback object identifier.</returns>
 		[[nodiscard]]
-		inline std::shared_ptr<TransformFeedback const> getTransformFeedbackObject(void) const noexcept
+		inline std::shared_ptr<WingTransformFeedback const> getTransformFeedbackObject(void) const noexcept
 		{
 			return transformFeedbackObject;
 		}
@@ -128,10 +91,7 @@ namespace silnith::wings::gl4
 		}
 
 	private:
-		std::shared_ptr<ArrayBuffer const> vertexBuffer{ nullptr };
-		std::shared_ptr<ArrayBuffer const> colorBuffer{ nullptr };
-		std::shared_ptr<ArrayBuffer const> edgeColorBuffer{ nullptr };
-		std::shared_ptr<TransformFeedback const> transformFeedbackObject{ nullptr };
+		std::shared_ptr<WingTransformFeedback const> transformFeedbackObject{ nullptr };
 		GLfloat const deltaAngle{ 15 };
 		GLfloat const deltaZ{ 0.5 };
 	};

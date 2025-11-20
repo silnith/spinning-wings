@@ -18,6 +18,7 @@
 #include "ArrayBuffer.h"
 #include "ElementArrayBuffer.h"
 #include "ModelViewProjectionUniformBuffer.h"
+#include "WingTransformFeedback.h"
 
 #include "FragmentShader.h"
 #include "Program.h"
@@ -321,23 +322,17 @@ void main() {
 		glProgramUniform3f(wingTransformProgram->GetName(), wingTransformProgram->getUniformLocation("color"s), red, green, blue);
 		//glProgramUniform3f(wingTransformProgram->GetName(), wingTransformProgram->getUniformLocation("edgeColor"s), 1, 1, 1);
 
-		std::shared_ptr<ArrayBuffer const> wingVertexBuffer{ nullptr };
-		std::shared_ptr<ArrayBuffer const> wingColorBuffer{ nullptr };
-		std::shared_ptr<ArrayBuffer const> wingEdgeColorBuffer{ nullptr };
-		std::shared_ptr<TransformFeedback const> wingTransformFeedbackObject{ nullptr };
+		std::shared_ptr<WingTransformFeedback const> wingTransformFeedbackObject{ nullptr };
 		if (wings.empty() || wings.size() < numWings)
 		{
-			wingVertexBuffer = wingGeometry->CreateBuffer(4);
+			std::shared_ptr<ArrayBuffer const> const wingVertexBuffer{ wingGeometry->CreateBuffer(4) };
+			std::shared_ptr<ArrayBuffer const> const wingColorBuffer{ wingGeometry->CreateBuffer(3) };
+			std::shared_ptr<ArrayBuffer const> const wingEdgeColorBuffer{ wingGeometry->CreateBuffer(3) };
 
-			wingColorBuffer = wingGeometry->CreateBuffer(3);
-
-			wingEdgeColorBuffer = wingGeometry->CreateBuffer(3);
-
-			wingTransformFeedbackObject = std::make_shared<TransformFeedback const>(std::initializer_list<std::shared_ptr<ArrayBuffer const> >{
+			wingTransformFeedbackObject = std::make_shared<WingTransformFeedback const>(
 				wingVertexBuffer,
 				wingColorBuffer,
-				wingEdgeColorBuffer,
-			});
+				wingEdgeColorBuffer);
 		}
 		else
 		{
@@ -346,16 +341,11 @@ void main() {
 			 * the various buffers for the newly-created wing.  The old data
 			 * will be overwritten.
 			 */
-			wingVertexBuffer = wings.back().getVertexBuffer();
-			wingColorBuffer = wings.back().getColorBuffer();
-			wingEdgeColorBuffer = wings.back().getEdgeColorBuffer();
 			wingTransformFeedbackObject = wings.back().getTransformFeedbackObject();
 			wings.pop_back();
 		}
 
-		wings.emplace_front(wingVertexBuffer,
-			wingColorBuffer,
-			wingEdgeColorBuffer,
+		wings.emplace_front(
 			wingTransformFeedbackObject,
 			deltaAngle, deltaZ);
 
@@ -397,9 +387,9 @@ void main() {
 
 			glUniform2f(renderProgram->getUniformLocation("deltaZ"s), deltaAngle, deltaZ);
 
-			wing.getVertexBuffer()->UseForVertexAttribute(vertexAttribLocation);
+			wing.getTransformFeedbackObject()->getVertexBuffer()->UseForVertexAttribute(vertexAttribLocation);
 
-			wing.getColorBuffer()->UseForVertexAttribute(colorAttribLocation);
+			wing.getTransformFeedbackObject()->getColorBuffer()->UseForVertexAttribute(colorAttribLocation);
 
 			wingGeometry->RenderAsPolygons();
 		}
@@ -415,9 +405,9 @@ void main() {
 
 			glUniform2f(renderProgram->getUniformLocation("deltaZ"s), deltaAngle, deltaZ);
 
-			wing.getVertexBuffer()->UseForVertexAttribute(vertexAttribLocation);
+			wing.getTransformFeedbackObject()->getVertexBuffer()->UseForVertexAttribute(vertexAttribLocation);
 
-			wing.getEdgeColorBuffer()->UseForVertexAttribute(colorAttribLocation);
+			wing.getTransformFeedbackObject()->getEdgeColorBuffer()->UseForVertexAttribute(colorAttribLocation);
 
 			wingGeometry->RenderAsOutline();
 		}
