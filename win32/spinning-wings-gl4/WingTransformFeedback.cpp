@@ -25,19 +25,19 @@ namespace silnith::wings::gl4
         glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
     }
 
-    std::shared_ptr<ArrayBuffer const> WingTransformFeedback::getVertexBuffer(void) const
+    void WingTransformFeedback::UseVertexBufferForVertexAttribute(GLuint attributeLocation) const
     {
-        return vertexBuffer;
+        vertexBuffer->UseForVertexAttribute(attributeLocation);
     }
 
-    std::shared_ptr<ArrayBuffer const> WingTransformFeedback::getColorBuffer(void) const
+    void WingTransformFeedback::UseColorBufferForVertexAttribute(GLuint attributeLocation) const
     {
-        return colorBuffer;
+        colorBuffer->UseForVertexAttribute(attributeLocation);
     }
 
-    std::shared_ptr<ArrayBuffer const> WingTransformFeedback::getEdgeColorBuffer(void) const
+    void WingTransformFeedback::UseEdgeColorBufferForVertexAttribute(GLuint attributeLocation) const
     {
-        return edgeColorBuffer;
+        edgeColorBuffer->UseForVertexAttribute(attributeLocation);
     }
 
 }

@@ -54,13 +54,41 @@ namespace silnith::wings::gl4
 #pragma endregion
 
     public:
-        std::shared_ptr<ArrayBuffer const> getVertexBuffer(void) const;
-        std::shared_ptr<ArrayBuffer const> getColorBuffer(void) const;
-        std::shared_ptr<ArrayBuffer const> getEdgeColorBuffer(void) const;
+        /// <summary>
+        /// Makes the vertex buffer the active buffer for the specified vertex
+        /// attribute location.
+        /// </summary>
+        /// <param name="attributeLocation">The index of the generic vertex attribute.</param>
+        void UseVertexBufferForVertexAttribute(GLuint attributeLocation) const;
+
+        /// <summary>
+        /// Makes the color buffer the active buffer for the specified vertex
+        /// attribute location.
+        /// </summary>
+        /// <param name="attributeLocation">The index of the generic vertex attribute.</param>
+        void UseColorBufferForVertexAttribute(GLuint attributeLocation) const;
+
+        /// <summary>
+        /// Makes the edge color buffer the active buffer for the specified vertex
+        /// attribute location.
+        /// </summary>
+        /// <param name="attributeLocation">The index of the generic vertex attribute.</param>
+        void UseEdgeColorBufferForVertexAttribute(GLuint attributeLocation) const;
 
     private:
+        /// <summary>
+        /// The array buffer that will receive vertex coordinates.
+        /// </summary>
         std::shared_ptr<ArrayBuffer const> vertexBuffer{ nullptr };
+
+        /// <summary>
+        /// The array buffer that will receive color values.
+        /// </summary>
         std::shared_ptr<ArrayBuffer const> colorBuffer{ nullptr };
+
+        /// <summary>
+        /// The array buffer that will receive edge color values.
+        /// </summary>
         std::shared_ptr<ArrayBuffer const> edgeColorBuffer{ nullptr };
     };
 

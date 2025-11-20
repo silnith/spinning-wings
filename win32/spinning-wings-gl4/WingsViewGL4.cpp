@@ -387,9 +387,9 @@ void main() {
 
 			glUniform2f(renderProgram->getUniformLocation("deltaZ"s), deltaAngle, deltaZ);
 
-			wing.getTransformFeedbackObject()->getVertexBuffer()->UseForVertexAttribute(vertexAttribLocation);
+			wing.getTransformFeedbackObject()->UseVertexBufferForVertexAttribute(vertexAttribLocation);
 
-			wing.getTransformFeedbackObject()->getColorBuffer()->UseForVertexAttribute(colorAttribLocation);
+			wing.getTransformFeedbackObject()->UseColorBufferForVertexAttribute(colorAttribLocation);
 
 			wingGeometry->RenderAsPolygons();
 		}
@@ -405,9 +405,9 @@ void main() {
 
 			glUniform2f(renderProgram->getUniformLocation("deltaZ"s), deltaAngle, deltaZ);
 
-			wing.getTransformFeedbackObject()->getVertexBuffer()->UseForVertexAttribute(vertexAttribLocation);
+			wing.getTransformFeedbackObject()->UseVertexBufferForVertexAttribute(vertexAttribLocation);
 
-			wing.getTransformFeedbackObject()->getEdgeColorBuffer()->UseForVertexAttribute(colorAttribLocation);
+			wing.getTransformFeedbackObject()->UseEdgeColorBufferForVertexAttribute(colorAttribLocation);
 
 			wingGeometry->RenderAsOutline();
 		}
