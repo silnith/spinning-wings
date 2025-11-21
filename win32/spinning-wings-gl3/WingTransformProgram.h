@@ -94,7 +94,6 @@ namespace silnith::wings::gl3
         /// The vertex array object that captures the <see cref="GL_ARRAY_BUFFER"/>
         /// that contains the source vertices to transform.
         /// </summary>
-        /// <see cref="originalVertices"/>
         GLuint vertexArray{ 0 };
 
         /// <summary>
