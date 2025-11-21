@@ -148,6 +148,20 @@ namespace silnith::wings::gl4
 
     private:
         /// <summary>
+        /// Writes the provided matrix into the buffer at the given offset.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// This is a convenience function for the public methods above,
+        /// because the code to write is the same for all of them.
+        /// </para>
+        /// </remarks>
+        /// <param name="offset">The offset inside the buffer where the matrix will be written.</param>
+        /// <param name="matrix">The matrix to write.</param>
+        void SetMatrix(GLintptr offset, std::array<GLfloat, 4 * 4> const& matrix) const;
+
+    private:
+        /// <summary>
         /// The binding point that this buffer will be bound to.
         /// </summary>
         /// <remarks>

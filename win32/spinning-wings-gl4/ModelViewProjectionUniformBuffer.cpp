@@ -187,33 +187,29 @@ uniform ModelViewProjection {
 		 * global binding point that the buffer is bound to.
 		 */
 		glUniformBlockBinding(programName, blockIndex, bindingPoint);
-
 	}
 
 	void ModelViewProjectionUniformBuffer::SetModelMatrix(std::array<GLfloat, 4 * 4> const& modelMatrix) const
 	{
-		GLsizeiptr const dataSize{ static_cast<GLsizeiptr>(sizeof(GLfloat) * modelMatrix.size()) };
-
-		glBindBuffer(GL_UNIFORM_BUFFER, GetName());
-		glBufferSubData(GL_UNIFORM_BUFFER, modelOffset, dataSize, modelMatrix.data());
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		SetMatrix(modelOffset, modelMatrix);
 	}
 
 	void ModelViewProjectionUniformBuffer::SetViewMatrix(std::array<GLfloat, 4 * 4> const& viewMatrix) const
 	{
-		GLsizeiptr const dataSize{ static_cast<GLsizeiptr>(sizeof(GLfloat) * viewMatrix.size()) };
-
-		glBindBuffer(GL_UNIFORM_BUFFER, GetName());
-		glBufferSubData(GL_UNIFORM_BUFFER, viewOffset, dataSize, viewMatrix.data());
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		SetMatrix(viewOffset, viewMatrix);
 	}
 
 	void ModelViewProjectionUniformBuffer::SetProjectionMatrix(std::array<GLfloat, 4 * 4> const& projectionMatrix) const
 	{
-		GLsizeiptr const dataSize{ static_cast<GLsizeiptr>(sizeof(GLfloat) * projectionMatrix.size()) };
+		SetMatrix(projectionOffset, projectionMatrix);
+	}
+
+	void ModelViewProjectionUniformBuffer::SetMatrix(GLintptr offset, std::array<GLfloat, 4 * 4> const& matrix) const
+	{
+		GLsizeiptr const dataSize{ static_cast<GLsizeiptr>(sizeof(GLfloat) * matrix.size()) };
 
 		glBindBuffer(GL_UNIFORM_BUFFER, GetName());
-		glBufferSubData(GL_UNIFORM_BUFFER, projectionOffset, dataSize, projectionMatrix.data());
+		glBufferSubData(GL_UNIFORM_BUFFER, offset, dataSize, matrix.data());
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
