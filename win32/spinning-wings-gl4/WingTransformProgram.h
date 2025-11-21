@@ -46,7 +46,7 @@ namespace silnith::wings::gl4
         /// The vertex array used for transform feedback.
         /// This maintains the state of the enabled vertex attributes.
         /// </summary>
-        GLuint wingTransformVertexArray{ 0 };
+        GLuint vertexArray{ 0 };
 
         GLint const radiusAngleUniformLocation{ 0 };
         GLint const rollPitchYawUniformLocation{ 0 };

@@ -71,16 +71,16 @@ void main() {
             }
         },
         wingGeometry{ wingGeometry },
-        wingTransformVertexArray{ 0 },
+        vertexArray{ 0 },
         radiusAngleUniformLocation{ getUniformLocation("radiusAngle"s) },
         rollPitchYawUniformLocation{ getUniformLocation("rollPitchYaw"s) },
         colorUniformLocation{ getUniformLocation("color"s) },
         edgeColorUniformLocation{ getUniformLocation("edgeColor"s) },
         vertexAttributeLocation{ getAttributeLocation("vertex"s) }
     {
-        glGenVertexArrays(1, &wingTransformVertexArray);
+        glGenVertexArrays(1, &vertexArray);
 
-        glBindVertexArray(wingTransformVertexArray);
+        glBindVertexArray(vertexArray);
         glEnableVertexAttribArray(vertexAttributeLocation);
         wingGeometry->UseForVertexAttribute(vertexAttributeLocation);
         glBindVertexArray(0);
@@ -88,7 +88,7 @@ void main() {
 
     WingTransformProgram::~WingTransformProgram(void) noexcept
     {
-        glDeleteVertexArrays(1, &wingTransformVertexArray);
+        glDeleteVertexArrays(1, &vertexArray);
     }
 
     void WingTransformProgram::TransformWing(GLfloat radius, GLfloat angle,
@@ -103,7 +103,7 @@ void main() {
         glUniform3f(colorUniformLocation, red, green, blue);
         glUniform3f(edgeColorUniformLocation, 1, 1, 1);
 
-        glBindVertexArray(wingTransformVertexArray);
+        glBindVertexArray(vertexArray);
 
         glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, wingTransformFeedbackObject.GetName());
 
