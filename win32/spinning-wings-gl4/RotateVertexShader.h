@@ -6,7 +6,6 @@
 #include <string>
 
 #include "VertexShader.h"
-#include "Shader.h"
 
 namespace silnith::wings::gl4
 {

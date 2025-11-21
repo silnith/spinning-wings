@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include <GL/glew.h>
 
+#include <initializer_list>
 #include <string>
 
 #include "RotateVertexShader.h"
