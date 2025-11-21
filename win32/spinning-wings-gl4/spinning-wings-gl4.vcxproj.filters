@@ -63,6 +63,9 @@
     <ClInclude Include="WingRenderProgram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="WingTransformProgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FragmentShader.cpp">
@@ -108,6 +111,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WingRenderProgram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WingTransformProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

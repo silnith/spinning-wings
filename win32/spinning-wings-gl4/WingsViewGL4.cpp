@@ -20,6 +20,7 @@
 #include "ModelViewProjectionUniformBuffer.h"
 #include "WingTransformFeedback.h"
 
+#include "WingTransformProgram.h"
 #include "WingRenderProgram.h"
 
 #include "FragmentShader.h"
@@ -50,15 +51,10 @@ namespace silnith::wings::gl4
 	CurveGenerator<GLfloat> greenCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 40) };
 	CurveGenerator<GLfloat> blueCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
 
-	std::unique_ptr<Program> wingTransformProgram{ nullptr };
+	std::unique_ptr<WingTransformProgram> wingTransformProgram{ nullptr };
 	std::unique_ptr<WingRenderProgram> wingRenderProgram{ nullptr };
 
 	std::shared_ptr<WingGeometry const> wingGeometry{ nullptr };
-	/// <summary>
-	/// The vertex array used for transform feedback.
-	/// This maintains the state of the enabled vertex attributes.
-	/// </summary>
-	GLuint wingTransformVertexArray{ 0 };
 
 	void InitializeOpenGLState(void)
 	{
@@ -103,63 +99,7 @@ namespace silnith::wings::gl4
 		std::shared_ptr<VertexShader const> scaleMatrixShader{
 			VertexShader::MakeScaleMatrixShader()
 		};
-		std::initializer_list<std::shared_ptr<VertexShader const> > transformVertexShaders{
-			std::make_shared<VertexShader const>(std::initializer_list<std::string>{
-				Shader::versionDeclaration,
-				R"shaderText(
-uniform vec2 radiusAngle;
-uniform vec3 rollPitchYaw;
-uniform vec3 color;
-uniform vec3 edgeColor = vec3(1, 1, 1);
-
-in vec4 vertex;
-
-smooth out vec3 varyingWingColor;
-smooth out vec3 varyingEdgeColor;
-
-const vec3 xAxis = vec3(1, 0, 0);
-const vec3 yAxis = vec3(0, 1, 0);
-const vec3 zAxis = vec3(0, 0, 1);
-)shaderText"s,
-				Shader::rotateMatrixFunctionDeclaration,
-				Shader::translateMatrixFunctionDeclaration,
-				R"shaderText(
-void main() {
-    float radius = radiusAngle[0];
-    float angle = radiusAngle[1];
-    float roll = rollPitchYaw[0];
-    float pitch = rollPitchYaw[1];
-    float yaw = rollPitchYaw[2];
-
-    varyingWingColor = color;
-    varyingEdgeColor = edgeColor;
-
-    mat4 wingTransformation = rotate(angle, zAxis)
-                              * translate(vec3(radius, 0, 0))
-                              * rotate(-yaw, zAxis)
-                              * rotate(-pitch, yAxis)
-                              * rotate(roll, xAxis);
-    gl_Position = wingTransformation * vertex;
-}
-)shaderText"s,
-			}),
-			rotateMatrixShader,
-			translateMatrixShader,
-		};
-		wingTransformProgram = std::make_unique<Program>(
-			transformVertexShaders,
-			std::initializer_list<std::string>{
-				"gl_Position"s,
-				"varyingWingColor"s,
-				"varyingEdgeColor"s,
-			}
-		);
-		GLuint const vertexAttributeLocation{ wingTransformProgram->getAttributeLocation("vertex") };
-		glGenVertexArrays(1, &wingTransformVertexArray);
-		glBindVertexArray(wingTransformVertexArray);
-		glEnableVertexAttribArray(vertexAttributeLocation);
-		wingGeometry->UseForVertexAttribute(vertexAttributeLocation);
-		glBindVertexArray(0);
+		wingTransformProgram = std::make_unique<WingTransformProgram>(wingGeometry, rotateMatrixShader, translateMatrixShader);
 
 		wingRenderProgram = std::make_unique<WingRenderProgram>(wingGeometry, rotateMatrixShader, translateMatrixShader);
 
@@ -169,8 +109,6 @@ void main() {
 	void CleanupOpenGLState(void)
 	{
 		wings.clear();
-
-		glDeleteVertexArrays(1, &wingTransformVertexArray);
 
 		wingGeometry = nullptr;
 
@@ -194,11 +132,6 @@ void main() {
 		GLfloat const red{ redCurve.getNextValue() };
 		GLfloat const green{ greenCurve.getNextValue() };
 		GLfloat const blue{ blueCurve.getNextValue() };
-
-		glProgramUniform2f(wingTransformProgram->GetName(), wingTransformProgram->getUniformLocation("radiusAngle"s), radius, angle);
-		glProgramUniform3f(wingTransformProgram->GetName(), wingTransformProgram->getUniformLocation("rollPitchYaw"s), roll, pitch, yaw);
-		glProgramUniform3f(wingTransformProgram->GetName(), wingTransformProgram->getUniformLocation("color"s), red, green, blue);
-		//glProgramUniform3f(wingTransformProgram->GetName(), wingTransformProgram->getUniformLocation("edgeColor"s), 1, 1, 1);
 
 		std::shared_ptr<WingTransformFeedback const> wingTransformFeedbackObject{ nullptr };
 		if (wings.empty() || wings.size() < numWings)
@@ -232,21 +165,12 @@ void main() {
 		 * animation state, and capture the transformed geometry using transform
 		 * feedback.
 		 */
-		wingTransformProgram->useProgram();
+		wingTransformProgram->TransformWing(radius, angle,
+			roll, pitch, yaw,
+			red, green, blue,
+			*wingTransformFeedbackObject);
 
-		glBindVertexArray(wingTransformVertexArray);
-
-		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, wingTransformFeedbackObject->GetName());
-
-		glEnable(GL_RASTERIZER_DISCARD);
-		glBeginTransformFeedback(GL_POINTS);
-		wingGeometry->RenderAsPoints();
-		glEndTransformFeedback();
-		glDisable(GL_RASTERIZER_DISCARD);
-
-		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
-
-		glBindVertexArray(0);
+		glFlush();
 	}
 
 	void DrawFrame(void)
