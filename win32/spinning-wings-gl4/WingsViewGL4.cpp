@@ -54,8 +54,6 @@ namespace silnith::wings::gl4
 	std::unique_ptr<WingTransformProgram> wingTransformProgram{ nullptr };
 	std::unique_ptr<WingRenderProgram> wingRenderProgram{ nullptr };
 
-	std::shared_ptr<WingGeometry const> wingGeometry{ nullptr };
-
 	void InitializeOpenGLState(void)
 	{
 		glGetIntegerv(GL_MAJOR_VERSION, &glMajorVersion);
@@ -88,7 +86,7 @@ namespace silnith::wings::gl4
 		 * Set up the pieces needed to render one single
 		 * (untransformed, uncolored) wing.
 		 */
-		wingGeometry = std::make_shared<WingGeometry const>();
+		std::shared_ptr<WingGeometry const> wingGeometry{ std::make_shared<WingGeometry const>() };
 
 		std::shared_ptr<VertexShader const> rotateMatrixShader{
 			VertexShader::MakeRotateMatrixShader()
@@ -109,8 +107,6 @@ namespace silnith::wings::gl4
 	void CleanupOpenGLState(void)
 	{
 		wings.clear();
-
-		wingGeometry = nullptr;
 
 		wingTransformProgram = nullptr;
 		wingRenderProgram = nullptr;
@@ -136,21 +132,14 @@ namespace silnith::wings::gl4
 		std::shared_ptr<WingTransformFeedback const> wingTransformFeedbackObject{ nullptr };
 		if (wings.empty() || wings.size() < numWings)
 		{
-			std::shared_ptr<ArrayBuffer const> const wingVertexBuffer{ wingGeometry->CreateBuffer(4) };
-			std::shared_ptr<ArrayBuffer const> const wingColorBuffer{ wingGeometry->CreateBuffer(3) };
-			std::shared_ptr<ArrayBuffer const> const wingEdgeColorBuffer{ wingGeometry->CreateBuffer(3) };
-
-			wingTransformFeedbackObject = std::make_shared<WingTransformFeedback const>(
-				wingVertexBuffer,
-				wingColorBuffer,
-				wingEdgeColorBuffer);
+			wingTransformFeedbackObject = wingTransformProgram->CreateTransformFeedback();
 		}
 		else
 		{
 			/*
 			 * If a wing expires off the end of the list of wings, we can reuse
-			 * the various buffers for the newly-created wing.  The old data
-			 * will be overwritten.
+			 * the transform feedback object and its buffers for the newly-created wing.
+			 * The old data will be overwritten.
 			 */
 			wingTransformFeedbackObject = wings.back().getTransformFeedbackObject();
 			wings.pop_back();

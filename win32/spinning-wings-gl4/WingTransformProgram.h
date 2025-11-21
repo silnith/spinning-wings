@@ -40,6 +40,14 @@ namespace silnith::wings::gl4
 
     public:
         /// <summary>
+        /// Creates and returns a transform feedback object initialized with
+        /// destination buffers of appropriate size for receiving the
+        /// transformed wing geometry.
+        /// </summary>
+        /// <returns>The transform feedback object.</returns>
+        std::shared_ptr<WingTransformFeedback const> CreateTransformFeedback(void) const;
+
+        /// <summary>
         /// Generates the transformed vertex data for a new wing.
         /// This applies the rotations and translations to put the wing in the
         /// correct place, and places the vertex coordinates and colors for the

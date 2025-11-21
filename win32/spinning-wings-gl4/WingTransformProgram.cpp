@@ -91,6 +91,18 @@ void main() {
         glDeleteVertexArrays(1, &vertexArray);
     }
 
+    std::shared_ptr<WingTransformFeedback const> WingTransformProgram::CreateTransformFeedback(void) const
+    {
+        std::shared_ptr<ArrayBuffer const> const wingVertexBuffer{ wingGeometry->CreateBuffer(4) };
+        std::shared_ptr<ArrayBuffer const> const wingColorBuffer{ wingGeometry->CreateBuffer(3) };
+        std::shared_ptr<ArrayBuffer const> const wingEdgeColorBuffer{ wingGeometry->CreateBuffer(3) };
+
+        return std::make_shared<WingTransformFeedback const>(
+            wingVertexBuffer,
+            wingColorBuffer,
+            wingEdgeColorBuffer);
+    }
+
     void WingTransformProgram::TransformWing(GLfloat radius, GLfloat angle,
         GLfloat roll, GLfloat pitch, GLfloat yaw,
         GLfloat red, GLfloat green, GLfloat blue,
