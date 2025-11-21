@@ -94,8 +94,6 @@ namespace silnith::wings::gl4
         /// </summary>
         /// <seealso cref="glUniform3f"/>
         GLint const edgeColorUniformLocation{ 0 };
-
-        GLuint const vertexAttributeLocation{ 0 };
     };
 
 }

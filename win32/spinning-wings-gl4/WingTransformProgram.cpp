@@ -75,11 +75,11 @@ void main() {
         radiusAngleUniformLocation{ getUniformLocation("radiusAngle"s) },
         rollPitchYawUniformLocation{ getUniformLocation("rollPitchYaw"s) },
         colorUniformLocation{ getUniformLocation("color"s) },
-        edgeColorUniformLocation{ getUniformLocation("edgeColor"s) },
-        vertexAttributeLocation{ getAttributeLocation("vertex"s) }
+        edgeColorUniformLocation{ getUniformLocation("edgeColor"s) }
     {
         glGenVertexArrays(1, &vertexArray);
 
+        GLuint const vertexAttributeLocation{ getAttributeLocation("vertex"s) };
         glBindVertexArray(vertexArray);
         glEnableVertexAttribArray(vertexAttributeLocation);
         wingGeometry->UseForVertexAttribute(vertexAttributeLocation);
