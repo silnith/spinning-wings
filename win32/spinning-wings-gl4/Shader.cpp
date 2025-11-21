@@ -23,22 +23,6 @@ namespace silnith::wings::gl4
 )shaderText"
     };
 
-    std::string const Shader::translateMatrixFunctionDeclaration{
-        R"shaderText(
-mat4 translate(const in vec3 move);
-)shaderText"
-    };
-
-    std::string const Shader::translateMatrixFunctionDefinition{
-        R"shaderText(
-mat4 translate(const in vec3 move) {
-    mat4 trans = mat4(1.0);
-    trans[3].xyz = move;
-    return trans;
-}
-)shaderText"
-    };
-
     std::string const Shader::scaleMatrixFunctionDeclaration{
         R"shaderText(
 mat4 scale(const in vec3 factor);

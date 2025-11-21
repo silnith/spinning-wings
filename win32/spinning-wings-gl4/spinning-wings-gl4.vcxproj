@@ -177,6 +177,7 @@
     <ClInclude Include="RotateVertexShader.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="TransformFeedback.h" />
+    <ClInclude Include="TranslateVertexShader.h" />
     <ClInclude Include="VertexShader.h" />
     <ClInclude Include="WingGeometry.h" />
     <ClInclude Include="WingGL4.h" />
@@ -196,6 +197,7 @@
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SpinningWingsGL4.cpp" />
     <ClCompile Include="TransformFeedback.cpp" />
+    <ClCompile Include="TranslateVertexShader.cpp" />
     <ClCompile Include="VertexShader.cpp" />
     <ClCompile Include="WingGeometry.cpp" />
     <ClCompile Include="WingGL4.cpp" />

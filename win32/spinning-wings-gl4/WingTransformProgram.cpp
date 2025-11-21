@@ -10,6 +10,7 @@
 #include "WingGeometry.h"
 #include "WingTransformFeedback.h"
 #include "RotateVertexShader.h"
+#include "TranslateVertexShader.h"
 #include "VertexShader.h"
 #include "Program.h"
 
@@ -20,7 +21,7 @@ namespace silnith::wings::gl4
 
     WingTransformProgram::WingTransformProgram(std::shared_ptr<WingGeometry const> wingGeometry,
         std::shared_ptr<RotateVertexShader const> rotateMatrixShader,
-        std::shared_ptr<VertexShader const> translateMatrixShader)
+        std::shared_ptr<TranslateVertexShader const> translateMatrixShader)
         : Program{
             std::initializer_list<std::shared_ptr<VertexShader const> >{
                 std::make_shared<VertexShader const>(std::initializer_list<std::string>{
@@ -41,7 +42,7 @@ const vec3 yAxis = vec3(0, 1, 0);
 const vec3 zAxis = vec3(0, 0, 1);
 )shaderText",
                     rotateMatrixShader->GetDeclaration(),
-                    Shader::translateMatrixFunctionDeclaration,
+                    translateMatrixShader->GetDeclaration(),
                     R"shaderText(
 void main() {
     float radius = radiusAngle[0];

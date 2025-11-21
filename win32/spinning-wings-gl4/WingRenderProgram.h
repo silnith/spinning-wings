@@ -12,6 +12,7 @@
 #include "ModelViewProjectionUniformBuffer.h"
 #include "WingGL4.h"
 #include "RotateVertexShader.h"
+#include "TranslateVertexShader.h"
 #include "VertexShader.h"
 
 namespace silnith::wings::gl4
@@ -50,7 +51,7 @@ namespace silnith::wings::gl4
 
         explicit WingRenderProgram(std::shared_ptr<WingGeometry const> wingGeometry,
             std::shared_ptr<RotateVertexShader const> rotateMatrixShader,
-            std::shared_ptr<VertexShader const> translateMatrixShader);
+            std::shared_ptr<TranslateVertexShader const> translateMatrixShader);
 
 #pragma region Rule of Five
 
