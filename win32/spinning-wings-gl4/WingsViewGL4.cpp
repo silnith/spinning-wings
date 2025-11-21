@@ -20,6 +20,8 @@
 #include "ModelViewProjectionUniformBuffer.h"
 #include "WingTransformFeedback.h"
 
+#include "WingRenderProgram.h"
+
 #include "FragmentShader.h"
 #include "Program.h"
 #include "VertexShader.h"
@@ -49,7 +51,7 @@ namespace silnith::wings::gl4
 	CurveGenerator<GLfloat> blueCurve{ CurveGenerator<GLfloat>::createGeneratorForColorComponents(0.0f, 0.04f, 0.01f, 70) };
 
 	std::unique_ptr<Program> wingTransformProgram{ nullptr };
-	std::unique_ptr<Program> renderProgram{ nullptr };
+	std::unique_ptr<WingRenderProgram> wingRenderProgram{ nullptr };
 
 	std::shared_ptr<WingGeometry const> wingGeometry{ nullptr };
 	/// <summary>
@@ -57,33 +59,6 @@ namespace silnith::wings::gl4
 	/// This maintains the state of the enabled vertex attributes.
 	/// </summary>
 	GLuint wingTransformVertexArray{ 0 };
-	/// <summary>
-	/// The vertex array used for rendering.
-	/// This maintains the state of the enabled vertex attributes,
-	/// as well as the binding for the ELEMENT_ARRAY_BUFFER.
-	/// </summary>
-	GLuint renderVertexArray{ 0 };
-
-	/// <summary>
-	/// The uniform buffer for the ModelViewProjection matrices.
-	/// </summary>
-	std::shared_ptr<ModelViewProjectionUniformBuffer const> modelViewProjectionUniformBuffer{ nullptr };
-	/// <summary>
-	/// The uniform buffer binding index for the ModelViewProjection matrices.
-	/// </summary>
-	/// <remarks>
-	/// <para>
-	/// Uniform buffers use an indirection mechanism.  Rather than binding them directly,
-	/// a shader program specifies an index into a set of binding points.
-	/// The application can then update the uniform buffer bound to that index
-	/// independently of whichever shader program is active.
-	/// </para>
-	/// <para>
-	/// In this case, there is only one shader program and one uniform buffer.
-	/// So this simply uses the first index in the array of binding points.
-	/// </para>
-	/// </remarks>
-	GLuint constexpr modelViewProjectionBindingIndex{ 0 };
 
 	void InitializeOpenGLState(void)
 	{
@@ -186,118 +161,21 @@ void main() {
 		wingGeometry->UseForVertexAttribute(vertexAttributeLocation);
 		glBindVertexArray(0);
 
-		std::initializer_list<std::shared_ptr<VertexShader const> > renderVertexShaders{
-			std::make_shared<VertexShader const>(std::initializer_list<std::string>{
-				Shader::versionDeclaration,
-				ModelViewProjectionUniformBuffer::uniformBlockDeclaration,
-				R"shaderText(
-uniform vec2 deltaZ = vec2(15, 0.5);
-
-in vec4 vertex;
-in vec4 color;
-
-smooth out vec4 varyingColor;
-
-const vec3 xAxis = vec3(1, 0, 0);
-const vec3 yAxis = vec3(0, 1, 0);
-const vec3 zAxis = vec3(0, 0, 1);
-)shaderText"s,
-				Shader::rotateMatrixFunctionDeclaration,
-				Shader::translateMatrixFunctionDeclaration,
-				R"shaderText(
-void main() {
-    float deltaAngle = deltaZ[0];
-    float deltaZ = deltaZ[1];
-
-    mat4 modelViewProjection = projection * view * model;
-
-    varyingColor = color;
-    gl_Position = modelViewProjection
-                  * translate(vec3(0, 0, deltaZ))
-                  * rotate(deltaAngle, zAxis)
-                  * vertex;
-}
-)shaderText"s,
-			}),
-			rotateMatrixShader,
-			translateMatrixShader,
-		};
-		std::initializer_list<std::shared_ptr<FragmentShader const> > renderFragmentShaders{
-			std::make_shared<FragmentShader const>(std::initializer_list<std::string>{
-				Shader::versionDeclaration,
-				R"shaderText(
-smooth in vec4 varyingColor;
-
-out vec4 fragmentColor;
-
-void main() {
-    fragmentColor = varyingColor;
-}
-)shaderText"s,
-			}),
-		};
-		renderProgram = std::make_unique<Program>(
-			renderVertexShaders,
-			renderFragmentShaders,
-			"fragmentColor"
-		);
-		glGenVertexArrays(1, &renderVertexArray);
-		glBindVertexArray(renderVertexArray);
-		glEnableVertexAttribArray(renderProgram->getAttributeLocation("vertex"s));
-		glEnableVertexAttribArray(renderProgram->getAttributeLocation("color"s));
-		wingGeometry->UseElementArrayBuffer();
-		glBindVertexArray(0);
+		wingRenderProgram = std::make_unique<WingRenderProgram>(wingGeometry, rotateMatrixShader, translateMatrixShader);
 
 		glReleaseShaderCompiler();
-
-		/*
-		 * Set up the initial camera position.
-		 */
-		glm::mat4 const view2{ glm::lookAt(
-			glm::vec3{ 0, 50, 50 },
-			glm::vec3{ 0, 0, 13 },
-			glm::vec3{ 0, 0, 1 }) };
-
-		std::array<GLfloat, 16> const view{
-			view2[0][0],
-			view2[0][1],
-			view2[0][2],
-			view2[0][3],
-
-			view2[1][0],
-			view2[1][1],
-			view2[1][2],
-			view2[1][3],
-
-			view2[2][0],
-			view2[2][1],
-			view2[2][2],
-			view2[2][3],
-
-			view2[3][0],
-			view2[3][1],
-			view2[3][2],
-			view2[3][3],
-		};
-
-		modelViewProjectionUniformBuffer = ModelViewProjectionUniformBuffer::MakeBuffer(renderProgram->GetName(), modelViewProjectionBindingIndex);
-
-		modelViewProjectionUniformBuffer->SetViewMatrix(view);
 	}
 
 	void CleanupOpenGLState(void)
 	{
 		wings.clear();
 
-		modelViewProjectionUniformBuffer = nullptr;
-
-		glDeleteVertexArrays(1, &renderVertexArray);
 		glDeleteVertexArrays(1, &wingTransformVertexArray);
 
 		wingGeometry = nullptr;
 
 		wingTransformProgram = nullptr;
-		renderProgram = nullptr;
+		wingRenderProgram = nullptr;
 	}
 
 	void AdvanceAnimation(void)
@@ -373,142 +251,9 @@ void main() {
 
 	void DrawFrame(void)
 	{
-		renderProgram->useProgram();
-		GLuint const vertexAttribLocation{ renderProgram->getAttributeLocation("vertex"s) };
-		GLuint const colorAttribLocation{ renderProgram->getAttributeLocation("color"s) };
-
-		glBindVertexArray(renderVertexArray);
-
-		GLfloat deltaZ{ 0 };
-		GLfloat deltaAngle{ 0 };
-		for (Wing const& wing : wings) {
-			deltaZ += wing.getDeltaZ();
-			deltaAngle += wing.getDeltaAngle();
-
-			glUniform2f(renderProgram->getUniformLocation("deltaZ"s), deltaAngle, deltaZ);
-
-			std::shared_ptr<WingTransformFeedback const> const wingTransformFeedbackObject{ wing.getTransformFeedbackObject() };
-
-			wingTransformFeedbackObject->UseVertexBufferForVertexAttribute(vertexAttribLocation);
-
-			wingTransformFeedbackObject->UseColorBufferForVertexAttribute(colorAttribLocation);
-
-			wingGeometry->RenderAsPolygons();
-		}
-
-		deltaZ = 0;
-		deltaAngle = 0;
-		glDepthFunc(GL_LEQUAL);
-		glDepthMask(GL_FALSE);
-		glEnable(GL_BLEND);
-		for (Wing const& wing : wings) {
-			deltaZ += wing.getDeltaZ();
-			deltaAngle += wing.getDeltaAngle();
-
-			glUniform2f(renderProgram->getUniformLocation("deltaZ"s), deltaAngle, deltaZ);
-
-			std::shared_ptr<WingTransformFeedback const> const wingTransformFeedbackObject{ wing.getTransformFeedbackObject() };
-
-			wingTransformFeedbackObject->UseVertexBufferForVertexAttribute(vertexAttribLocation);
-
-			wingTransformFeedbackObject->UseEdgeColorBufferForVertexAttribute(colorAttribLocation);
-
-			wingGeometry->RenderAsOutline();
-		}
-		glDisable(GL_BLEND);
-		glDepthMask(GL_TRUE);
-		glDepthFunc(GL_LESS);
-
-		glBindVertexArray(0);
+		wingRenderProgram->RenderWings(wings);
 
 		glFlush();
-	}
-
-	/// <summary>
-	/// Sets up the orthographic projection that transforms modelview coordinates
-	/// into normalized device coordinates.
-	/// This takes into account the aspect ratio of the viewport.
-	/// </summary>
-	/// <param name="width">The viewport width.</param>
-	/// <param name="height">The viewport height.</param>
-	void Ortho(GLfloat const width, GLfloat const height)
-	{
-		/*
-		 * These multipliers account for the aspect ratio of the window, so that
-		 * the rendering does not distort.  The conditional is so that the larger
-		 * number is always divided by the smaller, resulting in a multiplier no
-		 * less than one.  This way, the viewing area is always expanded rather than
-		 * contracted, and the expected viewing frustum is never clipped.
-		 */
-		GLfloat xmult{ 1.0 };
-		GLfloat ymult{ 1.0 };
-		if (width > height)
-		{
-			xmult = width / height;
-		}
-		else
-		{
-			ymult = height / width;
-		}
-
-		/*
-		 * The view frustum was hand-selected to match the parameters to the
-		 * curve generators and the initial camera position.
-		 */
-		GLfloat constexpr defaultLeft{ -20 };
-		GLfloat constexpr defaultRight{ 20 };
-		GLfloat constexpr defaultBottom{ -20 };
-		GLfloat constexpr defaultTop{ 20 };
-		GLfloat constexpr defaultNear{ 35 };
-		GLfloat constexpr defaultFar{ 105 };
-
-		GLfloat const left{ defaultLeft * xmult };
-		GLfloat const right{ defaultRight * xmult };
-		GLfloat const bottom{ defaultBottom * ymult };
-		GLfloat const top{ defaultTop * ymult };
-		GLfloat const nearZ{ defaultNear };
-		GLfloat const farZ{ defaultFar };
-
-		GLfloat const viewWidth{ right - left };
-		GLfloat const viewHeight{ top - bottom };
-		GLfloat const viewDepth{ farZ - nearZ };
-
-		assert(viewWidth > 0);
-		assert(viewHeight > 0);
-		assert(viewDepth > 0);
-
-		/*
-		 * Set up the projection matrix.
-		 * The projection matrix is only used for the viewing frustum.
-		 * Things like camera position belong in the modelview matrix.
-		 */
-		std::array<GLfloat, 16> const projection{
-			// column 0
-			static_cast<GLfloat>(2) / viewWidth,
-			0,
-			0,
-			0,
-
-			// column 1
-			0,
-			static_cast<GLfloat>(2) / viewHeight,
-			0,
-			0,
-
-			// column 2
-			0,
-			0,
-			static_cast<GLfloat>(-2) / viewDepth,
-			0,
-
-			// column 3
-			-(right + left) / viewWidth,
-			-(top + bottom) / viewHeight,
-			-(farZ + nearZ) / viewDepth,
-			static_cast<GLfloat>(1),
-		};
-
-		modelViewProjectionUniformBuffer->SetProjectionMatrix(projection);
 	}
 
 	void Resize(GLsizei width, GLsizei height)
@@ -526,7 +271,7 @@ void main() {
 		 */
 		glViewport(x, y, width, height);
 
-		Ortho(static_cast<GLfloat>(width), static_cast<GLfloat>(height));
+		wingRenderProgram->Ortho(static_cast<GLfloat>(width), static_cast<GLfloat>(height));
 	}
 
 }
