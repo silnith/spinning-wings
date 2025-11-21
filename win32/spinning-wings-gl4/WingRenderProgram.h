@@ -102,6 +102,12 @@ namespace silnith::wings::gl4
         GLuint vertexArray{ 0 };
 
         /// <summary>
+        /// The location of the uniform variable <c>deltaZ</c>.
+        /// </summary>
+        /// <seealso cref="glUniform2f"/>
+        GLint deltaZUniformLocation{ 0 };
+
+        /// <summary>
         /// The location of the vertex attribute <c>vertex</c>.
         /// </summary>
         GLuint vertexAttributeLocation{ 0 };
@@ -110,12 +116,6 @@ namespace silnith::wings::gl4
         /// The location of the vertex attribute <c>color</c>.
         /// </summary>
         GLuint colorAttributeLocation{ 0 };
-
-        /// <summary>
-        /// The location of the uniform variable <c>deltaZ</c>.
-        /// </summary>
-        /// <seealso cref="glUniform2f"/>
-        GLint deltaZUniformLocation{ 0 };
     };
 
 }

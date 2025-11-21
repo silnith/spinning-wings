@@ -72,11 +72,11 @@ void main() {
         },
         wingGeometry{ wingGeometry },
         wingTransformVertexArray{ 0 },
-        vertexAttributeLocation{ getAttributeLocation("vertex"s) },
         radiusAngleUniformLocation{ getUniformLocation("radiusAngle"s) },
         rollPitchYawUniformLocation{ getUniformLocation("rollPitchYaw"s) },
         colorUniformLocation{ getUniformLocation("color"s) },
-        edgeColorUniformLocation{ getUniformLocation("edgeColor"s) }
+        edgeColorUniformLocation{ getUniformLocation("edgeColor"s) },
+        vertexAttributeLocation{ getAttributeLocation("vertex"s) }
     {
         glGenVertexArrays(1, &wingTransformVertexArray);
 

@@ -48,12 +48,12 @@ namespace silnith::wings::gl4
         /// </summary>
         GLuint wingTransformVertexArray{ 0 };
 
-        GLuint const vertexAttributeLocation{ 0 };
-
         GLint const radiusAngleUniformLocation{ 0 };
         GLint const rollPitchYawUniformLocation{ 0 };
         GLint const colorUniformLocation{ 0 };
         GLint const edgeColorUniformLocation{ 0 };
+
+        GLuint const vertexAttributeLocation{ 0 };
     };
 
 }

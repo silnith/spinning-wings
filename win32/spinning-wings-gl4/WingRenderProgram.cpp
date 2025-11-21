@@ -88,9 +88,9 @@ void main() {
         wingGeometry{ wingGeometry },
         modelViewProjectionUniformBuffer{ nullptr },
         vertexArray{ 0 },
+        deltaZUniformLocation{ getUniformLocation("deltaZ"s) },
         vertexAttributeLocation{ getAttributeLocation("vertex"s) },
-        colorAttributeLocation{ getAttributeLocation("color"s) },
-        deltaZUniformLocation{ getUniformLocation("deltaZ"s) }
+        colorAttributeLocation{ getAttributeLocation("color"s) }
     {
         glGenVertexArrays(1, &vertexArray);
 
