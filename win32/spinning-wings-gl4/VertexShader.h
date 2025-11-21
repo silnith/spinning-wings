@@ -28,16 +28,6 @@ namespace silnith::wings::gl4
         /// <summary>
         /// A convenience factory method for creating a vertex shader that
         /// provides the functionality that used to be provided by
-        /// <c>glRotate</c>.  Any vertex shader that wants to link against this
-        /// should include the function declaration contained in
-        /// <see cref="Shader::rotateMatrixFunctionDeclaration"/>.
-        /// </summary>
-        /// <returns>A vertex shader that can be linked into a program.</returns>
-        static std::shared_ptr<VertexShader const> MakeRotateMatrixShader(void);
-
-        /// <summary>
-        /// A convenience factory method for creating a vertex shader that
-        /// provides the functionality that used to be provided by
         /// <c>glTranslate</c>.  Any vertex shader that wants to link against this
         /// should include the function declaration contained in
         /// <see cref="Shader::translateMatrixFunctionDeclaration"/>.

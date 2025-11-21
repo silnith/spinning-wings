@@ -23,6 +23,8 @@
 #include "WingTransformProgram.h"
 #include "WingRenderProgram.h"
 
+#include "RotateVertexShader.h"
+
 #include "FragmentShader.h"
 #include "Program.h"
 #include "VertexShader.h"
@@ -88,9 +90,7 @@ namespace silnith::wings::gl4
 		 */
 		std::shared_ptr<WingGeometry const> wingGeometry{ std::make_shared<WingGeometry const>() };
 
-		std::shared_ptr<VertexShader const> rotateMatrixShader{
-			VertexShader::MakeRotateMatrixShader()
-		};
+		std::shared_ptr<RotateVertexShader const> rotateMatrixShader{ std::make_shared<RotateVertexShader const>() };
 		std::shared_ptr<VertexShader const> translateMatrixShader{
 			VertexShader::MakeTranslateMatrixShader()
 		};

@@ -9,6 +9,7 @@
 
 #include "WingGeometry.h"
 #include "WingTransformFeedback.h"
+#include "RotateVertexShader.h"
 #include "VertexShader.h"
 
 namespace silnith::wings::gl4
@@ -25,7 +26,7 @@ namespace silnith::wings::gl4
         WingTransformProgram(void) = delete;
 
         WingTransformProgram(std::shared_ptr<WingGeometry const> wingGeometry,
-            std::shared_ptr<VertexShader const> rotateMatrixShader,
+            std::shared_ptr<RotateVertexShader const> rotateMatrixShader,
             std::shared_ptr<VertexShader const> translateMatrixShader);
 
 #pragma region Rule of Five

@@ -43,18 +43,6 @@ namespace silnith::wings::gl4
         static std::string const versionDeclaration;
 
         /// <summary>
-        /// The GLSL function declaration for <c>rotate</c>, which returns a
-        /// transformation matrix that rotates around an axis.
-        /// </summary>
-        static std::string const rotateMatrixFunctionDeclaration;
-
-        /// <summary>
-        /// The GLSL function definition for <c>rotate</c>, which returns a
-        /// transformation matrix that rotates around an axis.
-        /// </summary>
-        static std::string const rotateMatrixFunctionDefinition;
-
-        /// <summary>
         /// The GLSL function declaration for <c>translate</c>, which returns a
         /// transformation matrix that translates.
         /// </summary>

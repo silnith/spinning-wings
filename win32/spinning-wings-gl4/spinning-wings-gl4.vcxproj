@@ -174,6 +174,7 @@
     <ClInclude Include="ModelViewProjectionUniformBuffer.h" />
     <ClInclude Include="Program.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="RotateVertexShader.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="TransformFeedback.h" />
     <ClInclude Include="VertexShader.h" />
@@ -191,6 +192,7 @@
     <ClCompile Include="FragmentShader.cpp" />
     <ClCompile Include="ModelViewProjectionUniformBuffer.cpp" />
     <ClCompile Include="Program.cpp" />
+    <ClCompile Include="RotateVertexShader.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SpinningWingsGL4.cpp" />
     <ClCompile Include="TransformFeedback.cpp" />

@@ -10,14 +10,6 @@
 namespace silnith::wings::gl4
 {
 
-    std::shared_ptr<VertexShader const> VertexShader::MakeRotateMatrixShader(void)
-    {
-        return std::make_shared<VertexShader const>(std::initializer_list<std::string>{
-            Shader::versionDeclaration,
-            Shader::rotateMatrixFunctionDefinition,
-        });
-    }
-
     std::shared_ptr<VertexShader const> VertexShader::MakeTranslateMatrixShader(void)
     {
         return std::make_shared<VertexShader const>(std::initializer_list<std::string>{
