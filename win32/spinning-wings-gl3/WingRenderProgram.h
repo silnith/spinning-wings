@@ -119,13 +119,11 @@ namespace silnith::wings::gl3
         /// <summary>
         /// The location of the vertex attribute <c>vertex</c>.
         /// </summary>
-        /// <seealso cref="TransformedVertexBuffer"/>
         GLuint vertexAttributeLocation{ 0 };
         
         /// <summary>
         /// The location of the vertex attribute <c>color</c>.
         /// </summary>
-        /// <seealso cref="TransformedColorBuffer"/>
         GLuint colorAttributeLocation{ 0 };
     };
 
