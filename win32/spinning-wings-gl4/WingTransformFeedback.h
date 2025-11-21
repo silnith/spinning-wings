@@ -21,6 +21,9 @@ namespace silnith::wings::gl4
     /// This is tied to the specifics of the wing transform feedback program
     /// used to capture and preserve the wing-specific transformations.
     /// </para>
+    /// <para>
+    /// This requires OpenGL 4.0 or higher.
+    /// </para>
     /// </remarks>
     class WingTransformFeedback : public TransformFeedback
     {
