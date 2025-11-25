@@ -32,7 +32,9 @@ namespace silnith::wings::gl4
         /// Uniform buffers use an indirection mechanism.  Rather than binding them directly,
         /// a shader program specifies an index into a set of binding points.
         /// The application can then update the uniform buffer bound to that index
-        /// independently of whichever shader program is active.
+        /// independently of whichever shader program is active.  Also, multiple
+        /// GLSL programs can bind the same buffer index even when their individual
+        /// locations for the uniform block differ.
         /// </para>
         /// <para>
         /// In this case, there is only one shader program and one uniform buffer.
