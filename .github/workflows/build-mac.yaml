@@ -67,7 +67,7 @@ jobs:
           name: ${{ matrix.configuration }}-15
           path: |
             /Users/runner/Library/Developer/Xcode/DerivedData/
-  build-14:
+  build-26:
     name: Build MacOS 26
     runs-on: macos-26
     strategy:
