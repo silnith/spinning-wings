@@ -29,42 +29,7 @@
 
 - (instancetype)init
 {
-    self = [super init];
-    
-    NSLog(@"%@:init", self);
-    
-    if (self) {
-        NSOpenGLPixelFormatAttribute attributes[] = {
-            NSOpenGLPFAColorSize, 24,
-            NSOpenGLPFADepthSize, 32,
-            NSOpenGLPFAAccelerated,
-            NSOpenGLPFADoubleBuffer,
-            NSOpenGLPFAMaximumPolicy,
-            NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersionLegacy,
-            NSOpenGLPFAAllowOfflineRenderers,
-            0,
-        };
-        NSOpenGLPixelFormat *format = [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes];
-        
-        _glView = [[KSRWingsView alloc] initWithFrame:NSZeroRect pixelFormat:format];
-        
-        if (_glView) {
-//            NSLog(@"%@:Found OpenGL pixel format:%@", self, format);
-        } else {
-            NSLog(@"%@:No OpenGL view.", self);
-            
-            return nil;
-        }
-        
-        [_glView setWantsBestResolutionOpenGLSurface:YES];
-        [_glView setWantsExtendedDynamicRangeOpenGLSurface:YES];
-        
-        [self addSubview:_glView];
-        
-        [self setAnimationTimeInterval:[WingsSaverView frameInterval]];
-    }
-    
-    return self;
+    return [self initWithFrame:NSZeroRect];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder
@@ -109,43 +74,7 @@
 
 - (instancetype)initWithFrame:(NSRect)frameRect
 {
-    self = [super initWithFrame:frameRect];
-    
-    NSLog(@"%@:initWithFrame:{%f, %f, %f, %f}",
-          self, frameRect.origin.x, frameRect.origin.y, frameRect.size.width, frameRect.size.height);
-    
-    if (self) {
-        NSOpenGLPixelFormatAttribute attributes[] = {
-            NSOpenGLPFAColorSize, 24,
-            NSOpenGLPFADepthSize, 32,
-            NSOpenGLPFAAccelerated,
-            NSOpenGLPFADoubleBuffer,
-            NSOpenGLPFAMaximumPolicy,
-            NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersionLegacy,
-            NSOpenGLPFAAllowOfflineRenderers,
-            0,
-        };
-        NSOpenGLPixelFormat *format = [[NSOpenGLPixelFormat alloc] initWithAttributes:attributes];
-        
-        _glView = [[KSRWingsView alloc] initWithFrame:frameRect pixelFormat:format];
-        
-        if (_glView) {
-//            NSLog(@"%@:Found OpenGL pixel format:%@", self, format);
-        } else {
-            NSLog(@"%@:No OpenGL view.", self);
-            
-            return nil;
-        }
-        
-        [_glView setWantsBestResolutionOpenGLSurface:YES];
-        [_glView setWantsExtendedDynamicRangeOpenGLSurface:YES];
-        
-        [self addSubview:_glView];
-        
-        [self setAnimationTimeInterval:[WingsSaverView frameInterval]];
-    }
-    
-    return self;
+    return [self initWithFrame:frameRect isPreview:NO];
 }
 
 - (instancetype)initWithFrame:(NSRect)frame isPreview:(BOOL)isPreview
