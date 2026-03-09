@@ -67,3 +67,29 @@ jobs:
           name: ${{ matrix.configuration }}-15
           path: |
             /Users/runner/Library/Developer/Xcode/DerivedData/
+  build-14:
+    name: Build MacOS 26
+    runs-on: macos-26
+    strategy:
+      matrix:
+#        architecture:
+#          - ppc
+#          - ppc64
+#          - i386
+#          - x86_64
+#          - arm
+#          - arm64
+        configuration:
+          - Debug
+          - Release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Build
+        run: xcodebuild -workspace ${{ inputs.workspace_file }} -scheme WingsSaver -configuration=${{ matrix.configuration }}
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.configuration }}-26
+          path: |
+            /Users/runner/Library/Developer/Xcode/DerivedData/
