@@ -3,6 +3,8 @@
 #include <Windows.h>
 #include <gl/GL.h>
 
+#include <string>
+
 namespace silnith::wings::gl
 {
     /// <summary>
@@ -28,7 +30,34 @@ namespace silnith::wings::gl
     class GLInfo
     {
     public:
+        /// <summary>
+        /// Queries the OpenGL context for version information.
+        /// </summary>
         GLInfo(void);
+
+        /// <summary>
+        /// Parses the given OpenGL version string.
+        /// This should come from a call to <c>glGetString(GL_VERSION)</c>.
+        /// </summary>
+        /// <param name="versionString">A version string.</param>
+        /// <seealso cref="glGetVersion"/>
+        GLInfo(GLubyte const* const versionString);
+
+        /// <summary>
+        /// Parses the given OpenGL version string.
+        /// This should come from a call to <c>glGetString(GL_VERSION)</c>.
+        /// </summary>
+        /// <param name="versionString">A version string.</param>
+        /// <seealso cref="glGetVersion"/>
+        GLInfo(char const* const versionString);
+
+        /// <summary>
+        /// Parses the given OpenGL version string.
+        /// This should come from a call to <c>glGetString(GL_VERSION)</c>.
+        /// </summary>
+        /// <param name="versionString">A version string.</param>
+        /// <seealso cref="glGetVersion"/>
+        GLInfo(std::string const& versionString);
 
 #pragma region Rule of Five
 
@@ -42,6 +71,20 @@ namespace silnith::wings::gl
 #pragma endregion
 
     public:
+        /// <summary>
+        /// Returns the major version of the OpenGL implementation.
+        /// </summary>
+        /// <returns>The OpenGL major version number.</returns>
+        /// <seealso cref="isAtLeastVersion"/>
+        GLuint getMajorVersion(void) const;
+
+        /// <summary>
+        /// Returns the minor version of the OpenGL implementation.
+        /// </summary>
+        /// <returns>The OpenGL minor version number.</returns>
+        /// <seealso cref="isAtLeastVersion"/>
+        GLuint getMinorVersion(void) const;
+
         /// <summary>
         /// Returns <see langword="true"/> if the OpenGL implementation is equal to or higher
         /// than the input version number.
