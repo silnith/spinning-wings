@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		376B7CF32F6369C500959793 /* KSRGLInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 376B7CF22F6369C500959793 /* KSRGLInfo.m */; };
+		376B7CF52F63725A00959793 /* KSRGLInfoTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 376B7CF42F63725A00959793 /* KSRGLInfoTest.m */; };
 		37E6EED72B3EC0B400E37BE9 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 37E6EED62B3EC0B400E37BE9 /* AppDelegate.m */; };
 		37E6EED92B3EC0B700E37BE9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37E6EED82B3EC0B700E37BE9 /* Assets.xcassets */; };
 		37E6EEDC2B3EC0B700E37BE9 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37E6EEDA2B3EC0B700E37BE9 /* MainMenu.xib */; };
@@ -38,6 +40,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		376B7CF12F6369C500959793 /* KSRGLInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KSRGLInfo.h; sourceTree = "<group>"; };
+		376B7CF22F6369C500959793 /* KSRGLInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KSRGLInfo.m; sourceTree = "<group>"; };
+		376B7CF42F63725A00959793 /* KSRGLInfoTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KSRGLInfoTest.m; sourceTree = "<group>"; };
 		37E6EED22B3EC0B400E37BE9 /* SpinningWings.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpinningWings.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		37E6EED52B3EC0B400E37BE9 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		37E6EED62B3EC0B400E37BE9 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -117,6 +122,8 @@
 				37E6EF0B2B3ECABC00E37BE9 /* KSRColor.m */,
 				37E6EF082B3ECABB00E37BE9 /* KSRCurveGenerator.h */,
 				37E6EF062B3ECABB00E37BE9 /* KSRCurveGenerator.m */,
+				376B7CF12F6369C500959793 /* KSRGLInfo.h */,
+				376B7CF22F6369C500959793 /* KSRGLInfo.m */,
 				37E6EF072B3ECABB00E37BE9 /* KSRWing.h */,
 				37E6EF092B3ECABB00E37BE9 /* KSRWing.m */,
 				37E6EF052B3ECABB00E37BE9 /* KSRWingsView.h */,
@@ -137,6 +144,7 @@
 			children = (
 				37E6EEE92B3EC0B700E37BE9 /* SpinningWingsTests.m */,
 				37E6EEEB2B3EC0B700E37BE9 /* Info.plist */,
+				376B7CF42F63725A00959793 /* KSRGLInfoTest.m */,
 			);
 			path = SpinningWingsTests;
 			sourceTree = "<group>";
@@ -287,6 +295,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				376B7CF32F6369C500959793 /* KSRGLInfo.m in Sources */,
 				37E6EF0F2B3ECABC00E37BE9 /* KSRWingsView.m in Sources */,
 				37E6EF0D2B3ECABC00E37BE9 /* KSRCurveGenerator.m in Sources */,
 				37E6EF0E2B3ECABC00E37BE9 /* KSRWing.m in Sources */,
@@ -301,6 +310,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				37E6EEEA2B3EC0B700E37BE9 /* SpinningWingsTests.m in Sources */,
+				376B7CF52F63725A00959793 /* KSRGLInfoTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -393,7 +403,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				VALID_ARCHS = "ppc ppc64 i386 x86_64 arm arm64";
 			};
