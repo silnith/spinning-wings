@@ -23,12 +23,14 @@ NS_ASSUME_NONNULL_BEGIN
  This should be in the range [0, 1].
  */
 @property (readonly) GLfloat red;
+
 /**
  The green component.
  
  This should be in the range [0, 1].
  */
 @property (readonly) GLfloat green;
+
 /**
  The blue component.
  

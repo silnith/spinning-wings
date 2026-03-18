@@ -21,25 +21,33 @@ NS_ASSUME_NONNULL_BEGIN
  The minimum allowed value for the curve.
  */
 @property (readonly) GLfloat minimumValue;
+
 /**
  The maximum allowed value for the curve.
  */
 @property (readonly) GLfloat maximumValue;
+
 @property (readonly) GLfloat valueRange;
+
 /**
  Whether curve values wrap between maximum and minimum when they overflow.
  */
 @property (readonly) bool valueWraps;
+
 @property (readonly) GLfloat minimumVelocity;
+
 /**
  The maximum rate at which the curve value is allowed to change.
  */
 @property (readonly) GLfloat maximumVelocity;
+
 @property (readonly) GLfloat minimumAcceleration;
+
 /**
  The maximum acceleration for curve changes.
  */
 @property (readonly) GLfloat maximumAcceleration;
+
 /**
  The number of curve values to return before changing the curve acceleration.
  */
@@ -49,14 +57,17 @@ NS_ASSUME_NONNULL_BEGIN
  The current value of the curve.
  */
 @property (readonly) GLfloat value;
+
 /**
  The current velocity of the curve.  This is the amount the curve value has changed since the last value.
  */
 @property (readonly) GLfloat velocity;
+
 /**
  The current acceleration of the curve.  This is the amount that the curve velocity has changed since the last curve value.
  */
 @property (readonly) GLfloat acceleration;
+
 /**
  The number of curve values retrieved since the last time the curve acceleration changed.
  */
