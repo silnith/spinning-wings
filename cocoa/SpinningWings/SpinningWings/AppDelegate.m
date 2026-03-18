@@ -13,6 +13,7 @@
 @interface AppDelegate ()
 
 @property (weak) IBOutlet NSWindow *window;
+@property (weak) IBOutlet KSRWingsView *wingsView;
 
 @property NSTimer * timer;
 
@@ -29,20 +30,11 @@
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    // TODO: Replace this with idiomatic IBOutlet stuff.
-    KSRWingsView * wingsView = nil;
-    
-    for (NSView * view in self.window.contentView.subviews) {
-        if ([view isKindOfClass:[KSRWingsView class]]) {
-            wingsView = (KSRWingsView *) view;
-        }
-    }
-    
     NSTimeInterval interval = [AppDelegate frameInterval];
     NSMethodSignature * methodSignature = [KSRWingsView instanceMethodSignatureForSelector:@selector(advanceAnimation)];
     NSInvocation * invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
     invocation.selector = @selector(advanceAnimation);
-    invocation.target = wingsView;
+    invocation.target = self.wingsView;
     self.timer = [NSTimer scheduledTimerWithTimeInterval:interval invocation:invocation repeats:YES];
 }
 
