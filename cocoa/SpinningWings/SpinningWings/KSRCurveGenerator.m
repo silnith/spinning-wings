@@ -94,6 +94,11 @@ ticksPerAccelerationChange:(unsigned int)ticksPerAccelerationChange {
                             maximumValue:self.maximumVelocity];
 }
 
+/**
+ Advances the tick count, which may or may not trigger a change in acceleration.
+ Then applies the current acceleration to the velocity,
+ and applies the current velocity to the current curve value.
+ */
 - (void)advanceTick {
     if (++self.ticks > self.ticksPerAccelerationChange) {
         self.acceleration = SSRandomFloatBetween(_minimumAcceleration, self.maximumAcceleration);
