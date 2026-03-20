@@ -228,6 +228,7 @@
 		37E6EECA2B3EC0B400E37BE9 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				CLASSPREFIX = KSR;
 				LastUpgradeCheck = 1010;
 				ORGANIZATIONNAME = Silnith.org;
 				TargetAttributes = {
