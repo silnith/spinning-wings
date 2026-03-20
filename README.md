@@ -46,7 +46,7 @@ polynomials.  If you view it versus this side-by-side, the difference is quite o
 
 # Current Version
 
-## Win32
+## Win32 (Windows)
 
 This version has been cleaned up and refactored from the original source code I wrote
 in school.  Most prominently it now uses the Win32 API rather than GLUT.  I also
@@ -101,8 +101,8 @@ The OpenGL 4.1 version makes use of some additional functionality associated wit
 the transform feedback feature to save additional state in graphics memory instead
 of passing it along each time the shaders are changed.
 
-## Cocoa
+## Cocoa (MacOS)
 
-The MacOS screensaver is written in Objective-C, because my understanding is that Apple
-has not made Swift safe to use for screensavers yet.  It tries to use the native display
+The MacOS screensaver is written in Objective-C, because versions of MacOS prior to 14.6
+cannot run screensavers written in Swift.  It tries to use the native display
 resolution and color range where possible, so it should take advantage of "retina displays".
