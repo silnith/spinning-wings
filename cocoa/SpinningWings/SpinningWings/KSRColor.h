@@ -14,6 +14,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  A simple RGB color value.
+ 
+ Values for the color components should be in the range [0.0, 1.0].
+ 
+ This could theoretically be replaced with NSColor.  However, NSColor
+ uses CGFloat for its components, which is equivalent to a GLdouble.
+ NSColor does have the advantage of having built-in support for color
+ spaces, but OpenGL is defined to perform all color calculations in a
+ linear color space, so supporting other color spaces is irrelevant.
  */
 @interface KSRColor : NSObject
 
