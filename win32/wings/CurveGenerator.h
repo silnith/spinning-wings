@@ -21,6 +21,11 @@ namespace silnith::wings
 		/// <summary>
 		/// Returns a CurveGenerator for angles.
 		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// The values will be in the range <c>[0, 360)</c>, and will wrap.
+		/// </para>
+		/// </remarks>
 		/// <param name="initialValue">the initial angle</param>
 		/// <param name="maximumVelocity">the maximum angle change per tick</param>
 		/// <param name="maximumAcceleration">the maximum acceleration</param>
@@ -35,8 +40,8 @@ namespace silnith::wings
 		/// <summary>
 		/// Returns a CurveGenerator for color component values.  In other words, red, green, or blue.
 		/// </summary>
-		/// <param name="initialValue">the initial color value</param>
-		/// <param name="maximumVelocity">the maximum color change per tick</param>
+		/// <param name="initialValue">the initial color (component) value</param>
+		/// <param name="maximumVelocity">the maximum color (component) change per tick</param>
 		/// <param name="maximumAcceleration">the maximum acceleration</param>
 		/// <param name="ticksPerAccelerationChange">the number of values to generate before the acceleration changes</param>
 		/// <returns>a CurveGenerator that returns values specific for color components</returns>
@@ -227,7 +232,7 @@ namespace silnith::wings
 		/// <summary>
 		/// Advances the tick count, which may or may not trigger a change in acceleration.
 		/// Then applies the current acceleration to the velocity,
-		/// and aplies the current velocity to the current curve value.
+		/// and applies the current velocity to the current curve value.
 		/// </summary>
 		void advanceTick(void)
 		{

@@ -43,6 +43,11 @@ namespace silnith::wings
 		/// <summary>
 		/// Returns the red component.
 		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// This should be in the range <c>[0, 1]</c>.
+		/// </para>
+		/// </remarks>
 		/// <returns>the red component</returns>
 		[[nodiscard]]
 		inline T getRed(void) const noexcept
@@ -53,6 +58,11 @@ namespace silnith::wings
 		/// <summary>
 		/// Returns the green component.
 		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// This should be in the range <c>[0, 1]</c>.
+		/// </para>
+		/// </remarks>
 		/// <returns>the green component</returns>
 		[[nodiscard]]
 		inline T getGreen(void) const noexcept
@@ -63,6 +73,11 @@ namespace silnith::wings
 		/// <summary>
 		/// Returns the blue component.
 		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// This should be in the range <c>[0, 1]</c>.
+		/// </para>
+		/// </remarks>
 		/// <returns>the blue component</returns>
 		[[nodiscard]]
 		inline T getBlue(void) const noexcept

@@ -75,7 +75,7 @@ namespace silnith::wings
 
 	public:
 		/// <summary>
-		/// Returns the OpenGL display list identifier that renders this wing.
+		/// Returns the identifier for the OpenGL display list that renders this wing.
 		/// </summary>
 		/// <returns>The OpenGL display list identifier.</returns>
 		[[nodiscard]]
@@ -112,6 +112,11 @@ namespace silnith::wings
 		/// <summary>
 		/// Returns the additional angle around the central axis that each subsequent wing should be rendered.
 		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// This is the angle between this wing and the previous wing.
+		/// </para>
+		/// </remarks>
 		/// <returns>The additional angle that the wing gains as it recedes into history.</returns>
 		[[nodiscard]]
 		inline T getDeltaAngle(void) const noexcept
