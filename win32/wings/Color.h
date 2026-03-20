@@ -8,6 +8,11 @@ namespace silnith::wings
 	/// <summary>
 	/// A simple RGB color value.
 	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// Values for color components should be in the range <c>[0.0, 1.0]</c>.
+	/// </para>
+	/// </remarks>
 	template<std::floating_point T>
 	class Color
 	{
