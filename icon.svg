@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11-flat.dtd">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="64, 64">
-	<polygon points="6,44 29,32 52,44 29,56" fill="rgb(100%, 0%, 0%)" stroke="white"/>
-	<polygon points="8,31 31,19 54,31 31,43" fill="rgb(0%, 0%, 100%)" stroke="white"/>
-	<polygon points="10,18 33,6 56,18 33,30" fill="rgb(0%, 100%, 0%)" stroke="white"/>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0,0 64,64" preserveAspectRatio="meet">
+	<polygon points="6,44 29,32 52,44 29,56" fill="red" stroke="white"/>
+	<polygon points="8,31 31,19 54,31 31,43" fill="blue" stroke="white"/>
+	<polygon points="10,18 33,6 56,18 33,30" fill="lime" stroke="white"/>
 </svg>
