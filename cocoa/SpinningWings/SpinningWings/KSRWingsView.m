@@ -11,7 +11,12 @@
 #import <OpenGL/gl.h>
 #import <OpenGL/glu.h>
 
+#import "KSRGLInfo.h"
+
 @interface KSRWingsView ()
+
+// TODO: Use DisplayLink for animation.
+// https://developer.apple.com/library/archive/documentation/GraphicsImaging/Conceptual/OpenGL-MacProgGuide/opengl_designstrategies/opengl_designstrategies.html
 
 @property NSArray<KSRWing *> * wingList;
 
@@ -26,8 +31,7 @@
 @property (readonly) KSRCurveGenerator * greenCurve;
 @property (readonly) KSRCurveGenerator * blueCurve;
 
-@property GLuint glMajorVersion;
-@property GLuint glMinorVersion;
+@property BOOL enablePolygonOffset;
 
 @property GLuint wingDisplayList;
 
@@ -96,8 +100,7 @@
                                                     maximumAcceleration:0.01
                                              ticksPerAccelerationChange:70];
         
-        _glMajorVersion = 1;
-        _glMinorVersion = 0;
+        _enablePolygonOffset = NO;
         
         _wingDisplayList = 0;
     }
@@ -166,8 +169,7 @@
                                                     maximumAcceleration:0.01
                                              ticksPerAccelerationChange:70];
         
-        _glMajorVersion = 1;
-        _glMinorVersion = 0;
+        _enablePolygonOffset = NO;
         
         _wingDisplayList = 0;
     }
@@ -236,8 +238,7 @@
                                                    maximumAcceleration:0.01
                                             ticksPerAccelerationChange:70];
         
-        _glMajorVersion = 1;
-        _glMinorVersion = 0;
+        _enablePolygonOffset = NO;
         
         _wingDisplayList = 0;
     }
@@ -245,41 +246,16 @@
     return self;
 }
 
-- (void)parseOpenGLVersion:(NSString *)versionString {
-    NSLog(@"%@:parseOpenGLVersion:%@",
-          self, versionString);
-    
-    NSScanner * scanner = [NSScanner scannerWithString:versionString];
-    scanner.charactersToBeSkipped = [NSCharacterSet characterSetWithCharactersInString:@""];
-    unsigned long long majorVersion;
-    if ([scanner scanUnsignedLongLong:&majorVersion]) {
-        self.glMajorVersion = [@(majorVersion) unsignedIntValue];
-        
-        scanner.charactersToBeSkipped = [NSCharacterSet characterSetWithCharactersInString:@"."];
-        unsigned long long minorVersion;
-        if ([scanner scanUnsignedLongLong:&minorVersion]) {
-            self.glMinorVersion = [@(minorVersion) unsignedIntValue];
-        }
-    }
-}
-
-- (BOOL)hasOpenGLVersionMajor:(GLuint)major minor:(GLuint)minor {
-    return (self.glMajorVersion > major) || (self.glMajorVersion == major && self.glMinorVersion >= minor);
-}
-
 - (void)prepareOpenGL {
     [super prepareOpenGL];
     
-    GLubyte const * const glVersion = glGetString(GL_VERSION);
-    [self parseOpenGLVersion:@((char const *)glVersion)];
-    
-    NSLog(@"%@:OpenGL Version:%u.%u",
-          self, self.glMajorVersion, self.glMinorVersion);
+    KSRGLInfo * info = [[KSRGLInfo alloc] init];
+    self.enablePolygonOffset = [info isAtLeastVersionMajor:1 Minor:1];
     
     glEnable(GL_DEPTH_TEST);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
-    if ([self hasOpenGLVersionMajor:1 minor:1]) {
+    
+    if (self.enablePolygonOffset) {
         glPolygonOffset(-0.5, -2.0);
         glEnable(GL_POLYGON_OFFSET_LINE);
 
@@ -392,7 +368,7 @@
     }
     glPopMatrix();
     
-    if ([self hasOpenGLVersionMajor:1 minor:1]) {
+    if (self.enablePolygonOffset) {
         glEnable(GL_BLEND);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glPushMatrix();
