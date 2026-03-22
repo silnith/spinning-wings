@@ -15,7 +15,7 @@ defaults:
     working-directory: cocoa
 
 jobs:
-  build-14-x86:
+  build-14-x64:
     name: Build MacOS 14 x64
     runs-on: macos-14-large
     strategy:
@@ -63,7 +63,7 @@ jobs:
           name: ${{ matrix.configuration }}-14-arm64
           path: |
             /Users/runner/Library/Developer/Xcode/DerivedData/
-  build-15-intel:
+  build-15-x64:
     name: Build MacOS 15 x64
     runs-on: macos-15-intel
     strategy:
@@ -109,7 +109,7 @@ jobs:
           name: ${{ matrix.configuration }}-15-arm64
           path: |
             /Users/runner/Library/Developer/Xcode/DerivedData/
-  build-26:
+  build-26-x64:
     name: Build MacOS 26 x64
     runs-on: macos-26-intel
     strategy:
@@ -132,7 +132,7 @@ jobs:
           name: ${{ matrix.configuration }}-26-x64
           path: |
             /Users/runner/Library/Developer/Xcode/DerivedData/
-  build-26:
+  build-26-arm64:
     name: Build MacOS 26 arm64
     runs-on: macos-26
     strategy:
