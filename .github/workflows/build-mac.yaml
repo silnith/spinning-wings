@@ -15,18 +15,36 @@ defaults:
     working-directory: cocoa
 
 jobs:
-  build-14:
-    name: Build MacOS 14
+  build-14-x86:
+    name: Build MacOS 14 x64
+    runs-on: macos-14-large
+    strategy:
+      matrix:
+        configuration:
+          - Debug
+          - Release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Build SpinningWings
+        run: xcodebuild -workspace ${{ inputs.workspace_file }} -scheme SpinningWings -configuration=${{ matrix.configuration }}
+      - name: List Destinations
+        run: xcodebuild test -workspace ${{ inputs.workspace_file }} -scheme SpinningWings -configuration=${{ matrix.configuration }} -showdestinations
+      - name: Test SpinningWings
+        run: xcodebuild test -workspace ${{ inputs.workspace_file }} -scheme SpinningWings -configuration=${{ matrix.configuration }} -destination 'platform=macOS,arch=x86_64'
+      - name: Build WingsSaver
+        run: xcodebuild -workspace ${{ inputs.workspace_file }} -scheme WingsSaver -configuration=${{ matrix.configuration }}
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.configuration }}-14-x64
+          path: |
+            /Users/runner/Library/Developer/Xcode/DerivedData/
+  build-14-arm64:
+    name: Build MacOS 14 arm64
     runs-on: macos-14
     strategy:
       matrix:
-#        architecture:
-#          - ppc
-#          - ppc64
-#          - i386
-#          - x86_64
-#          - arm
-#          - arm64
         configuration:
           - Debug
           - Release
@@ -36,27 +54,43 @@ jobs:
       - name: Build SpinningWings
         run: xcodebuild -workspace ${{ inputs.workspace_file }} -scheme SpinningWings -configuration=${{ matrix.configuration }}
       - name: Test SpinningWings
-        run: xcodebuild test -workspace ${{ inputs.workspace_file }} -scheme SpinningWings -configuration=${{ matrix.configuration }}
+        run: xcodebuild test -workspace ${{ inputs.workspace_file }} -scheme SpinningWings -configuration=${{ matrix.configuration }} -destination 'platform=macOS,arch=arm64'
       - name: Build WingsSaver
         run: xcodebuild -workspace ${{ inputs.workspace_file }} -scheme WingsSaver -configuration=${{ matrix.configuration }}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.configuration }}-14
+          name: ${{ matrix.configuration }}-14-arm64
           path: |
             /Users/runner/Library/Developer/Xcode/DerivedData/
-  build-15:
-    name: Build MacOS 15
+  build-15-intel:
+    name: Build MacOS 15 x64
+    runs-on: macos-15-intel
+    strategy:
+      matrix:
+        configuration:
+          - Debug
+          - Release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Build SpinningWings
+        run: xcodebuild -workspace ${{ inputs.workspace_file }} -scheme SpinningWings -configuration=${{ matrix.configuration }}
+      - name: Test SpinningWings
+        run: xcodebuild test -workspace ${{ inputs.workspace_file }} -scheme SpinningWings -configuration=${{ matrix.configuration }} -destination 'platform=macOS,arch=x86_64'
+      - name: Build WingsSaver
+        run: xcodebuild -workspace ${{ inputs.workspace_file }} -scheme WingsSaver -configuration=${{ matrix.configuration }}
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.configuration }}-15-x64
+          path: |
+            /Users/runner/Library/Developer/Xcode/DerivedData/
+  build-15-arm64:
+    name: Build MacOS 15 arm64
     runs-on: macos-15
     strategy:
       matrix:
-#        architecture:
-#          - ppc
-#          - ppc64
-#          - i386
-#          - x86_64
-#          - arm
-#          - arm64
         configuration:
           - Debug
           - Release
@@ -66,27 +100,20 @@ jobs:
       - name: Build SpinningWings
         run: xcodebuild -workspace ${{ inputs.workspace_file }} -scheme SpinningWings -configuration=${{ matrix.configuration }}
       - name: Test SpinningWings
-        run: xcodebuild test -workspace ${{ inputs.workspace_file }} -scheme SpinningWings -configuration=${{ matrix.configuration }}
+        run: xcodebuild test -workspace ${{ inputs.workspace_file }} -scheme SpinningWings -configuration=${{ matrix.configuration }} -destination 'platform=macOS,arch=arm64'
       - name: Build WingsSaver
         run: xcodebuild -workspace ${{ inputs.workspace_file }} -scheme WingsSaver -configuration=${{ matrix.configuration }}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.configuration }}-15
+          name: ${{ matrix.configuration }}-15-arm64
           path: |
             /Users/runner/Library/Developer/Xcode/DerivedData/
   build-26:
-    name: Build MacOS 26
-    runs-on: macos-26
+    name: Build MacOS 26 x64
+    runs-on: macos-26-intel
     strategy:
       matrix:
-#        architecture:
-#          - ppc
-#          - ppc64
-#          - i386
-#          - x86_64
-#          - arm
-#          - arm64
         configuration:
           - Debug
           - Release
@@ -96,12 +123,35 @@ jobs:
       - name: Build SpinningWings
         run: xcodebuild -workspace ${{ inputs.workspace_file }} -scheme SpinningWings -configuration=${{ matrix.configuration }}
       - name: Test SpinningWings
-        run: xcodebuild test -workspace ${{ inputs.workspace_file }} -scheme SpinningWings -configuration=${{ matrix.configuration }}
+        run: xcodebuild test -workspace ${{ inputs.workspace_file }} -scheme SpinningWings -configuration=${{ matrix.configuration }} -destination 'platform=macOS,arch=x86_64'
       - name: Build WingsSaver
         run: xcodebuild -workspace ${{ inputs.workspace_file }} -scheme WingsSaver -configuration=${{ matrix.configuration }}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.configuration }}-26
+          name: ${{ matrix.configuration }}-26-x64
+          path: |
+            /Users/runner/Library/Developer/Xcode/DerivedData/
+  build-26:
+    name: Build MacOS 26 arm64
+    runs-on: macos-26
+    strategy:
+      matrix:
+        configuration:
+          - Debug
+          - Release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Build SpinningWings
+        run: xcodebuild -workspace ${{ inputs.workspace_file }} -scheme SpinningWings -configuration=${{ matrix.configuration }}
+      - name: Test SpinningWings
+        run: xcodebuild test -workspace ${{ inputs.workspace_file }} -scheme SpinningWings -configuration=${{ matrix.configuration }} -destination 'platform=macOS,arch=arm64'
+      - name: Build WingsSaver
+        run: xcodebuild -workspace ${{ inputs.workspace_file }} -scheme WingsSaver -configuration=${{ matrix.configuration }}
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.configuration }}-26-arm64
           path: |
             /Users/runner/Library/Developer/Xcode/DerivedData/
