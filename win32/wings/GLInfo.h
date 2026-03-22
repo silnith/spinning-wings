@@ -40,7 +40,6 @@ namespace silnith::wings::gl
         /// This should come from a call to <c>glGetString(GL_VERSION)</c>.
         /// </summary>
         /// <param name="versionString">A version string.</param>
-        /// <seealso cref="glGetVersion"/>
         GLInfo(GLubyte const* const versionString);
 
         /// <summary>
@@ -48,7 +47,6 @@ namespace silnith::wings::gl
         /// This should come from a call to <c>glGetString(GL_VERSION)</c>.
         /// </summary>
         /// <param name="versionString">A version string.</param>
-        /// <seealso cref="glGetVersion"/>
         GLInfo(char const* const versionString);
 
         /// <summary>
@@ -56,7 +54,6 @@ namespace silnith::wings::gl
         /// This should come from a call to <c>glGetString(GL_VERSION)</c>.
         /// </summary>
         /// <param name="versionString">A version string.</param>
-        /// <seealso cref="glGetVersion"/>
         GLInfo(std::string const& versionString);
 
 #pragma region Rule of Five
