@@ -32,6 +32,7 @@
 		370091582B182BFD001D9D78 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		37B70DB32F6DE93F00723BC9 /* thumbnail@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "thumbnail@2x.png"; sourceTree = "<group>"; };
 		37B70DB42F6DE93F00723BC9 /* thumbnail.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = thumbnail.png; sourceTree = "<group>"; };
+		37B70DB72F6FAE2300723BC9 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		37E0E5472B19735800B405A0 /* KSRWingsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KSRWingsView.h; sourceTree = "<group>"; };
 		37E0E5482B19735800B405A0 /* KSRWingsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KSRWingsView.m; sourceTree = "<group>"; };
 		37E3BAE62B201D970029E50A /* KSRWing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KSRWing.m; sourceTree = "<group>"; };
@@ -75,6 +76,7 @@
 		370091392B1737F5001D9D78 /* WingsSaver */ = {
 			isa = PBXGroup;
 			children = (
+				37B70DB72F6FAE2300723BC9 /* README.md */,
 				37B70DB42F6DE93F00723BC9 /* thumbnail.png */,
 				37B70DB32F6DE93F00723BC9 /* thumbnail@2x.png */,
 				3700913E2B1737F5001D9D78 /* Info.plist */,
