@@ -47,9 +47,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.1
-        with:
-          msbuild-architecture: x64
+        uses: microsoft/setup-msbuild@v3
       - name: Download Packages Artifact
         uses: actions/download-artifact@v8
         with:
