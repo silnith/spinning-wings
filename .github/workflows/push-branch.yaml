@@ -14,9 +14,88 @@ jobs:
     with:
       workspace_file: Wings.xcworkspace
     secrets: inherit
-  call-build-windows:
-    name: Windows Build
-    uses: ./.github/workflows/build-windows.yaml
+
+  get-date:
+    name: Date
+    uses: silnith/github-workflows/.github/workflows/bash-get-date.yaml@main
+  nuget-cache:
+    name: NuGet Cache
+    permissions:
+      contents: read
+      packages: read
+    needs:
+      - get-date
+    uses: silnith/github-workflows/.github/workflows/nuget-cache-dependencies.yaml@main
     with:
-      solution_file: spinning-wings.sln
+      directory: win32
+      solution-file: spinning-wings.sln
+      year: ${{ needs.get-date.outputs.year }}
+      month: ${{ needs.get-date.outputs.month }}
+      day: ${{ needs.get-date.outputs.day }}
+    secrets: inherit
+  msbuild-intel:
+    name: C++ Intel
+    permissions:
+      contents: read
+      packages: read
+    needs:
+      - get-date
+      - nuget-cache
+    strategy:
+      matrix:
+        platform:
+          - x86
+          - x64
+        configuration:
+          - Debug
+          - Release
+    uses: silnith/github-workflows/.github/workflows/msbuild-intel.yaml@main
+    with:
+      directory: win32
+      solution-file: spinning-wings.sln
+      platform: ${{ matrix.platform }}
+      configuration: ${{ matrix.configuration }}
+      year: ${{ needs.get-date.outputs.year }}
+      month: ${{ needs.get-date.outputs.month }}
+      day: ${{ needs.get-date.outputs.day }}
+    secrets: inherit
+#  msbuild-arm:
+#    name: C++ ARM
+#    permissions:
+#      contents: read
+#      packages: read
+#    needs:
+#      - get-date
+#      - nuget-cache
+#    strategy:
+#      matrix:
+#        platform:
+#          - ARM
+#          - ARM64
+#        configuration:
+#          - Debug
+#          - Release
+#    uses: silnith/github-workflows/.github/workflows/msbuild-arm.yaml@main
+#    with:
+#      directory: win32
+#      solution-file: spinning-wings.sln
+#      platform: ${{ matrix.platform }}
+#      configuration: ${{ matrix.configuration }}
+#      year: ${{ needs.get-date.outputs.year }}
+#      month: ${{ needs.get-date.outputs.month }}
+#      day: ${{ needs.get-date.outputs.day }}
+#    secrets: inherit
+  vstest-results:
+    name: Publish VSTest Results
+    permissions:
+      checks: write
+    needs:
+      - msbuild-intel
+#      - msbuild-arm
+    uses: silnith/github-workflows/.github/workflows/publish-test-results.yaml@main
+    with:
+      check-name: C++ Test Results
+      artifact-pattern: msbuild-vstest-*
+      artifact-path: win32
+      test-result-files: "**/TestResults/**/*.trx"
     secrets: inherit
