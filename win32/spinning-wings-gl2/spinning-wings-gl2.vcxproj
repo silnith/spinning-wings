@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.Windows.SDK.CPP.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.props" Condition="Exists('..\packages\Microsoft.Windows.SDK.CPP.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|ARM">
       <Configuration>Debug</Configuration>
@@ -343,11 +344,14 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\glew.v140.1.12.0\build\native\glew.v140.targets" Condition="Exists('..\packages\glew.v140.1.12.0\build\native\glew.v140.targets')" />
+    <Import Project="..\packages\Microsoft.Windows.SDK.CPP.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.targets" Condition="Exists('..\packages\Microsoft.Windows.SDK.CPP.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\glew.v140.1.12.0\build\native\glew.v140.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\glew.v140.1.12.0\build\native\glew.v140.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Windows.SDK.CPP.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.SDK.CPP.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Windows.SDK.CPP.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.SDK.CPP.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.targets'))" />
   </Target>
 </Project>
