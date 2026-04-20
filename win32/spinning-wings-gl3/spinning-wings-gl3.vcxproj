@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\glew.static.2.3.1\build\native\glew.static.props" Condition="Exists('..\packages\glew.static.2.3.1\build\native\glew.static.props')" />
   <Import Project="..\packages\Microsoft.Windows.SDK.CPP.arm.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.arm.props" Condition="Exists('..\packages\Microsoft.Windows.SDK.CPP.arm.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.arm.props')" />
   <Import Project="..\packages\Microsoft.Windows.SDK.CPP.x86.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.x86.props" Condition="Exists('..\packages\Microsoft.Windows.SDK.CPP.x86.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.x86.props')" />
   <Import Project="..\packages\Microsoft.Windows.SDK.CPP.arm64.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.arm64.props" Condition="Exists('..\packages\Microsoft.Windows.SDK.CPP.arm64.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.arm64.props')" />
@@ -359,6 +360,7 @@
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\glm.1.0.3\build\native\glm.targets" Condition="Exists('..\packages\glm.1.0.3\build\native\glm.targets')" />
     <Import Project="..\packages\Microsoft.Windows.SDK.CPP.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.targets" Condition="Exists('..\packages\Microsoft.Windows.SDK.CPP.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.targets')" />
+    <Import Project="..\packages\glew.static.2.3.1\build\native\glew.static.targets" Condition="Exists('..\packages\glew.static.2.3.1\build\native\glew.static.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -371,5 +373,7 @@
     <Error Condition="!Exists('..\packages\Microsoft.Windows.SDK.CPP.arm64.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.arm64.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.SDK.CPP.arm64.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.arm64.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Windows.SDK.CPP.x86.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.x86.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.SDK.CPP.x86.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.x86.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Windows.SDK.CPP.arm.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.arm.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.SDK.CPP.arm.10.0.22000.196\build\native\Microsoft.Windows.SDK.cpp.arm.props'))" />
+    <Error Condition="!Exists('..\packages\glew.static.2.3.1\build\native\glew.static.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\glew.static.2.3.1\build\native\glew.static.props'))" />
+    <Error Condition="!Exists('..\packages\glew.static.2.3.1\build\native\glew.static.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\glew.static.2.3.1\build\native\glew.static.targets'))" />
   </Target>
 </Project>
