@@ -62,7 +62,7 @@ ID_APP                  ICON                    "wings.ico"
 
 STRINGTABLE
 BEGIN
-    IDS_DESCRIPTION         "A graphics hack of spinning wings."
+    IDS_DESCRIPTION         "Spinning Wings"
 END
 
 #endif    // English (United States) resources
