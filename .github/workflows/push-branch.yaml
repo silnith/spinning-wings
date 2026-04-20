@@ -88,6 +88,8 @@ jobs:
   vstest-results:
     name: Publish VSTest Results
     permissions:
+      contents: read
+      issues: read
       checks: write
     needs:
       - msbuild-intel
